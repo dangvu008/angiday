@@ -1,5 +1,5 @@
-
 import { useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,6 +9,7 @@ import { Calendar, Users, DollarSign, Heart, Clock, ChefHat } from 'lucide-react
 
 const MealPlanDetailPage = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
 
   // Mock data for the meal plan details - in real app this would come from API
   const mealPlan = {
@@ -75,6 +76,23 @@ const MealPlanDetailPage = () => {
         dinner: "Lẩu cá + Bánh tráng nướng"
       }
     ]
+  };
+
+  const getDayParam = (day: string) => {
+    const dayMap: { [key: string]: string } = {
+      "Thứ 2": "monday",
+      "Thứ 3": "tuesday", 
+      "Thứ 4": "wednesday",
+      "Thứ 5": "thursday",
+      "Thứ 6": "friday",
+      "Thứ 7": "saturday",
+      "Chủ nhật": "sunday"
+    };
+    return dayMap[day] || day;
+  };
+
+  const handleMealClick = (day: string, mealType: 'breakfast' | 'lunch' | 'dinner') => {
+    navigate(`/meal-plans/${id}/${getDayParam(day)}/${mealType}`);
   };
 
   return (
@@ -177,15 +195,30 @@ const MealPlanDetailPage = () => {
                       <div className="space-y-3">
                         <div>
                           <h4 className="font-medium text-gray-900 mb-1">🌅 Sáng</h4>
-                          <p className="text-gray-600">{day.breakfast}</p>
+                          <p 
+                            className="text-gray-600 hover:text-orange-600 cursor-pointer hover:underline"
+                            onClick={() => handleMealClick(day.day, 'breakfast')}
+                          >
+                            {day.breakfast}
+                          </p>
                         </div>
                         <div>
                           <h4 className="font-medium text-gray-900 mb-1">☀️ Trưa</h4>
-                          <p className="text-gray-600">{day.lunch}</p>
+                          <p 
+                            className="text-gray-600 hover:text-orange-600 cursor-pointer hover:underline"
+                            onClick={() => handleMealClick(day.day, 'lunch')}
+                          >
+                            {day.lunch}
+                          </p>
                         </div>
                         <div>
                           <h4 className="font-medium text-gray-900 mb-1">🌙 Tối</h4>
-                          <p className="text-gray-600">{day.dinner}</p>
+                          <p 
+                            className="text-gray-600 hover:text-orange-600 cursor-pointer hover:underline"
+                            onClick={() => handleMealClick(day.day, 'dinner')}
+                          >
+                            {day.dinner}
+                          </p>
                         </div>
                       </div>
                     </CardContent>

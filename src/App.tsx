@@ -11,6 +11,7 @@ import RecipesPage from "./pages/RecipesPage";
 import RecipeDetailPage from "./pages/RecipeDetailPage";
 import MealPlansPage from "./pages/MealPlansPage";
 import MealPlanDetailPage from "./pages/MealPlanDetailPage";
+import MealDetailPage from "./pages/MealDetailPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import MyRecipesPage from "./pages/MyRecipesPage";
@@ -32,6 +33,7 @@ const App = () => (
           <Route path="/recipes/:id" element={<RecipeDetailPage />} />
           <Route path="/meal-plans" element={<MealPlansPage />} />
           <Route path="/meal-plans/:id" element={<MealPlanDetailPage />} />
+          <Route path="/meal-plans/:planId/:day/:mealType" element={<MealDetailPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/my-recipes" element={<MyRecipesPage />} />
