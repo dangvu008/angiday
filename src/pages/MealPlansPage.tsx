@@ -1,12 +1,14 @@
-
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Calendar, Users, DollarSign, Heart } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const MealPlansPage = () => {
+  const navigate = useNavigate();
+
   const mealPlans = [
     {
       id: 1,
@@ -128,7 +130,11 @@ const MealPlansPage = () => {
           <div className="max-w-6xl mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {mealPlans.map((plan) => (
-                <Card key={plan.id} className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer">
+                <Card 
+                  key={plan.id} 
+                  className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+                  onClick={() => navigate(`/meal-plans/${plan.id}`)}
+                >
                   <div className="aspect-video overflow-hidden relative">
                     <img 
                       src={plan.image} 
@@ -178,7 +184,13 @@ const MealPlansPage = () => {
                         </Badge>
                       ))}
                     </div>
-                    <Button className="w-full bg-green-600 hover:bg-green-700">
+                    <Button 
+                      className="w-full bg-green-600 hover:bg-green-700"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/meal-plans/${plan.id}`);
+                      }}
+                    >
                       Sử dụng thực đơn
                     </Button>
                   </CardContent>

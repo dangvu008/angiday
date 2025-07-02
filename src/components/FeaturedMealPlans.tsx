@@ -1,9 +1,11 @@
-
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Calendar } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const FeaturedMealPlans = () => {
+  const navigate = useNavigate();
+
   const featuredPlans = [
     {
       id: 1,
@@ -103,8 +105,7 @@ const FeaturedMealPlans = () => {
                 <Button 
                   className="w-full bg-orange-600 hover:bg-orange-700 text-white"
                   onClick={() => {
-                    // Sẽ hiển thị popup đăng nhập nếu chưa đăng nhập
-                    console.log(`Xem chi tiết thực đơn: ${plan.title}`);
+                    navigate(`/meal-plans/${plan.id}`);
                   }}
                 >
                   Xem chi tiết
@@ -115,7 +116,12 @@ const FeaturedMealPlans = () => {
         </div>
 
         <div className="text-center mt-8">
-          <Button variant="outline" size="lg" className="border-orange-600 text-orange-600 hover:bg-orange-50">
+          <Button 
+            variant="outline" 
+            size="lg" 
+            className="border-orange-600 text-orange-600 hover:bg-orange-50"
+            onClick={() => navigate('/meal-plans')}
+          >
             Xem tất cả thực đơn
           </Button>
         </div>
