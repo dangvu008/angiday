@@ -2,8 +2,11 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Calendar, User } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const BlogSection = () => {
+  const navigate = useNavigate();
+
   const articles = [
     {
       id: 1,
@@ -51,7 +54,8 @@ const BlogSection = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {articles.map((article) => (
-            <Card key={article.id} className="group hover:shadow-lg transition-all duration-300 bg-white overflow-hidden">
+            <Card key={article.id} className="group hover:shadow-lg transition-all duration-300 bg-white overflow-hidden cursor-pointer"
+                  onClick={() => navigate(`/blog/${article.id}`)}>
               <CardHeader className="p-0">
                 <div className="aspect-video bg-gradient-to-br from-green-100 to-orange-100 relative overflow-hidden">
                   <img 
@@ -94,6 +98,10 @@ const BlogSection = () => {
                     variant="ghost" 
                     size="sm"
                     className="text-green-600 hover:text-green-700 hover:bg-green-50 p-0 h-auto font-medium"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/blog/${article.id}`);
+                    }}
                   >
                     Đọc thêm →
                   </Button>
@@ -104,7 +112,12 @@ const BlogSection = () => {
         </div>
 
         <div className="text-center mt-8">
-          <Button variant="outline" size="lg" className="border-green-600 text-green-600 hover:bg-green-50">
+          <Button 
+            variant="outline" 
+            size="lg" 
+            className="border-green-600 text-green-600 hover:bg-green-50"
+            onClick={() => navigate('/blog')}
+          >
             Xem tất cả bài viết
           </Button>
         </div>

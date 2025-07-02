@@ -2,8 +2,11 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Clock, User } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const PopularRecipes = () => {
+  const navigate = useNavigate();
+
   const recipes = [
     {
       id: 1,
@@ -69,7 +72,8 @@ const PopularRecipes = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {recipes.map((recipe) => (
-            <Card key={recipe.id} className="group hover:shadow-lg transition-all duration-300 overflow-hidden">
+            <Card key={recipe.id} className="group hover:shadow-lg transition-all duration-300 overflow-hidden cursor-pointer"
+                  onClick={() => navigate(`/recipes/${recipe.id}`)}>
               <CardHeader className="p-0">
                 <div className="aspect-square bg-gradient-to-br from-orange-100 to-yellow-100 relative overflow-hidden">
                   <img 
@@ -116,8 +120,9 @@ const PopularRecipes = () => {
 
                 <Button 
                   className="w-full bg-orange-600 hover:bg-orange-700 text-white text-sm"
-                  onClick={() => {
-                    console.log(`Xem công thức: ${recipe.title}`);
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate(`/recipes/${recipe.id}`);
                   }}
                 >
                   Xem công thức
@@ -128,7 +133,12 @@ const PopularRecipes = () => {
         </div>
 
         <div className="text-center mt-8">
-          <Button variant="outline" size="lg" className="border-orange-600 text-orange-600 hover:bg-orange-50">
+          <Button 
+            variant="outline" 
+            size="lg" 
+            className="border-orange-600 text-orange-600 hover:bg-orange-50"
+            onClick={() => navigate('/recipes')}
+          >
             Khám phá thêm công thức
           </Button>
         </div>

@@ -4,8 +4,11 @@ import Footer from '@/components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Clock, Eye } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const BlogPage = () => {
+  const navigate = useNavigate();
+
   const blogPosts = [
     {
       id: 1,
@@ -89,7 +92,8 @@ const BlogPage = () => {
           <div className="max-w-6xl mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {blogPosts.map((post) => (
-                <Card key={post.id} className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer">
+                <Card key={post.id} className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+                      onClick={() => navigate(`/blog/${post.id}`)}>
                   <div className="aspect-video overflow-hidden">
                     <img 
                       src={post.image} 
