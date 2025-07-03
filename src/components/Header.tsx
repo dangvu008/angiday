@@ -35,12 +35,16 @@ const Header = () => {
 
           {/* User Actions */}
           <div className="hidden md:flex items-center space-x-4">
-            <Button variant="ghost" className="text-gray-700 hover:text-orange-600">
-              <User className="h-4 w-4 mr-2" />
-              Đăng nhập
+            <Button variant="ghost" className="text-gray-700 hover:text-orange-600" asChild>
+              <Link to="/login">
+                <User className="h-4 w-4 mr-2" />
+                Đăng nhập
+              </Link>
             </Button>
-            <Button className="bg-orange-600 hover:bg-orange-700 text-white">
-              Đăng ký
+            <Button className="bg-orange-600 hover:bg-orange-700 text-white" asChild>
+              <Link to="/register">
+                Đăng ký
+              </Link>
             </Button>
           </div>
 
@@ -73,12 +77,16 @@ const Header = () => {
                 Thực đơn mẫu
               </Link>
               <div className="flex flex-col space-y-2 px-2 pt-4 border-t">
-                <Button variant="ghost" className="justify-start text-gray-700 hover:text-orange-600">
-                  <User className="h-4 w-4 mr-2" />
-                  Đăng nhập
+                <Button variant="ghost" className="justify-start text-gray-700 hover:text-orange-600" asChild>
+                  <Link to="/login">
+                    <User className="h-4 w-4 mr-2" />
+                    Đăng nhập
+                  </Link>
                 </Button>
-                <Button className="bg-orange-600 hover:bg-orange-700 text-white">
-                  Đăng ký
+                <Button className="bg-orange-600 hover:bg-orange-700 text-white" asChild>
+                  <Link to="/register">
+                    Đăng ký
+                  </Link>
                 </Button>
               </div>
             </nav>
