@@ -1,4 +1,3 @@
-
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Calendar, User } from 'lucide-react';
@@ -7,17 +6,18 @@ import { useNavigate } from 'react-router-dom';
 const BlogSection = () => {
   const navigate = useNavigate();
 
-  const articles = [
-    {
-      id: 1,
-      title: "5 Mẹo chọn rau củ tươi ngon tại chợ",
-      excerpt: "Học cách nhận biết rau củ tươi ngon qua màu sắc, mùi vị và cảm giác khi chạm vào...",
-      image: "/placeholder.svg",
-      author: "Chef Minh",
-      date: "2024-01-15",
-      category: "Mẹo vặt",
-      readTime: "3 phút đọc"
-    },
+  const featuredArticle = {
+    id: 1,
+    title: "5 Mẹo chọn rau củ tươi ngon tại chợ",
+    excerpt: "Học cách nhận biết rau củ tươi ngon qua màu sắc, mùi vị và cảm giác khi chạm vào. Những bí quyết từ các bà mẹ dày dạn kinh nghiệm sẽ giúp bạn chọn được những nguyên liệu tốt nhất cho gia đình.",
+    image: "/placeholder.svg",
+    author: "Chef Minh",
+    date: "2024-01-15",
+    category: "Mẹo vặt",
+    readTime: "3 phút đọc"
+  };
+
+  const otherArticles = [
     {
       id: 2,
       title: "Tìm hiểu về gia vị ẩm thực Thái Lan",
@@ -37,6 +37,26 @@ const BlogSection = () => {
       date: "2024-01-10",
       category: "Mẹo vặt",
       readTime: "4 phút đọc"
+    },
+    {
+      id: 4,
+      title: "Bí quyết làm nước mắm chấm hoàn hảo",
+      excerpt: "Cách pha chế nước mắm chấm cân bằng vị ngọt, chua, cay, mặn...",
+      image: "/placeholder.svg",
+      author: "Chef Tâm",
+      date: "2024-01-08",
+      category: "Mẹo vặt",
+      readTime: "2 phút đọc"
+    },
+    {
+      id: 5,
+      title: "Xu hướng ẩm thực Việt hiện đại",
+      excerpt: "Cách các chef Việt Nam hiện đại hóa món ăn truyền thống...",
+      image: "/placeholder.svg",
+      author: "Chef Dương",
+      date: "2024-01-05",
+      category: "Tin tức",
+      readTime: "6 phút đọc"
     }
   ];
 
@@ -52,55 +72,55 @@ const BlogSection = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {articles.map((article) => (
-            <Card key={article.id} className="group hover:shadow-lg transition-all duration-300 bg-white overflow-hidden cursor-pointer"
-                  onClick={() => navigate(`/blog/${article.id}`)}>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Featured Article - Left Side */}
+          <div className="lg:col-span-2">
+            <Card className="group hover:shadow-lg transition-all duration-300 bg-white overflow-hidden cursor-pointer h-full"
+                  onClick={() => navigate(`/blog/${featuredArticle.id}`)}>
               <CardHeader className="p-0">
-                <div className="aspect-video bg-gradient-to-br from-green-100 to-orange-100 relative overflow-hidden">
+                <div className="aspect-[16/10] bg-gradient-to-br from-green-100 to-orange-100 relative overflow-hidden">
                   <img 
-                    src={article.image} 
-                    alt={article.title}
+                    src={featuredArticle.image} 
+                    alt={featuredArticle.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
-                  <div className="absolute top-4 left-4">
-                    <span className="bg-green-600 text-white px-3 py-1 rounded-full text-xs font-medium">
-                      {article.category}
+                  <div className="absolute top-6 left-6">
+                    <span className="bg-green-600 text-white px-4 py-2 rounded-full text-sm font-medium">
+                      {featuredArticle.category}
                     </span>
+                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                  <div className="absolute bottom-6 left-6 right-6 text-white">
+                    <h3 className="text-2xl md:text-3xl font-bold mb-3 group-hover:text-green-300 transition-colors">
+                      {featuredArticle.title}
+                    </h3>
+                    <div className="flex items-center space-x-4 text-sm">
+                      <span className="flex items-center">
+                        <User className="h-4 w-4 mr-1" />
+                        {featuredArticle.author}
+                      </span>
+                      <span className="flex items-center">
+                        <Calendar className="h-4 w-4 mr-1" />
+                        {new Date(featuredArticle.date).toLocaleDateString('vi-VN')}
+                      </span>
+                      <span>{featuredArticle.readTime}</span>
+                    </div>
                   </div>
                 </div>
               </CardHeader>
 
               <CardContent className="p-6">
-                <h3 className="text-xl font-semibold text-gray-900 mb-3 group-hover:text-green-600 transition-colors line-clamp-2">
-                  {article.title}
-                </h3>
-                <p className="text-gray-600 mb-4 line-clamp-3">
-                  {article.excerpt}
+                <p className="text-gray-600 text-lg leading-relaxed">
+                  {featuredArticle.excerpt}
                 </p>
                 
-                <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
-                  <div className="flex items-center space-x-4">
-                    <span className="flex items-center">
-                      <User className="h-4 w-4 mr-1" />
-                      {article.author}
-                    </span>
-                    <span className="flex items-center">
-                      <Calendar className="h-4 w-4 mr-1" />
-                      {new Date(article.date).toLocaleDateString('vi-VN')}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-gray-500">{article.readTime}</span>
+                <div className="flex items-center justify-between mt-6">
                   <Button 
                     variant="ghost" 
-                    size="sm"
-                    className="text-green-600 hover:text-green-700 hover:bg-green-50 p-0 h-auto font-medium"
+                    className="text-green-600 hover:text-green-700 hover:bg-green-50 p-0 h-auto font-medium text-lg"
                     onClick={(e) => {
                       e.stopPropagation();
-                      navigate(`/blog/${article.id}`);
+                      navigate(`/blog/${featuredArticle.id}`);
                     }}
                   >
                     Đọc thêm →
@@ -108,10 +128,52 @@ const BlogSection = () => {
                 </div>
               </CardContent>
             </Card>
-          ))}
+          </div>
+
+          {/* Other Articles - Right Side Grid */}
+          <div className="space-y-6">
+            {otherArticles.map((article) => (
+              <Card key={article.id} className="group hover:shadow-lg transition-all duration-300 bg-white overflow-hidden cursor-pointer"
+                    onClick={() => navigate(`/blog/${article.id}`)}>
+                <div className="flex">
+                  <div className="w-24 h-24 flex-shrink-0">
+                    <div className="w-full h-full bg-gradient-to-br from-green-100 to-orange-100 relative overflow-hidden">
+                      <img 
+                        src={article.image} 
+                        alt={article.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    </div>
+                  </div>
+                  
+                  <CardContent className="flex-1 p-4">
+                    <div className="mb-2">
+                      <span className="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-medium">
+                        {article.category}
+                      </span>
+                    </div>
+                    <h3 className="text-sm font-semibold text-gray-900 mb-2 group-hover:text-green-600 transition-colors line-clamp-2">
+                      {article.title}
+                    </h3>
+                    <p className="text-gray-600 text-xs mb-2 line-clamp-2">
+                      {article.excerpt}
+                    </p>
+                    
+                    <div className="flex items-center justify-between text-xs text-gray-500">
+                      <span className="flex items-center">
+                        <User className="h-3 w-3 mr-1" />
+                        {article.author}
+                      </span>
+                      <span>{article.readTime}</span>
+                    </div>
+                  </CardContent>
+                </div>
+              </Card>
+            ))}
+          </div>
         </div>
 
-        <div className="text-center mt-8">
+        <div className="text-center mt-12">
           <Button 
             variant="outline" 
             size="lg" 

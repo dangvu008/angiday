@@ -2,8 +2,8 @@
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import HeroSection from '@/components/HeroSection';
-import FeaturedMealPlans from '@/components/FeaturedMealPlans';
-import PopularRecipes from '@/components/PopularRecipes';
+import FeaturedMealPlansGrid from '@/components/FeaturedMealPlansGrid';
+import PopularRecipesGrid from '@/components/PopularRecipesGrid';
 import BlogSection from '@/components/BlogSection';
 import CallToAction from '@/components/CallToAction';
 
@@ -13,8 +13,8 @@ const Index = () => {
       <Header />
       <main>
         <HeroSection />
-        <FeaturedMealPlans />
-        <PopularRecipes />
+        <FeaturedMealPlansGrid />
+        <PopularRecipesGrid />
         <BlogSection />
         <CallToAction />
       </main>
