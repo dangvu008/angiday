@@ -11,7 +11,21 @@ const MealPlanDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  // Mock data for the meal plan details - in real app this would come from API
+  // Mock authentication check - in real app this would come from auth context
+  const isLoggedIn = false; // This would come from your auth state
+
+  const handleApplyMealPlan = () => {
+    if (!isLoggedIn) {
+      // Redirect to login page if not logged in
+      navigate('/login');
+      return;
+    }
+    
+    // Handle meal plan application logic here
+    console.log('Applying meal plan...');
+    // You can add toast notification or other feedback here
+  };
+
   const mealPlan = {
     id: parseInt(id || '1'),
     title: "Thực đơn 7 ngày cho bà bầu",
@@ -261,7 +275,10 @@ const MealPlanDetailPage = () => {
 
               {/* Action Buttons */}
               <div className="space-y-3">
-                <Button className="w-full bg-green-600 hover:bg-green-700 text-white h-12">
+                <Button 
+                  className="w-full bg-green-600 hover:bg-green-700 text-white h-12"
+                  onClick={handleApplyMealPlan}
+                >
                   Áp dụng thực đơn này
                 </Button>
                 <Button variant="outline" className="w-full border-orange-600 text-orange-600 hover:bg-orange-50 h-12">
