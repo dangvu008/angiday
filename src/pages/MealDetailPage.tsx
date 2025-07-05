@@ -11,42 +11,236 @@ const MealDetailPage = () => {
   const { planId, day, mealType } = useParams();
   const navigate = useNavigate();
 
-  // Mock data for meal details
+  // Mock data for meal details with multiple dishes per meal
+  const getMealData = (mealType: string) => {
+    const mealData = {
+      breakfast: {
+        dishes: [
+          {
+            id: 1,
+            name: "Cháo yến mạch chuối",
+            image: "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400&h=300&fit=crop",
+            cookTime: "15 phút",
+            servings: "1 người",
+            difficulty: "Dễ",
+            description: "Cháo yến mạch bổ dưỡng với chuối tươi, giàu chất xơ và vitamin",
+            ingredients: [
+              "100g yến mạch",
+              "1 quả chuối chín",
+              "300ml sữa tươi",
+              "1 thìa mật ong",
+              "1 nhúm muối"
+            ],
+            instructions: [
+              "Đun sôi sữa tươi trong nồi",
+              "Cho yến mạch vào nấu nhỏ lửa 10 phút",
+              "Nghiền chuối và trộn vào cháo",
+              "Nêm mật ong và muối vừa ăn",
+              "Trang trí với lát chuối và dùng nóng"
+            ],
+            nutrition: {
+              calories: "320 kcal",
+              protein: "12g",
+              carbs: "45g",
+              fat: "8g"
+            }
+          },
+          {
+            id: 2,
+            name: "Bánh mì trứng ốp la",
+            image: "https://images.unsplash.com/photo-1525351326368-efbb5cb6814d?w=400&h=300&fit=crop",
+            cookTime: "10 phút",
+            servings: "1 người",
+            difficulty: "Dễ",
+            description: "Bánh mì nướng giòn kết hợp với trứng ốp la thơm ngon",
+            ingredients: [
+              "2 lát bánh mì",
+              "2 quả trứng gà",
+              "1 thìa dầu ăn",
+              "Muối, tiêu",
+              "Rau xà lách"
+            ],
+            instructions: [
+              "Nướng bánh mì cho giòn",
+              "Đun chảo với dầu ăn",
+              "Đập trứng vào chảo, ốp la hai mặt",
+              "Nêm muối tiêu vừa ăn",
+              "Kẹp trứng vào bánh mì với rau xà lách"
+            ],
+            nutrition: {
+              calories: "280 kcal",
+              protein: "15g",
+              carbs: "25g",
+              fat: "12g"
+            }
+          }
+        ]
+      },
+      lunch: {
+        dishes: [
+          {
+            id: 3,
+            name: "Cơm gà nướng mật ong",
+            image: "https://images.unsplash.com/photo-1604329760661-e71dc83f8f26?w=400&h=300&fit=crop",
+            cookTime: "45 phút",
+            servings: "2 người",
+            difficulty: "Trung bình",
+            description: "Cơm trắng kết hợp với gà nướng mật ong thơm ngon, bổ dưỡng",
+            ingredients: [
+              "300g đùi gà",
+              "2 chén cơm trắng",
+              "3 thìa mật ong",
+              "2 thìa nước tương",
+              "1 thìa dầu mè",
+              "Tỏi, gừng"
+            ],
+            instructions: [
+              "Ướp gà với mật ong, nước tương, dầu mè",
+              "Để ướp 30 phút",
+              "Nướng gà trong lò 25 phút ở 200°C",
+              "Trở mặt và nướng thêm 15 phút",
+              "Thái gà và ăn kèm cơm trắng"
+            ],
+            nutrition: {
+              calories: "450 kcal",
+              protein: "35g",
+              carbs: "45g",
+              fat: "15g"
+            }
+          },
+          {
+            id: 4,
+            name: "Canh chua cá lóc",
+            image: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=400&h=300&fit=crop",
+            cookTime: "30 phút",
+            servings: "3 người",
+            difficulty: "Trung bình",
+            description: "Canh chua đậm đà với cá lóc tươi ngon, rau thơm",
+            ingredients: [
+              "500g cá lóc",
+              "200g bầu",
+              "100g đậu bắp",
+              "Me chua, cà chua",
+              "Ngò gai, rau kinh giới"
+            ],
+            instructions: [
+              "Rửa sạch cá, cắt khúc vừa ăn",
+              "Nấu nước dùng từ xương cá",
+              "Cho me chua, cà chua vào nấu",
+              "Thêm bầu, đậu bắp và cá",
+              "Nêm nếm vừa ăn, thêm rau thơm"
+            ],
+            nutrition: {
+              calories: "180 kcal",
+              protein: "25g",
+              carbs: "12g",
+              fat: "4g"
+            }
+          },
+          {
+            id: 5,
+            name: "Rau muống xào tỏi",
+            image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&h=300&fit=crop",
+            cookTime: "10 phút",
+            servings: "2 người",
+            difficulty: "Dễ",
+            description: "Rau muống xào giòn ngọt với tỏi thơm, bổ sung chất xơ",
+            ingredients: [
+              "500g rau muống",
+              "3 tép tỏi",
+              "2 thìa dầu ăn",
+              "Muối, nước mắm",
+              "Ớt sừng"
+            ],
+            instructions: [
+              "Nhặt rau muống, rửa sạch",
+              "Băm nhỏ tỏi và ớt",
+              "Đun nóng dầu, phi thơm tỏi",
+              "Cho rau muống vào xào nhanh tay",
+              "Nêm muối, nước mắm vừa ăn"
+            ],
+            nutrition: {
+              calories: "85 kcal",
+              protein: "4g",
+              carbs: "8g",
+              fat: "4g"
+            }
+          }
+        ]
+      },
+      dinner: {
+        dishes: [
+          {
+            id: 6,
+            name: "Cháo tôm thịt",
+            image: "https://images.unsplash.com/photo-1559847844-5315695dadae?w=400&h=300&fit=crop",
+            cookTime: "40 phút",
+            servings: "2 người",
+            difficulty: "Trung bình",
+            description: "Cháo mềm ngọt với tôm tươi và thịt băm, dễ tiêu hóa",
+            ingredients: [
+              "1 chén gạo tẻ",
+              "200g tôm tươi",
+              "150g thịt heo băm",
+              "Hành tây, cần tây",
+              "Nước mắm, tiêu"
+            ],
+            instructions: [
+              "Vo gạo sạch, nấu cháo",
+              "Tôm lột vỏ, thái nhỏ",
+              "Ướp thịt băm với gia vị",
+              "Cho tôm thịt vào cháo nấu chín",
+              "Thêm hành cần, nêm nếm vừa ăn"
+            ],
+            nutrition: {
+              calories: "380 kcal",
+              protein: "28g",
+              carbs: "40g",
+              fat: "10g"
+            }
+          },
+          {
+            id: 7,
+            name: "Salad trái cây",
+            image: "https://images.unsplash.com/photo-1546793665-c74683f339c1?w=400&h=300&fit=crop",
+            cookTime: "15 phút",
+            servings: "2 người",
+            difficulty: "Dễ",
+            description: "Salad trái cây tươi mát, giàu vitamin và chất xơ",
+            ingredients: [
+              "1 quả táo",
+              "1 quả lê",
+              "100g nho",
+              "1 quả cam",
+              "2 thìa mật ong",
+              "Lá bạc hà"
+            ],
+            instructions: [
+              "Rửa sạch tất cả trái cây",
+              "Thái táo, lê thành miếng vừa ăn",
+              "Tách múi cam, bóc vỏ nho",
+              "Trộn tất cả với mật ong",
+              "Trang trí với lá bạc hà"
+            ],
+            nutrition: {
+              calories: "150 kcal",
+              protein: "2g",
+              carbs: "38g",
+              fat: "1g"
+            }
+          }
+        ]
+      }
+    };
+
+    return mealData[mealType as keyof typeof mealData] || mealData.breakfast;
+  };
+
   const mealDetails = {
     planTitle: "Thực đơn 7 ngày cho bà bầu",
-    day: "Thứ 2",
-    mealType: "Sáng",
-    dishes: [
-      {
-        id: 1,
-        name: "Cháo yến mạch chuối",
-        image: "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400&h=300&fit=crop",
-        cookTime: "15 phút",
-        servings: "1 người",
-        difficulty: "Dễ",
-        description: "Cháo yến mạch bổ dưỡng với chuối tươi, giàu chất xơ và vitamin",
-        ingredients: [
-          "100g yến mạch",
-          "1 quả chuối chín",
-          "300ml sữa tươi",
-          "1 thìa mật ong",
-          "1 nhúm muối"
-        ],
-        instructions: [
-          "Đun sôi sữa tươi trong nồi",
-          "Cho yến mạch vào nấu nhỏ lửa 10 phút",
-          "Nghiền chuối và trộn vào cháo",
-          "Nêm mật ong và muối vừa ăn",
-          "Trang trí với lát chuối và dùng nóng"
-        ],
-        nutrition: {
-          calories: "320 kcal",
-          protein: "12g",
-          carbs: "45g",
-          fat: "8g"
-        }
-      }
-    ]
+    day: getDayInVietnamese(day || ''),
+    mealType: getMealTypeInVietnamese(mealType || ''),
+    dishes: getMealData(mealType || 'breakfast').dishes
   };
 
   const getMealTypeInVietnamese = (type: string) => {
@@ -94,13 +288,13 @@ const MealDetailPage = () => {
           <div className="max-w-6xl mx-auto">
             <div className="flex items-center space-x-2 mb-2">
               <Badge variant="outline">{mealDetails.planTitle}</Badge>
-              <Badge className="bg-orange-600">{getDayInVietnamese(day || '')}</Badge>
+              <Badge className="bg-orange-600">{mealDetails.day}</Badge>
             </div>
             <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Bữa {getMealTypeInVietnamese(mealType || '')}
+              Bữa {mealDetails.mealType}
             </h1>
             <p className="text-lg text-gray-600">
-              Các món ăn được chọn lọc kỹ càng cho bữa {getMealTypeInVietnamese(mealType || '').toLowerCase()}
+              {mealDetails.dishes.length} món ăn được chọn lọc kỹ càng cho bữa {mealDetails.mealType.toLowerCase()}
             </p>
           </div>
         </section>
@@ -109,7 +303,7 @@ const MealDetailPage = () => {
         <section className="py-12 px-4">
           <div className="max-w-6xl mx-auto">
             <div className="grid gap-8">
-              {mealDetails.dishes.map((dish) => (
+              {mealDetails.dishes.map((dish, index) => (
                 <Card key={dish.id} className="overflow-hidden">
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {/* Image */}
@@ -124,7 +318,12 @@ const MealDetailPage = () => {
                     {/* Content */}
                     <div className="p-6">
                       <div className="flex items-center justify-between mb-4">
-                        <h2 className="text-2xl font-bold text-gray-900">{dish.name}</h2>
+                        <div className="flex items-center space-x-3">
+                          <span className="bg-orange-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">
+                            {index + 1}
+                          </span>
+                          <h2 className="text-2xl font-bold text-gray-900">{dish.name}</h2>
+                        </div>
                         <Heart className="h-6 w-6 text-gray-400 hover:text-red-500 cursor-pointer" />
                       </div>
 
