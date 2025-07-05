@@ -1,4 +1,3 @@
-
 import { useParams, useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -10,6 +9,29 @@ import { ArrowLeft, Clock, Users, ChefHat, Heart } from 'lucide-react';
 const MealDetailPage = () => {
   const { planId, day, mealType } = useParams();
   const navigate = useNavigate();
+
+  // Helper functions - moved to top to avoid hoisting issues
+  const getMealTypeInVietnamese = (type: string) => {
+    switch(type) {
+      case 'breakfast': return 'Sáng';
+      case 'lunch': return 'Trưa';
+      case 'dinner': return 'Tối';
+      default: return type;
+    }
+  };
+
+  const getDayInVietnamese = (dayParam: string) => {
+    const days = {
+      'monday': 'Thứ 2',
+      'tuesday': 'Thứ 3',
+      'wednesday': 'Thứ 4',
+      'thursday': 'Thứ 5',
+      'friday': 'Thứ 6',
+      'saturday': 'Thứ 7',
+      'sunday': 'Chủ nhật'
+    };
+    return days[dayParam as keyof typeof days] || dayParam;
+  };
 
   // Mock data for meal details with multiple dishes per meal
   const getMealData = (mealType: string) => {
@@ -241,28 +263,6 @@ const MealDetailPage = () => {
     day: getDayInVietnamese(day || ''),
     mealType: getMealTypeInVietnamese(mealType || ''),
     dishes: getMealData(mealType || 'breakfast').dishes
-  };
-
-  const getMealTypeInVietnamese = (type: string) => {
-    switch(type) {
-      case 'breakfast': return 'Sáng';
-      case 'lunch': return 'Trưa';
-      case 'dinner': return 'Tối';
-      default: return type;
-    }
-  };
-
-  const getDayInVietnamese = (dayParam: string) => {
-    const days = {
-      'monday': 'Thứ 2',
-      'tuesday': 'Thứ 3',
-      'wednesday': 'Thứ 4',
-      'thursday': 'Thứ 5',
-      'friday': 'Thứ 6',
-      'saturday': 'Thứ 7',
-      'sunday': 'Chủ nhật'
-    };
-    return days[dayParam as keyof typeof days] || dayParam;
   };
 
   return (
