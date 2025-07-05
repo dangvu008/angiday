@@ -6,12 +6,28 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import NewsModal from './NewsModal';
+import { useToast } from '@/hooks/use-toast';
+
+interface NewsItem {
+  id: number;
+  title: string;
+  category: string;
+  status: 'published' | 'draft';
+  author: string;
+  publishDate: string;
+  views: number;
+}
 
 const NewsManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedNews, setSelectedNews] = useState<NewsItem | null>(null);
+  const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
+  const { toast } = useToast();
 
   // Mock data - in real app this would come from API
-  const news = [
+  const [news, setNews] = useState<NewsItem[]>([
     {
       id: 1,
       title: '10 Thực phẩm tốt nhất cho sức khỏe tim mạch',
@@ -39,12 +55,58 @@ const NewsManagement = () => {
       publishDate: '2024-01-18',
       views: 0
     },
-  ];
+  ]);
 
   const filteredNews = news.filter(item =>
     item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     item.category.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const handleAdd = () => {
+    setSelectedNews(null);
+    setModalMode('add');
+    setIsModalOpen(true);
+  };
+
+  const handleEdit = (newsItem: NewsItem) => {
+    setSelectedNews(newsItem);
+    setModalMode('edit');
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = (id: number) => {
+    if (confirm('Bạn có chắc chắn muốn xóa bài viết này?')) {
+      setNews(news.filter(item => item.id !== id));
+      toast({
+        title: "Thành công",
+        description: "Đã xóa bài viết thành công",
+      });
+    }
+  };
+
+  const handleSave = (newsData: any) => {
+    if (modalMode === 'add') {
+      const newNews = {
+        ...newsData,
+        id: Math.max(...news.map(n => n.id)) + 1,
+        publishDate: new Date().toISOString().split('T')[0],
+        views: 0
+      };
+      setNews([...news, newNews]);
+      toast({
+        title: "Thành công",
+        description: "Đã thêm bài viết mới thành công",
+      });
+    } else {
+      setNews(news.map(item => 
+        item.id === selectedNews?.id ? { ...item, ...newsData } : item
+      ));
+      toast({
+        title: "Thành công",
+        description: "Đã cập nhật bài viết thành công",
+      });
+    }
+  };
 
   const getStatusBadge = (status: string) => {
     return status === 'published' ? (
@@ -75,7 +137,7 @@ const NewsManagement = () => {
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle>Quản lý tin tức</CardTitle>
-            <Button>
+            <Button onClick={handleAdd}>
               <Plus className="mr-2 h-4 w-4" />
               Thêm bài viết
             </Button>
@@ -122,10 +184,10 @@ const NewsManagement = () => {
                       <Button variant="ghost" size="sm">
                         <Eye className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="sm">
+                      <Button variant="ghost" size="sm" onClick={() => handleEdit(item)}>
                         <Edit className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="sm">
+                      <Button variant="ghost" size="sm" onClick={() => handleDelete(item.id)}>
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
@@ -136,6 +198,14 @@ const NewsManagement = () => {
           </Table>
         </CardContent>
       </Card>
+
+      <NewsModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSave={handleSave}
+        news={selectedNews}
+        mode={modalMode}
+      />
     </div>
   );
 };
