@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Search, Plus, Edit, Trash2, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -8,6 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import NewsModal from './NewsModal';
 import { useToast } from '@/hooks/use-toast';
+import ImportModal from './ImportModal';
 
 interface NewsItem {
   id: number;
@@ -25,6 +25,7 @@ const NewsManagement = () => {
   const [selectedNews, setSelectedNews] = useState<NewsItem | null>(null);
   const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
   const { toast } = useToast();
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
   // Mock data - in real app this would come from API
   const [news, setNews] = useState<NewsItem[]>([
@@ -108,6 +109,21 @@ const NewsManagement = () => {
     }
   };
 
+  const handleImport = (importedData: any) => {
+    const newNews = {
+      ...importedData,
+      id: Math.max(...news.map(n => n.id)) + 1,
+      publishDate: new Date().toISOString().split('T')[0],
+      views: 0,
+      status: 'draft' as const
+    };
+    setNews([...news, newNews]);
+    toast({
+      title: "Thành công",
+      description: "Đã import bài viết thành công",
+    });
+  };
+
   const getStatusBadge = (status: string) => {
     return status === 'published' ? (
       <Badge className="bg-green-100 text-green-800">Đã xuất bản</Badge>
@@ -137,10 +153,16 @@ const NewsManagement = () => {
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle>Quản lý tin tức</CardTitle>
-            <Button onClick={handleAdd}>
-              <Plus className="mr-2 h-4 w-4" />
-              Thêm bài viết
-            </Button>
+            <div className="flex space-x-2">
+              <Button variant="outline" onClick={() => setIsImportModalOpen(true)}>
+                <Eye className="mr-2 h-4 w-4" />
+                Import từ URL
+              </Button>
+              <Button onClick={handleAdd}>
+                <Plus className="mr-2 h-4 w-4" />
+                Thêm bài viết
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent>
@@ -205,6 +227,13 @@ const NewsManagement = () => {
         onSave={handleSave}
         news={selectedNews}
         mode={modalMode}
+      />
+
+      <ImportModal
+        isOpen={isImportModalOpen}
+        onClose={() => setIsImportModalOpen(false)}
+        onImport={handleImport}
+        type="news"
       />
     </div>
   );

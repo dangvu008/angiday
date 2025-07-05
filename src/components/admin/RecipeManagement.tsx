@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Search, Plus, Edit, Trash2, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -8,6 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import RecipeModal from './RecipeModal';
 import { useToast } from '@/hooks/use-toast';
+import ImportModal from './ImportModal';
 
 interface Recipe {
   id: number;
@@ -28,6 +28,7 @@ const RecipeManagement = () => {
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
   const { toast } = useToast();
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
   // Mock data - in real app this would come from API
   const [recipes, setRecipes] = useState<Recipe[]>([
@@ -120,6 +121,22 @@ const RecipeManagement = () => {
     }
   };
 
+  const handleImport = (importedData: any) => {
+    const newRecipe = {
+      ...importedData,
+      id: Math.max(...recipes.map(r => r.id)) + 1,
+      createdDate: new Date().toISOString().split('T')[0],
+      views: 0,
+      status: 'draft' as const,
+      difficulty: importedData.difficulty || 'Dễ' as const
+    };
+    setRecipes([...recipes, newRecipe]);
+    toast({
+      title: "Thành công",
+      description: "Đã import công thức thành công",
+    });
+  };
+
   const getStatusBadge = (status: string) => {
     return status === 'published' ? (
       <Badge className="bg-green-100 text-green-800">Đã xuất bản</Badge>
@@ -148,10 +165,16 @@ const RecipeManagement = () => {
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle>Quản lý công thức</CardTitle>
-            <Button onClick={handleAdd}>
-              <Plus className="mr-2 h-4 w-4" />
-              Thêm công thức
-            </Button>
+            <div className="flex space-x-2">
+              <Button variant="outline" onClick={() => setIsImportModalOpen(true)}>
+                <link className="mr-2 h-4 w-4" />
+                Import từ URL
+              </Button>
+              <Button onClick={handleAdd}>
+                <Plus className="mr-2 h-4 w-4" />
+                Thêm công thức
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent>
@@ -218,6 +241,13 @@ const RecipeManagement = () => {
         onSave={handleSave}
         recipe={selectedRecipe}
         mode={modalMode}
+      />
+
+      <ImportModal
+        isOpen={isImportModalOpen}
+        onClose={() => setIsImportModalOpen(false)}
+        onImport={handleImport}
+        type="recipe"
       />
     </div>
   );
