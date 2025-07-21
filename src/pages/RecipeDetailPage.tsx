@@ -5,6 +5,10 @@ import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { FavoriteButton } from '@/components/recipe/FavoriteButton';
+import { RatingStars } from '@/components/recipe/RatingStars';
+import { ReviewSection } from '@/components/recipe/ReviewSection';
+import { ServingConverter } from '@/components/recipe/ServingConverter';
 import { Clock, Users, ChefHat, Heart, BookOpen, Star } from 'lucide-react';
 
 const RecipeDetailPage = () => {
@@ -83,19 +87,24 @@ const RecipeDetailPage = () => {
               <p className="text-xl mb-6 max-w-2xl">
                 {recipe.description}
               </p>
-              <div className="flex items-center space-x-6 text-sm">
-                <div className="flex items-center">
-                  <Star className="h-5 w-5 text-yellow-400 mr-1" />
-                  <span>{recipe.rating}</span>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-6 text-sm">
+                  <RatingStars rating={recipe.rating} readonly />
+                  <div className="flex items-center">
+                    <Heart className="h-5 w-5 text-red-500 mr-1" />
+                    <span>{recipe.likes}</span>
+                  </div>
+                  <div className="flex items-center">
+                    <ChefHat className="h-5 w-5 mr-1" />
+                    <span>{recipe.chef}</span>
+                  </div>
                 </div>
-                <div className="flex items-center">
-                  <Heart className="h-5 w-5 text-red-500 mr-1" />
-                  <span>{recipe.likes}</span>
-                </div>
-                <div className="flex items-center">
-                  <ChefHat className="h-5 w-5 mr-1" />
-                  <span>{recipe.chef}</span>
-                </div>
+                <FavoriteButton 
+                  itemId={recipe.id || '1'} 
+                  itemType="recipe" 
+                  showText
+                  className="bg-white/10 hover:bg-white/20 border-white/20"
+                />
               </div>
             </div>
           </div>
@@ -134,7 +143,12 @@ const RecipeDetailPage = () => {
           <div className="max-w-4xl mx-auto">
             <div className="grid md:grid-cols-3 gap-8">
               {/* Ingredients */}
-              <div className="md:col-span-1">
+              <div className="md:col-span-1 space-y-6">
+                <ServingConverter 
+                  originalServings={4}
+                  ingredients={recipe.ingredients}
+                />
+                
                 <Card>
                   <CardHeader>
                     <CardTitle>Nguyên liệu</CardTitle>
@@ -198,6 +212,13 @@ const RecipeDetailPage = () => {
                 </Card>
               </div>
             </div>
+          </div>
+        </section>
+
+        {/* Reviews Section */}
+        <section className="py-12 px-4 bg-muted/30">
+          <div className="max-w-4xl mx-auto">
+            <ReviewSection recipeId={recipe.id || '1'} />
           </div>
         </section>
       </main>

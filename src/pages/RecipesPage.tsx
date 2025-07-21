@@ -1,12 +1,19 @@
 
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { FavoriteButton } from '@/components/recipe/FavoriteButton';
+import { RatingStars } from '@/components/recipe/RatingStars';
+import { AdvancedSearchFilters } from '@/components/search/AdvancedSearchFilters';
 import { Clock, Users, ChefHat, Search } from 'lucide-react';
 
 const RecipesPage = () => {
+  const [filteredRecipes, setFilteredRecipes] = useState<any[]>([]);
+  
   const recipes = [
     {
       id: 1,
@@ -79,6 +86,85 @@ const RecipesPage = () => {
   const categories = ["Tất cả", "Món chính", "Khai vị", "Tráng miệng", "Ăn sáng", "Nước dùng"];
   const difficulties = ["Tất cả", "Dễ", "Trung bình", "Khó"];
 
+  // Initialize filtered recipes
+  useState(() => {
+    setFilteredRecipes(recipes);
+  });
+
+  const handleFiltersChange = (filters: any) => {
+    let filtered = [...recipes];
+
+    // Search query
+    if (filters.query) {
+      filtered = filtered.filter(recipe => 
+        recipe.title.toLowerCase().includes(filters.query.toLowerCase()) ||
+        recipe.description.toLowerCase().includes(filters.query.toLowerCase()) ||
+        recipe.tags.some((tag: string) => tag.toLowerCase().includes(filters.query.toLowerCase()))
+      );
+    }
+
+    // Categories
+    if (filters.categories.length > 0) {
+      filtered = filtered.filter(recipe => 
+        filters.categories.some((cat: string) => recipe.tags.includes(cat))
+      );
+    }
+
+    // Difficulties
+    if (filters.difficulties.length > 0) {
+      filtered = filtered.filter(recipe => 
+        filters.difficulties.includes(recipe.difficulty)
+      );
+    }
+
+    // Cook time (convert to minutes for comparison)
+    if (filters.cookTimeMax < 300) {
+      filtered = filtered.filter(recipe => {
+        const timeStr = recipe.cookTime;
+        const hours = timeStr.includes('giờ') ? parseInt(timeStr) : 0;
+        const minutes = timeStr.includes('phút') ? parseInt(timeStr.split(' ').find((s: string) => s.includes('phút'))?.replace('phút', '') || '0') : 0;
+        const totalMinutes = hours * 60 + minutes;
+        return totalMinutes <= filters.cookTimeMax;
+      });
+    }
+
+    // Rating
+    if (filters.ratingMin > 0) {
+      filtered = filtered.filter(recipe => recipe.rating >= filters.ratingMin);
+    }
+
+    // Tags
+    if (filters.tags.length > 0) {
+      filtered = filtered.filter(recipe => 
+        filters.tags.some((tag: string) => recipe.tags.includes(tag))
+      );
+    }
+
+    // Sort
+    switch (filters.sortBy) {
+      case 'rating':
+        filtered.sort((a, b) => b.rating - a.rating);
+        break;
+      case 'cookTime':
+        filtered.sort((a, b) => {
+          const aTime = a.cookTime.includes('giờ') ? parseInt(a.cookTime) * 60 : parseInt(a.cookTime);
+          const bTime = b.cookTime.includes('giờ') ? parseInt(b.cookTime) * 60 : parseInt(b.cookTime);
+          return aTime - bTime;
+        });
+        break;
+      case 'difficulty':
+        const diffOrder = { 'Dễ': 1, 'Trung bình': 2, 'Khó': 3 };
+        filtered.sort((a, b) => diffOrder[a.difficulty as keyof typeof diffOrder] - diffOrder[b.difficulty as keyof typeof diffOrder]);
+        break;
+      case 'newest':
+      default:
+        // Keep original order for newest
+        break;
+    }
+
+    setFilteredRecipes(filtered);
+  };
+
   return (
     <div className="min-h-screen bg-white">
       <Header />
@@ -93,61 +179,24 @@ const RecipesPage = () => {
               Khám phá hàng trăm công thức nấu ăn từ dễ đến khó, phù hợp với mọi người
             </p>
             
-            {/* Search Bar */}
-            <div className="max-w-md mx-auto">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                <input
-                  type="text"
-                  placeholder="Tìm công thức..."
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                />
-              </div>
-            </div>
+            <AdvancedSearchFilters 
+              onFiltersChange={handleFiltersChange}
+              className="max-w-4xl mx-auto"
+            />
           </div>
         </section>
 
-        {/* Filters */}
-        <section className="py-8 px-4 border-b bg-gray-50">
-          <div className="max-w-6xl mx-auto">
-            <div className="space-y-4">
-              <div>
-                <h3 className="font-semibold mb-2">Loại món:</h3>
-                <div className="flex flex-wrap gap-2">
-                  {categories.map((category) => (
-                    <Badge 
-                      key={category} 
-                      variant={category === "Tất cả" ? "default" : "outline"}
-                      className="cursor-pointer hover:bg-orange-600 hover:text-white"
-                    >
-                      {category}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <h3 className="font-semibold mb-2">Độ khó:</h3>
-                <div className="flex flex-wrap gap-2">
-                  {difficulties.map((difficulty) => (
-                    <Badge 
-                      key={difficulty} 
-                      variant={difficulty === "Tất cả" ? "default" : "outline"}
-                      className="cursor-pointer hover:bg-green-600 hover:text-white"
-                    >
-                      {difficulty}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
 
         {/* Recipes Grid */}
         <section className="py-12 px-4">
           <div className="max-w-6xl mx-auto">
+            <div className="mb-6 text-center">
+              <p className="text-muted-foreground">
+                Hiển thị {filteredRecipes.length} trong {recipes.length} công thức
+              </p>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {recipes.map((recipe) => (
+              {filteredRecipes.map((recipe) => (
                 <Card key={recipe.id} className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer">
                   <div className="aspect-video overflow-hidden relative">
                     <img 
@@ -155,20 +204,23 @@ const RecipesPage = () => {
                       alt={recipe.title}
                       className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                     />
-                    <div className="absolute top-2 right-2">
+                    <div className="absolute top-2 right-2 flex space-x-2">
+                      <FavoriteButton itemId={recipe.id.toString()} itemType="recipe" />
                       <Badge className="bg-yellow-500 text-white">
                         ⭐ {recipe.rating}
                       </Badge>
                     </div>
                   </div>
                   <CardHeader>
-                    <CardTitle className="line-clamp-1 hover:text-orange-600 transition-colors">
-                      {recipe.title}
+                    <CardTitle className="line-clamp-1 hover:text-primary transition-colors">
+                      <Link to={`/recipes/${recipe.id}`}>
+                        {recipe.title}
+                      </Link>
                     </CardTitle>
-                    <p className="text-gray-600 text-sm line-clamp-2">{recipe.description}</p>
+                    <p className="text-muted-foreground text-sm line-clamp-2">{recipe.description}</p>
                   </CardHeader>
                   <CardContent>
-                    <div className="flex items-center justify-between text-sm text-gray-600 mb-4">
+                    <div className="flex items-center justify-between text-sm text-muted-foreground mb-4">
                       <div className="flex items-center space-x-1">
                         <Clock className="h-4 w-4" />
                         <span>{recipe.cookTime}</span>
@@ -182,6 +234,7 @@ const RecipesPage = () => {
                         <span>{recipe.difficulty}</span>
                       </div>
                     </div>
+                    <RatingStars rating={recipe.rating} readonly size="sm" className="mb-4" />
                     <div className="flex flex-wrap gap-1 mb-4">
                       {recipe.tags.slice(0, 2).map((tag) => (
                         <Badge key={tag} variant="secondary" className="text-xs">
@@ -189,8 +242,10 @@ const RecipesPage = () => {
                         </Badge>
                       ))}
                     </div>
-                    <Button className="w-full bg-orange-600 hover:bg-orange-700">
-                      Xem công thức
+                    <Button asChild className="w-full">
+                      <Link to={`/recipes/${recipe.id}`}>
+                        Xem công thức
+                      </Link>
                     </Button>
                   </CardContent>
                 </Card>
