@@ -1,4 +1,5 @@
 
+import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -11,9 +12,11 @@ import { ReviewSection } from '@/components/recipe/ReviewSection';
 import { ServingConverter } from '@/components/recipe/ServingConverter';
 import { Clock, Users, ChefHat, Heart, BookOpen, Star } from 'lucide-react';
 import { NutritionCalculator } from '@/components/recipe/NutritionCalculator';
+import { CookingMode } from '@/components/recipe/CookingMode';
 
 const RecipeDetailPage = () => {
   const { id } = useParams();
+  const [isCookingMode, setIsCookingMode] = useState(false);
 
   // Mock data - trong thực tế sẽ fetch từ API dựa trên id
   const recipe = {
@@ -181,9 +184,18 @@ const RecipeDetailPage = () => {
                         </li>
                       ))}
                     </ul>
-                    <Button className="w-full mt-4 bg-orange-600 hover:bg-orange-700">
-                      Thêm vào danh sách mua
-                    </Button>
+                    <div className="flex space-x-2 mt-4">
+                      <Button className="flex-1 bg-orange-600 hover:bg-orange-700">
+                        Thêm vào danh sách mua
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        className="flex-1"
+                        onClick={() => setIsCookingMode(true)}
+                      >
+                        🍳 Chế độ nấu ăn
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
               </div>
@@ -236,6 +248,20 @@ const RecipeDetailPage = () => {
           </div>
         </section>
       </main>
+      
+      {/* Cooking Mode Modal */}
+      {isCookingMode && (
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+          <div className="bg-background rounded-lg w-full max-w-4xl max-h-[90vh] overflow-hidden">
+            <CookingMode
+              steps={recipe.instructions}
+              recipeName={recipe.title}
+              onClose={() => setIsCookingMode(false)}
+            />
+          </div>
+        </div>
+      )}
+      
       <Footer />
     </div>
   );

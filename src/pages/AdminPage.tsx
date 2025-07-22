@@ -1,18 +1,20 @@
 
 import React, { useState } from 'react';
-import { Users, BookOpen, Newspaper, BarChart3, Settings, Home, ChefHat } from 'lucide-react';
+import { Users, BookOpen, Newspaper, BarChart3, Settings, Home, ChefHat, Activity } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import UserManagement from '@/components/admin/UserManagement';
 import MealPlanManagement from '@/components/admin/MealPlanManagement';
 import NewsManagement from '@/components/admin/NewsManagement';
 import RecipeManagement from '@/components/admin/RecipeManagement';
+import { AdminAnalytics } from '@/components/admin/AdminAnalytics';
 
 const AdminPage = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
 
   const menuItems = [
     { id: 'dashboard', label: 'Tổng quan', icon: BarChart3 },
+    { id: 'analytics', label: 'Analytics', icon: Activity },
     { id: 'users', label: 'Quản lý người dùng', icon: Users },
     { id: 'recipes', label: 'Quản lý công thức', icon: ChefHat },
     { id: 'meal-plans', label: 'Quản lý thực đơn', icon: BookOpen },
@@ -22,6 +24,8 @@ const AdminPage = () => {
 
   const renderContent = () => {
     switch (activeTab) {
+      case 'analytics':
+        return <AdminAnalytics />;
       case 'users':
         return <UserManagement />;
       case 'recipes':
