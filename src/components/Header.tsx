@@ -31,6 +31,9 @@ const Header = () => {
             <Link to="/meal-plans" className="text-foreground hover:text-primary transition-colors font-medium">
               Thực đơn mẫu
             </Link>
+            <Link to="/meal-planner" className="text-foreground hover:text-primary transition-colors font-medium">
+              Lập kế hoạch
+            </Link>
           </nav>
 
           {/* User Actions */}
@@ -80,6 +83,9 @@ const Header = () => {
               </Link>
               <Link to="/meal-plans" className="text-foreground hover:text-primary transition-colors font-medium px-2">
                 Thực đơn mẫu
+              </Link>
+              <Link to="/meal-planner" className="text-foreground hover:text-primary transition-colors font-medium px-2">
+                Lập kế hoạch
               </Link>
               <Link to="/my-favorites" className="text-foreground hover:text-red-500 transition-colors font-medium px-2 flex items-center">
                 <Heart className="h-4 w-4 mr-2" />

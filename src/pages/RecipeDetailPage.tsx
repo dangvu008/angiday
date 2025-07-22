@@ -10,6 +10,7 @@ import { RatingStars } from '@/components/recipe/RatingStars';
 import { ReviewSection } from '@/components/recipe/ReviewSection';
 import { ServingConverter } from '@/components/recipe/ServingConverter';
 import { Clock, Users, ChefHat, Heart, BookOpen, Star } from 'lucide-react';
+import { NutritionCalculator } from '@/components/recipe/NutritionCalculator';
 
 const RecipeDetailPage = () => {
   const { id } = useParams();
@@ -59,7 +60,15 @@ const RecipeDetailPage = () => {
       "Ninh xương càng lâu nước dùng càng ngọt và trong",
       "Không nên cho quá nhiều gia vị để giữ hương vị tự nhiên",
       "Thịt bò thái mỏng sẽ chín vừa đủ khi chan nước dùng nóng"
-    ]
+    ],
+    nutrition: {
+      calories: 420,
+      protein: 28.5,
+      carbs: 45.2,
+      fat: 12.8,
+      fiber: 3.2,
+      sugar: 8.1
+    }
   };
 
   return (
@@ -147,6 +156,11 @@ const RecipeDetailPage = () => {
                 <ServingConverter 
                   originalServings={4}
                   ingredients={recipe.ingredients}
+                />
+                
+                <NutritionCalculator
+                  nutrition={recipe.nutrition}
+                  servings={4}
                 />
                 
                 <Card>

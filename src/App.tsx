@@ -16,6 +16,7 @@ import RegisterPage from "./pages/RegisterPage";
 import MyRecipesPage from "./pages/MyRecipesPage";
 import AdminPage from "./pages/AdminPage";
 import MyFavoritesPage from "./pages/MyFavoritesPage";
+import MealPlannerPage from "./pages/MealPlannerPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -38,7 +39,8 @@ const App = () => (
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/my-recipes" element={<MyRecipesPage />} />
-          <Route path="/my-favorites" element={<MyFavoritesPage />} />
+        <Route path="/my-favorites" element={<MyFavoritesPage />} />
+        <Route path="/meal-planner" element={<MealPlannerPage />} />
           <Route path="/admin" element={<AdminPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
