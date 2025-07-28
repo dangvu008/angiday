@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -22,12 +22,13 @@ interface SearchFilters {
 interface AdvancedSearchFiltersProps {
   onFiltersChange: (filters: SearchFilters) => void;
   className?: string;
+  initialQuery?: string;
 }
 
-export const AdvancedSearchFilters = ({ onFiltersChange, className }: AdvancedSearchFiltersProps) => {
+export const AdvancedSearchFilters = ({ onFiltersChange, className, initialQuery = '' }: AdvancedSearchFiltersProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [filters, setFilters] = useState<SearchFilters>({
-    query: '',
+    query: initialQuery,
     categories: [],
     difficulties: [],
     cookTimeMax: 300, // 5 hours in minutes
@@ -82,6 +83,15 @@ export const AdvancedSearchFilters = ({ onFiltersChange, className }: AdvancedSe
     setFilters(clearedFilters);
     onFiltersChange(clearedFilters);
   };
+
+  // Update filters when initialQuery changes
+  useEffect(() => {
+    if (initialQuery && initialQuery !== filters.query) {
+      const updatedFilters = { ...filters, query: initialQuery };
+      setFilters(updatedFilters);
+      onFiltersChange(updatedFilters);
+    }
+  }, [initialQuery]);
 
   const activeFilterCount = 
     filters.categories.length + 

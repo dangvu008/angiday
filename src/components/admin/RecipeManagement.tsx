@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Plus, Edit, Trash2, Eye } from 'lucide-react';
+import { Search, Plus, Edit, Trash2, Eye, Link } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import RecipeModal from './RecipeModal';
 import { useToast } from '@/hooks/use-toast';
 import ImportModal from './ImportModal';
+import BatchImportModal from './BatchImportModal';
 
 interface Recipe {
   id: number;
@@ -29,6 +30,7 @@ const RecipeManagement = () => {
   const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
   const { toast } = useToast();
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [isBatchImportModalOpen, setIsBatchImportModalOpen] = useState(false);
 
   // Mock data - in real app this would come from API
   const [recipes, setRecipes] = useState<Recipe[]>([
@@ -122,19 +124,75 @@ const RecipeManagement = () => {
   };
 
   const handleImport = (importedData: any) => {
+    // Validate and clean imported data
+    const cleanedData = {
+      title: importedData.title || 'Công thức chưa có tên',
+      category: importedData.category || 'Món chính',
+      difficulty: importedData.difficulty || 'Dễ' as const,
+      cookingTime: importedData.cookingTime || '30 phút',
+      servings: importedData.servings || 2,
+      author: importedData.author || 'Admin',
+      status: 'draft' as const,
+      ingredients: importedData.ingredients || '',
+      instructions: importedData.instructions || '',
+      description: importedData.description || '',
+      image: importedData.image || '',
+      calories: importedData.calories || 0,
+      protein: importedData.protein || 0,
+      carbs: importedData.carbs || 0,
+      fat: importedData.fat || 0,
+      tags: []
+    };
+
     const newRecipe = {
-      ...importedData,
+      ...cleanedData,
       id: Math.max(...recipes.map(r => r.id)) + 1,
       createdDate: new Date().toISOString().split('T')[0],
-      views: 0,
-      status: 'draft' as const,
-      difficulty: importedData.difficulty || 'Dễ' as const
+      views: 0
     };
+
     setRecipes([...recipes, newRecipe]);
+
     toast({
       title: "Thành công",
-      description: "Đã import công thức thành công",
+      description: `Đã import công thức "${cleanedData.title}" thành công`,
     });
+
+    setIsImportModalOpen(false);
+  };
+
+  const handleBatchImport = (importedRecipes: any[]) => {
+    const newRecipes = importedRecipes.map((data, index) => {
+      const cleanedData = {
+        title: data.title || 'Công thức không tên',
+        category: data.category || 'Khác',
+        difficulty: (data.difficulty as 'Dễ' | 'Trung bình' | 'Khó') || 'Trung bình',
+        cookingTime: data.cookingTime || '30 phút',
+        servings: data.servings || 2,
+        author: data.author || 'Admin',
+        ingredients: data.ingredients || '',
+        instructions: data.instructions || '',
+        description: data.description || '',
+        image: data.image || ''
+      };
+
+      return {
+        id: recipes.length + index + 1,
+        ...cleanedData,
+        status: 'draft' as const,
+        createdDate: new Date().toISOString().split('T')[0],
+        views: 0
+      };
+    });
+
+    setRecipes([...recipes, ...newRecipes]);
+
+    toast({
+      title: "Thành công",
+      description: `Đã import ${importedRecipes.length} công thức thành công`,
+    });
+
+    setIsBatchImportModalOpen(false);
   };
 
   const getStatusBadge = (status: string) => {
@@ -165,10 +223,114 @@ const RecipeManagement = () => {
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle>Quản lý công thức</CardTitle>
-            <div className="flex space-x-2">
+            <div className="flex flex-wrap gap-2">
+              <Button
+                variant="outline"
+                onClick={() => window.open('/import-demo', '_blank')}
+                size="sm"
+              >
+                <Eye className="mr-2 h-4 w-4" />
+                Demo Import
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => window.open('/multilang-import', '_blank')}
+                size="sm"
+                className="bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100"
+              >
+                🌐 Demo Đa Ngôn Ngữ
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => window.open('/validation-test', '_blank')}
+                size="sm"
+                className="bg-orange-50 border-orange-200 text-orange-700 hover:bg-orange-100"
+              >
+                ⚠️ Test Validation
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => window.open('/smart-extraction', '_blank')}
+                size="sm"
+                className="bg-purple-50 border-purple-200 text-purple-700 hover:bg-purple-100"
+              >
+                🧠 Smart Extraction
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => window.open('/error-handling', '_blank')}
+                size="sm"
+                className="bg-red-50 border-red-200 text-red-700 hover:bg-red-100"
+              >
+                🐛 Error Handling
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => window.open('/anti-block', '_blank')}
+                size="sm"
+                className="bg-green-50 border-green-200 text-green-700 hover:bg-green-100"
+              >
+                🛡️ Anti-Block
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => window.open('/knorr-style-demo', '_blank')}
+                size="sm"
+                className="bg-pink-50 border-pink-200 text-pink-700 hover:bg-pink-100"
+              >
+                🎨 Knorr Style
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => window.open('/knorr-system-demo', '_blank')}
+                size="sm"
+                className="bg-indigo-50 border-indigo-200 text-indigo-700 hover:bg-indigo-100"
+              >
+                🎯 Design System
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => window.open('/batch-import-demo', '_blank')}
+                size="sm"
+                className="bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200 text-blue-700 hover:from-blue-100 hover:to-purple-100"
+              >
+                📦 Batch Import Demo
+              </Button>
               <Button variant="outline" onClick={() => setIsImportModalOpen(true)}>
-                <link className="mr-2 h-4 w-4" />
+                <Link className="mr-2 h-4 w-4" />
                 Import từ URL
+              </Button>
+              <Button
+                onClick={() => setIsBatchImportModalOpen(true)}
+                size="sm"
+                className="bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700"
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                Batch Import
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => window.open('/menu-system-demo', '_blank')}
+                size="sm"
+                className="bg-green-50 border-green-200 text-green-700 hover:bg-green-100"
+              >
+                🍽️ Demo Hệ Thống Thực Đơn
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => window.open('/admin', '_blank')}
+                size="sm"
+                className="bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100"
+              >
+                📝 Quản Lý Thực Đơn
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => window.open('/ke-hoach-nau-an', '_blank')}
+                size="sm"
+                className="bg-purple-50 border-purple-200 text-purple-700 hover:bg-purple-100"
+              >
+                📅 Kế Hoạch Nấu Ăn
               </Button>
               <Button onClick={handleAdd}>
                 <Plus className="mr-2 h-4 w-4" />
@@ -241,6 +403,7 @@ const RecipeManagement = () => {
         onSave={handleSave}
         recipe={selectedRecipe}
         mode={modalMode}
+        existingRecipes={recipes}
       />
 
       <ImportModal
@@ -248,6 +411,14 @@ const RecipeManagement = () => {
         onClose={() => setIsImportModalOpen(false)}
         onImport={handleImport}
         type="recipe"
+      />
+
+      <BatchImportModal
+        isOpen={isBatchImportModalOpen}
+        onClose={() => setIsBatchImportModalOpen(false)}
+        onImport={handleBatchImport}
+        type="recipe"
+        existingRecipes={recipes}
       />
     </div>
   );

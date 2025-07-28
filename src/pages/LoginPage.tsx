@@ -1,23 +1,56 @@
 
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import ProtectedRoute from '@/components/ProtectedRoute';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ChefHat, Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { ChefHat, Mail, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
 
 const LoginPage = () => {
+  const { login, isLoading } = useAuth();
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
+  const [debugInfo, setDebugInfo] = useState('');
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Debug function to check localStorage
+  const checkLocalStorage = () => {
+    const users = JSON.parse(localStorage.getItem('registered_users') || '[]');
+    const info = `Found ${users.length} users:\n${users.map((u: any, i: number) =>
+      `${i + 1}. ${u.email} / ${u.password}`
+    ).join('\n')}`;
+    setDebugInfo(info);
+    console.log('LocalStorage users:', users);
+  };
+
+  // Check localStorage on component mount
+  React.useEffect(() => {
+    checkLocalStorage();
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Login attempt:', formData);
-    // Handle login logic here
+    setError('');
+
+    if (!formData.email || !formData.password) {
+      setError('Vui lòng nhập đầy đủ thông tin');
+      return;
+    }
+
+    try {
+      await login(formData.email, formData.password);
+      // Redirect to home page or previous page after successful login
+      navigate('/');
+    } catch (err: any) {
+      setError(err.message || 'Đăng nhập thất bại. Vui lòng thử lại.');
+    }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -25,12 +58,15 @@ const LoginPage = () => {
       ...formData,
       [e.target.name]: e.target.value
     });
+    // Clear error when user starts typing
+    if (error) setError('');
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-green-50">
-      <Header />
-      <main className="flex items-center justify-center py-12 px-4">
+    <ProtectedRoute requireAuth={false} redirectTo="/">
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-green-50">
+        <Header />
+        <main className="flex items-center justify-center py-12 px-4">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
             <div className="flex justify-center mb-4">
@@ -44,6 +80,52 @@ const LoginPage = () => {
             </p>
           </CardHeader>
           <CardContent>
+            {/* Demo Accounts Info */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+              <div className="flex items-center justify-between mb-2">
+                <h4 className="text-sm font-semibold text-blue-800">🎯 Tài khoản demo:</h4>
+                <div className="flex gap-2">
+                  <button
+                    onClick={checkLocalStorage}
+                    className="text-xs text-green-600 hover:text-green-800 underline"
+                  >
+                    Check Users
+                  </button>
+                  <button
+                    onClick={() => {
+                      localStorage.removeItem('registered_users');
+                      window.location.reload();
+                    }}
+                    className="text-xs text-blue-600 hover:text-blue-800 underline"
+                  >
+                    Reset Demo
+                  </button>
+                </div>
+              </div>
+              <div className="text-xs text-blue-700 space-y-1">
+                <div><strong>Email:</strong> demo@angiday.com | <strong>Password:</strong> 123456</div>
+                <div><strong>Email:</strong> admin@angiday.com | <strong>Password:</strong> admin123</div>
+              </div>
+            </div>
+
+            {/* Debug Info */}
+            {debugInfo && (
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 mb-4">
+                <h4 className="text-sm font-semibold text-gray-800 mb-2">🔍 Debug Info:</h4>
+                <pre className="text-xs text-gray-700 whitespace-pre-wrap">{debugInfo}</pre>
+              </div>
+            )}
+
+            {/* Error Message */}
+            {error && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
+                <div className="flex items-center">
+                  <AlertCircle className="h-4 w-4 text-red-600 mr-2" />
+                  <p className="text-sm text-red-800">{error}</p>
+                </div>
+              </div>
+            )}
+
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
@@ -60,6 +142,7 @@ const LoginPage = () => {
                     placeholder="Nhập email của bạn"
                     className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                     required
+                    disabled={isLoading}
                   />
                 </div>
               </div>
@@ -79,6 +162,7 @@ const LoginPage = () => {
                     placeholder="Nhập mật khẩu"
                     className="w-full pl-10 pr-12 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                     required
+                    disabled={isLoading}
                   />
                   <button
                     type="button"
@@ -100,8 +184,12 @@ const LoginPage = () => {
                 </a>
               </div>
 
-              <Button type="submit" className="w-full bg-orange-600 hover:bg-orange-700 text-white">
-                Đăng nhập
+              <Button
+                type="submit"
+                className="w-full bg-orange-600 hover:bg-orange-700 text-white"
+                disabled={isLoading}
+              >
+                {isLoading ? 'Đang đăng nhập...' : 'Đăng nhập'}
               </Button>
 
               <div className="relative">
@@ -134,9 +222,10 @@ const LoginPage = () => {
             </div>
           </CardContent>
         </Card>
-      </main>
-      <Footer />
-    </div>
+        </main>
+        <Footer />
+      </div>
+    </ProtectedRoute>
   );
 };
 

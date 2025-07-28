@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Search, Plus, Edit, Trash2, Eye } from 'lucide-react';
+import { Search, Plus, Edit, Trash2, Eye, Calendar, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -136,10 +136,21 @@ const MealPlanManagement = () => {
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle>Quản lý thực đơn</CardTitle>
-            <Button onClick={handleAdd}>
-              <Plus className="mr-2 h-4 w-4" />
-              Thêm thực đơn
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={() => window.open('/meal-plan-importer', '_blank')}
+                size="sm"
+                className="bg-orange-50 border-orange-200 text-orange-700 hover:bg-orange-100"
+              >
+                <Calendar className="mr-2 h-4 w-4" />
+                Import từ MonNgonMoiNgay
+              </Button>
+              <Button onClick={handleAdd}>
+                <Plus className="mr-2 h-4 w-4" />
+                Thêm thực đơn
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent>

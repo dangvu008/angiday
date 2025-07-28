@@ -1,15 +1,20 @@
 
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import ProtectedRoute from '@/components/ProtectedRoute';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ChefHat, Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
+import { ChefHat, Mail, Lock, User, Eye, EyeOff, AlertCircle } from 'lucide-react';
 
 const RegisterPage = () => {
+  const { register, isLoading } = useAuth();
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [error, setError] = useState('');
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -17,14 +22,33 @@ const RegisterPage = () => {
     confirmPassword: ''
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (formData.password !== formData.confirmPassword) {
-      alert('Mật khẩu xác nhận không khớp!');
+    setError('');
+
+    // Validation
+    if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
+      setError('Vui lòng nhập đầy đủ thông tin');
       return;
     }
-    console.log('Register attempt:', formData);
-    // Handle registration logic here
+
+    if (formData.password !== formData.confirmPassword) {
+      setError('Mật khẩu xác nhận không khớp!');
+      return;
+    }
+
+    if (formData.password.length < 6) {
+      setError('Mật khẩu phải có ít nhất 6 ký tự');
+      return;
+    }
+
+    try {
+      await register(formData.email, formData.password, formData.name);
+      // Redirect to home page after successful registration
+      navigate('/');
+    } catch (err: any) {
+      setError(err.message || 'Đăng ký thất bại. Vui lòng thử lại.');
+    }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -32,12 +56,15 @@ const RegisterPage = () => {
       ...formData,
       [e.target.name]: e.target.value
     });
+    // Clear error when user starts typing
+    if (error) setError('');
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-green-50">
-      <Header />
-      <main className="flex items-center justify-center py-12 px-4">
+    <ProtectedRoute requireAuth={false} redirectTo="/">
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-green-50">
+        <Header />
+        <main className="flex items-center justify-center py-12 px-4">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
             <div className="flex justify-center mb-4">
@@ -51,6 +78,16 @@ const RegisterPage = () => {
             </p>
           </CardHeader>
           <CardContent>
+            {/* Error Message */}
+            {error && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
+                <div className="flex items-center">
+                  <AlertCircle className="h-4 w-4 text-red-600 mr-2" />
+                  <p className="text-sm text-red-800">{error}</p>
+                </div>
+              </div>
+            )}
+
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
@@ -67,6 +104,7 @@ const RegisterPage = () => {
                     placeholder="Nhập họ và tên"
                     className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                     required
+                    disabled={isLoading}
                   />
                 </div>
               </div>
@@ -86,6 +124,7 @@ const RegisterPage = () => {
                     placeholder="Nhập email của bạn"
                     className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                     required
+                    disabled={isLoading}
                   />
                 </div>
               </div>
@@ -105,6 +144,7 @@ const RegisterPage = () => {
                     placeholder="Nhập mật khẩu"
                     className="w-full pl-10 pr-12 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                     required
+                    disabled={isLoading}
                   />
                   <button
                     type="button"
@@ -131,6 +171,7 @@ const RegisterPage = () => {
                     placeholder="Nhập lại mật khẩu"
                     className="w-full pl-10 pr-12 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                     required
+                    disabled={isLoading}
                   />
                   <button
                     type="button"
@@ -161,8 +202,12 @@ const RegisterPage = () => {
                 </label>
               </div>
 
-              <Button type="submit" className="w-full bg-orange-600 hover:bg-orange-700 text-white">
-                Tạo tài khoản
+              <Button
+                type="submit"
+                className="w-full bg-orange-600 hover:bg-orange-700 text-white"
+                disabled={isLoading}
+              >
+                {isLoading ? 'Đang tạo tài khoản...' : 'Tạo tài khoản'}
               </Button>
 
               <div className="relative">
@@ -195,9 +240,10 @@ const RegisterPage = () => {
             </div>
           </CardContent>
         </Card>
-      </main>
-      <Footer />
-    </div>
+        </main>
+        <Footer />
+      </div>
+    </ProtectedRoute>
   );
 };
 

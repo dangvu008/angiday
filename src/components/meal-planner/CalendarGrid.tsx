@@ -2,9 +2,25 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ChevronLeft, ChevronRight, Plus, Utensils } from 'lucide-react';
+import {
+  ChevronLeft,
+  ChevronRight,
+  Plus,
+  Utensils,
+  ShoppingCart,
+  Eye,
+  Share2,
+  Copy,
+  MoreHorizontal
+} from 'lucide-react';
 import { format, startOfWeek, addDays, isSameDay, addWeeks, subWeeks } from 'date-fns';
 import { vi } from 'date-fns/locale';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface MealPlan {
   id: string;
@@ -18,12 +34,20 @@ interface CalendarGridProps {
   mealPlans: MealPlan[];
   onAddMeal: (date: Date, mealType: string) => void;
   onRemoveMeal: (mealPlanId: string) => void;
+  onSelectPresetMenu?: (date: Date) => void;
+  onViewDayDetails?: (date: Date) => void;
+  onGenerateShoppingList?: (date: Date) => void;
+  onShareDay?: (date: Date) => void;
 }
 
-export const CalendarGrid = ({ 
-  mealPlans, 
-  onAddMeal, 
-  onRemoveMeal 
+export const CalendarGrid = ({
+  mealPlans,
+  onAddMeal,
+  onRemoveMeal,
+  onSelectPresetMenu,
+  onViewDayDetails,
+  onGenerateShoppingList,
+  onShareDay
 }: CalendarGridProps) => {
   const [currentWeek, setCurrentWeek] = useState(new Date());
 
@@ -102,48 +126,101 @@ export const CalendarGrid = ({
         </div>
 
         <div className="grid grid-cols-7 gap-2">
-          {weekDays.map((day, dayIndex) => (
-            <div key={dayIndex} className="border rounded-lg p-2 min-h-[300px] space-y-2">
-              {mealTypes.map((mealType) => {
-                const meals = getMealsByType(day, mealType.key);
-                return (
-                  <div key={mealType.key} className="space-y-1">
-                    <div className="flex items-center justify-between">
-                      <Badge 
-                        variant="secondary" 
-                        className={`text-xs ${mealType.color}`}
-                      >
-                        {mealType.label}
-                      </Badge>
+          {weekDays.map((day, dayIndex) => {
+            const dayMeals = getMealsForDay(day);
+            const hasMeals = dayMeals.length > 0;
+
+            return (
+              <div key={dayIndex} className="border rounded-lg p-2 min-h-[350px] space-y-2">
+                {/* Day Actions */}
+                <div className="flex items-center justify-between mb-2 pb-2 border-b">
+                  <span className="text-xs font-medium text-muted-foreground">
+                    {format(day, 'dd/MM', { locale: vi })}
+                  </span>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
                       <Button
                         variant="ghost"
                         size="icon"
                         className="h-6 w-6"
-                        onClick={() => onAddMeal(day, mealType.key)}
                       >
-                        <Plus className="h-3 w-3" />
+                        <MoreHorizontal className="h-3 w-3" />
                       </Button>
-                    </div>
-                    
-                    {meals.map((meal) => (
-                      <div
-                        key={meal.id}
-                        className="bg-muted rounded p-2 text-xs group relative cursor-pointer"
-                        onClick={() => onRemoveMeal(meal.id)}
-                      >
-                        <div className="truncate" title={meal.recipeName}>
-                          {meal.recipeName}
-                        </div>
-                        <div className="absolute inset-0 bg-red-500/80 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded">
-                          Xóa
-                        </div>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-48">
+                      <DropdownMenuItem onClick={() => onSelectPresetMenu?.(day)}>
+                        <Copy className="h-4 w-4 mr-2" />
+                        Chọn thực đơn có sẵn
+                      </DropdownMenuItem>
+                      {hasMeals && (
+                        <>
+                          <DropdownMenuItem onClick={() => onViewDayDetails?.(day)}>
+                            <Eye className="h-4 w-4 mr-2" />
+                            Chi tiết thực đơn ngày
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => onGenerateShoppingList?.(day)}>
+                            <ShoppingCart className="h-4 w-4 mr-2" />
+                            Đi chợ cho ngày này
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => onShareDay?.(day)}>
+                            <Share2 className="h-4 w-4 mr-2" />
+                            Chia sẻ thực đơn
+                          </DropdownMenuItem>
+                        </>
+                      )}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+
+                {/* Meal Types */}
+                {mealTypes.map((mealType) => {
+                  const meals = getMealsByType(day, mealType.key);
+                  return (
+                    <div key={mealType.key} className="space-y-1">
+                      <div className="flex items-center justify-between">
+                        <Badge
+                          variant="secondary"
+                          className={`text-xs ${mealType.color}`}
+                        >
+                          {mealType.label}
+                        </Badge>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6"
+                          onClick={() => onAddMeal(day, mealType.key)}
+                        >
+                          <Plus className="h-3 w-3" />
+                        </Button>
                       </div>
-                    ))}
-                  </div>
-                );
-              })}
-            </div>
-          ))}
+
+                      {meals.map((meal) => (
+                        <div
+                          key={meal.id}
+                          className="bg-muted rounded p-2 text-xs group relative cursor-pointer"
+                          onClick={() => onRemoveMeal(meal.id)}
+                        >
+                          <div className="truncate" title={meal.recipeName}>
+                            {meal.recipeName}
+                          </div>
+                          <div className="absolute inset-0 bg-red-500/80 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded">
+                            Xóa
+                          </div>
+                        </div>
+                      ))}
+
+                      {/* Show count if multiple meals */}
+                      {meals.length > 1 && (
+                        <div className="text-xs text-muted-foreground text-center">
+                          {meals.length} món
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })}
         </div>
 
         {/* Tổng kết tuần */}

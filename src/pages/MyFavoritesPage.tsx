@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import ProtectedRoute from '@/components/ProtectedRoute';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -76,9 +77,10 @@ const MyFavoritesPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <main>
+    <ProtectedRoute requireAuth={true}>
+      <div className="min-h-screen bg-background">
+        <Header />
+        <main>
         {/* Hero Section */}
         <section className="py-12 px-4 bg-gradient-to-br from-red-50 to-pink-50">
           <div className="max-w-4xl mx-auto text-center">
@@ -245,9 +247,10 @@ const MyFavoritesPage = () => {
             </div>
           </div>
         )}
-      </main>
-      <Footer />
-    </div>
+        </main>
+        <Footer />
+      </div>
+    </ProtectedRoute>
   );
 };
 

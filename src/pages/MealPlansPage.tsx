@@ -170,11 +170,46 @@ const MealPlansPage = () => {
   ];
 
   const categories = [
-    { key: 'all', label: 'Tất cả', color: 'bg-gray-600' },
-    { key: 'single', label: 'Thực đơn lẻ', color: 'bg-blue-600' },
-    { key: 'daily', label: 'Thực đơn ngày', color: 'bg-green-600' },
-    { key: 'weekly', label: 'Thực đơn tuần', color: 'bg-orange-600' },
-    { key: 'monthly', label: 'Thực đơn tháng', color: 'bg-purple-600' }
+    {
+      key: 'all',
+      label: 'Tất cả thực đơn',
+      color: 'bg-gradient-to-r from-gray-500 to-gray-600',
+      hoverColor: 'hover:from-gray-600 hover:to-gray-700',
+      icon: '🍽️',
+      description: 'Xem tất cả'
+    },
+    {
+      key: 'single',
+      label: 'Thực đơn bữa lẻ',
+      color: 'bg-gradient-to-r from-blue-500 to-blue-600',
+      hoverColor: 'hover:from-blue-600 hover:to-blue-700',
+      icon: '🥘',
+      description: 'Từng bữa ăn'
+    },
+    {
+      key: 'daily',
+      label: 'Thực đơn cả ngày',
+      color: 'bg-gradient-to-r from-green-500 to-green-600',
+      hoverColor: 'hover:from-green-600 hover:to-green-700',
+      icon: '📅',
+      description: '3 bữa/ngày'
+    },
+    {
+      key: 'weekly',
+      label: 'Thực đơn tuần',
+      color: 'bg-gradient-to-r from-orange-500 to-red-500',
+      hoverColor: 'hover:from-orange-600 hover:to-red-600',
+      icon: '📊',
+      description: '7 ngày'
+    },
+    {
+      key: 'monthly',
+      label: 'Thực đơn tháng',
+      color: 'bg-gradient-to-r from-purple-500 to-pink-500',
+      hoverColor: 'hover:from-purple-600 hover:to-pink-600',
+      icon: '🗓️',
+      description: '30 ngày'
+    }
   ];
 
   const filteredMealPlans = selectedCategory === 'all' 
@@ -182,13 +217,8 @@ const MealPlansPage = () => {
     : mealPlans.filter(plan => plan.type === selectedCategory);
 
   const getCategoryIcon = (type: string) => {
-    switch(type) {
-      case 'single': return '🍽️';
-      case 'daily': return '📅';
-      case 'weekly': return '📊';
-      case 'monthly': return '🗓️';
-      default: return '🍳';
-    }
+    const category = categories.find(cat => cat.key === type);
+    return category ? category.icon : '🍳';
   };
 
   return (
@@ -208,36 +238,69 @@ const MealPlansPage = () => {
         </section>
 
         {/* Categories Filter */}
-        <section className="py-8 px-4 border-b bg-gray-50">
+        <section className="py-12 px-4 bg-gradient-to-br from-orange-50 via-white to-red-50">
           <div className="max-w-6xl mx-auto">
-            <div className="flex flex-wrap gap-3 justify-center">
+            <div className="text-center mb-8">
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Chọn loại thực đơn</h2>
+              <p className="text-gray-600">Tìm thực đơn phù hợp với nhu cầu và thời gian của bạn</p>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 max-w-5xl mx-auto">
               {categories.map((category) => (
-                <Badge 
-                  key={category.key} 
-                  className={`cursor-pointer px-6 py-3 text-sm font-medium transition-all ${
-                    selectedCategory === category.key 
-                      ? `${category.color} text-white` 
-                      : 'bg-white text-gray-600 border border-gray-300 hover:bg-gray-100'
-                  }`}
+                <div
+                  key={category.key}
                   onClick={() => setSelectedCategory(category.key)}
+                  className={`relative group cursor-pointer rounded-2xl p-6 text-center transition-all duration-300 transform hover:scale-105 hover:shadow-xl ${
+                    selectedCategory === category.key
+                      ? `${category.color} ${category.hoverColor} text-white shadow-lg scale-105 ring-4 ring-orange-200`
+                      : 'bg-white text-gray-700 border-2 border-gray-200 hover:border-orange-300 hover:bg-orange-50 shadow-md'
+                  }`}
                 >
-                  {getCategoryIcon(category.key)} {category.label}
-                </Badge>
+                  {/* Icon */}
+                  <div className={`text-4xl mb-3 transition-transform duration-300 ${
+                    selectedCategory === category.key ? 'scale-110' : 'group-hover:scale-110'
+                  }`}>
+                    {category.icon}
+                  </div>
+
+                  {/* Label */}
+                  <h3 className={`font-bold text-lg mb-2 transition-colors duration-300 ${
+                    selectedCategory === category.key ? 'text-white' : 'text-gray-900 group-hover:text-orange-600'
+                  }`}>
+                    {category.label}
+                  </h3>
+
+                  {/* Description */}
+                  <p className={`text-sm transition-colors duration-300 ${
+                    selectedCategory === category.key ? 'text-white/90' : 'text-gray-500 group-hover:text-orange-500'
+                  }`}>
+                    {category.description}
+                  </p>
+
+                  {/* Active indicator */}
+                  {selectedCategory === category.key && (
+                    <div className="absolute -top-2 -right-2 w-6 h-6 bg-white rounded-full flex items-center justify-center shadow-lg">
+                      <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                    </div>
+                  )}
+                </div>
               ))}
             </div>
           </div>
         </section>
 
         {/* Meal Plans Grid */}
-        <section className="py-12 px-4">
+        <section className="py-12 px-4 bg-white">
           <div className="max-w-6xl mx-auto">
-            <div className="mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">
-                {selectedCategory === 'all' ? 'Tất cả thực đơn' : 
-                 categories.find(cat => cat.key === selectedCategory)?.label}
-              </h2>
-              <p className="text-gray-600 mt-2">
-                Tìm thấy {filteredMealPlans.length} thực đơn phù hợp
+            {/* Results Header */}
+            <div className="text-center mb-12">
+              <div className="inline-flex items-center gap-3 bg-gradient-to-r from-orange-100 to-red-100 px-6 py-3 rounded-full mb-4">
+                <span className="text-2xl">{getCategoryIcon(selectedCategory)}</span>
+                <h2 className="text-xl font-bold text-gray-900">
+                  {categories.find(cat => cat.key === selectedCategory)?.label || 'Tất cả thực đơn'}
+                </h2>
+              </div>
+              <p className="text-gray-600">
+                Tìm thấy <span className="font-semibold text-orange-600">{filteredMealPlans.length}</span> thực đơn phù hợp
               </p>
             </div>
             
