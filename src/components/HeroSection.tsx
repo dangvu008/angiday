@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Search, Mic, MicOff, Calendar, BookOpen } from 'lucide-react';
+import { Search, Mic, MicOff, Calendar, BookOpen, Salad, Baby, DollarSign, Leaf, PartyPopper } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
 const HeroSection = () => {
@@ -14,7 +14,13 @@ const HeroSection = () => {
   // Voice search functionality
   const startVoiceSearch = () => {
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-      const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
+      const SpeechRecognition = (window as typeof window & {
+        webkitSpeechRecognition?: typeof SpeechRecognition;
+        SpeechRecognition?: typeof SpeechRecognition;
+      }).webkitSpeechRecognition || (window as typeof window & {
+        webkitSpeechRecognition?: typeof SpeechRecognition;
+        SpeechRecognition?: typeof SpeechRecognition;
+      }).SpeechRecognition;
       const recognition = new SpeechRecognition();
 
       recognition.continuous = false;
@@ -25,7 +31,7 @@ const HeroSection = () => {
         setIsListening(true);
       };
 
-      recognition.onresult = (event: any) => {
+      recognition.onresult = (event: SpeechRecognitionEvent) => {
         const transcript = event.results[0][0].transcript;
         setSearchQuery(transcript);
         setIsListening(false);
@@ -74,59 +80,121 @@ const HeroSection = () => {
         ) : (
           <>
             <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-              Khám phá <span className="text-orange-600">ẩm thực</span><br />
-              <span className="text-orange-600">Việt Nam</span> mỗi ngày
+              <span className="text-orange-600">Bữa Ăn Ngay Lại</span><br />
+              <span className="text-gray-900">Không Còn Đau Đầu Suy Nghĩ</span>
             </h1>
-            <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-              Từ những mẹo vặt nhà bếp đến thực đơn hoàn chỉnh, Angiday đồng hành cùng bạn trong hành trình khám phá ẩm thực
+            <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+              Angiday cung cấp thực đơn thông minh cho mọi nhu cầu của gia đình bạn: từ dinh dưỡng cho mẹ bầu, ăn kiêng, ăn chay đến quản lý chi tiêu hiệu quả.
             </p>
           </>
         )}
 
-        {/* Search Bar - Improved with Voice Search */}
-        <div className="max-w-2xl mx-auto mb-8">
-          <div className="relative flex items-center bg-white rounded-full border-2 border-gray-200 shadow-lg focus-within:ring-2 focus-within:ring-orange-500 focus-within:border-orange-500 transition-all duration-300" style={{ height: '64px' }}>
-            {/* Search Icon */}
-            <div className="absolute left-4 flex items-center justify-center" style={{ height: '64px' }}>
-              <Search className="h-5 w-5 text-gray-400" />
-            </div>
-
-            {/* Input Field */}
-            <input
-              type="text"
-              placeholder={isListening ? "Đang nghe..." : "Ăn gì hôm nay?"}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyPress={handleKeyPress}
-              className="w-full h-full pl-14 pr-40 bg-transparent border-0 outline-none text-gray-700 placeholder:text-gray-400 text-lg rounded-full"
-            />
-
-            {/* Right Side Buttons */}
-            <div className="absolute right-2 flex items-center gap-2" style={{ height: '64px' }}>
-              {/* Voice Search Button */}
+        {/* Hộp Giải Pháp Thông Minh */}
+        {!isAuthenticated && (
+          <div className="max-w-4xl mx-auto mb-12">
+            <h3 className="text-2xl font-semibold text-gray-800 mb-6 text-center">
+              Angiday có sẵn giải pháp cho gia đình bạn
+            </h3>
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
               <button
-                onClick={startVoiceSearch}
-                disabled={isListening}
-                className={`flex items-center justify-center w-10 h-10 rounded-full transition-all duration-200 ${
-                  isListening
-                    ? 'bg-red-100 text-red-600 animate-pulse'
-                    : 'hover:bg-orange-50 hover:text-orange-600 text-gray-500'
-                }`}
-                title="Tìm kiếm bằng giọng nói"
+                onClick={() => navigate('/recipes?category=eat-clean')}
+                className="flex flex-col items-center p-6 bg-white rounded-2xl border-2 border-green-200 hover:border-green-400 hover:shadow-lg transition-all duration-300 group"
               >
-                {isListening ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
+                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-3 group-hover:bg-green-200 transition-colors">
+                  <Salad className="h-6 w-6 text-green-600" />
+                </div>
+                <span className="text-sm font-medium text-gray-700 text-center">Thực đơn<br />Eat Clean</span>
               </button>
 
-              {/* Search Button */}
               <button
-                onClick={handleSearch}
-                className="flex items-center justify-center bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-6 h-12 rounded-full font-medium text-lg shadow-lg hover:shadow-xl transition-all duration-300"
+                onClick={() => navigate('/recipes?category=pregnancy')}
+                className="flex flex-col items-center p-6 bg-white rounded-2xl border-2 border-pink-200 hover:border-pink-400 hover:shadow-lg transition-all duration-300 group"
               >
-                Tìm kiếm
+                <div className="w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center mb-3 group-hover:bg-pink-200 transition-colors">
+                  <Baby className="h-6 w-6 text-pink-600" />
+                </div>
+                <span className="text-sm font-medium text-gray-700 text-center">Dinh dưỡng<br />cho Mẹ Bầu</span>
+              </button>
+
+              <button
+                onClick={() => navigate('/recipes?category=budget')}
+                className="flex flex-col items-center p-6 bg-white rounded-2xl border-2 border-blue-200 hover:border-blue-400 hover:shadow-lg transition-all duration-300 group"
+              >
+                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-3 group-hover:bg-blue-200 transition-colors">
+                  <DollarSign className="h-6 w-6 text-blue-600" />
+                </div>
+                <span className="text-sm font-medium text-gray-700 text-center">Thực đơn<br />Tiết kiệm</span>
+              </button>
+
+              <button
+                onClick={() => navigate('/recipes?category=vegetarian')}
+                className="flex flex-col items-center p-6 bg-white rounded-2xl border-2 border-emerald-200 hover:border-emerald-400 hover:shadow-lg transition-all duration-300 group"
+              >
+                <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mb-3 group-hover:bg-emerald-200 transition-colors">
+                  <Leaf className="h-6 w-6 text-emerald-600" />
+                </div>
+                <span className="text-sm font-medium text-gray-700 text-center">Món Chay<br />Dễ Làm</span>
+              </button>
+
+              <button
+                onClick={() => navigate('/recipes?category=party')}
+                className="flex flex-col items-center p-6 bg-white rounded-2xl border-2 border-purple-200 hover:border-purple-400 hover:shadow-lg transition-all duration-300 group"
+              >
+                <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mb-3 group-hover:bg-purple-200 transition-colors">
+                  <PartyPopper className="h-6 w-6 text-purple-600" />
+                </div>
+                <span className="text-sm font-medium text-gray-700 text-center">Thực đơn<br />Đãi tiệc</span>
               </button>
             </div>
           </div>
-        </div>
+        )}
+
+        {/* Search Bar cho người đã đăng nhập */}
+        {isAuthenticated && (
+          <div className="max-w-2xl mx-auto mb-8">
+            <div className="relative flex items-center bg-white rounded-full border-2 border-gray-200 shadow-lg focus-within:ring-2 focus-within:ring-orange-500 focus-within:border-orange-500 transition-all duration-300" style={{ height: '64px' }}>
+              {/* Search Icon */}
+              <div className="absolute left-4 flex items-center justify-center" style={{ height: '64px' }}>
+                <Search className="h-5 w-5 text-gray-400" />
+              </div>
+
+              {/* Input Field */}
+              <input
+                type="text"
+                placeholder={isListening ? "Đang nghe..." : "Ăn gì hôm nay?"}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyPress={handleKeyPress}
+                className="w-full h-full pl-14 pr-40 bg-transparent border-0 outline-none text-gray-700 placeholder:text-gray-400 text-lg rounded-full"
+              />
+
+              {/* Right Side Buttons */}
+              <div className="absolute right-2 flex items-center gap-2" style={{ height: '64px' }}>
+                {/* Voice Search Button */}
+                <button
+                  onClick={startVoiceSearch}
+                  disabled={isListening}
+                  className={`flex items-center justify-center w-10 h-10 rounded-full transition-all duration-200 ${
+                    isListening
+                      ? 'bg-red-100 text-red-600 animate-pulse'
+                      : 'hover:bg-orange-50 hover:text-orange-600 text-gray-500'
+                  }`}
+                  title="Tìm kiếm bằng giọng nói"
+                >
+                  {isListening ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
+                </button>
+
+                {/* Search Button */}
+                <button
+                  onClick={handleSearch}
+                  className="flex items-center justify-center bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-6 h-12 rounded-full font-medium text-lg shadow-lg hover:shadow-xl transition-all duration-300"
+                >
+                  Tìm kiếm
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           {isAuthenticated ? (

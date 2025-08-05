@@ -47,21 +47,25 @@ interface MealPlanningContextType {
   // Current meal plan being edited
   currentPlan: MealPlan | null;
   setCurrentPlan: (plan: MealPlan | null) => void;
-  
+
+  // Active meal plan (the one being used for daily tracking and shopping)
+  activePlan: MealPlan | null;
+  setActivePlan: (plan: MealPlan | null) => void;
+
   // All user's meal plans
   userMealPlans: MealPlan[];
-  
+
   // Available recipes
   availableRecipes: Recipe[];
-  
+
   // Current view date
   currentDate: Date;
   setCurrentDate: (date: Date) => void;
-  
+
   // View mode
   viewMode: 'week' | 'month';
   setViewMode: (mode: 'week' | 'month') => void;
-  
+
   // Actions
   createNewPlan: (name: string, startDate: string, endDate: string) => MealPlan;
   saveMealPlan: (plan: MealPlan) => void;
@@ -70,14 +74,15 @@ interface MealPlanningContextType {
   addDishToMeal: (planId: string, date: string, mealType: string, recipe: Recipe) => void;
   removeMealFromSlot: (planId: string, date: string, mealType: string) => void;
   removeDishFromMeal: (planId: string, mealSlotId: string) => void;
-  
+
   // Nutrition
   getDayNutrition: (date: string) => NutritionSummary;
   getWeekNutrition: (startDate: string) => NutritionSummary;
-  
+
   // Shopping list
   generateShoppingList: (planId: string) => { [category: string]: string[] };
-  
+  generateActiveShoppingList: () => { [category: string]: string[] };
+
   // Loading states
   isLoading: boolean;
 }
@@ -174,24 +179,199 @@ const createSampleMealPlans = (userId: string): MealPlan[] => {
     {
       id: `plan_${Date.now()}_1`,
       userId,
-      name: 'Kế hoạch tuần này',
-      description: 'Kế hoạch ăn uống cho tuần hiện tại',
+      name: 'Thực đơn healthy tuần này',
+      description: 'Kế hoạch ăn uống cân bằng dinh dưỡng cho tuần hiện tại',
       startDate: today.toISOString().split('T')[0],
       endDate: nextWeek.toISOString().split('T')[0],
       meals: [
+        // Hôm nay - đầy đủ 4 bữa
         {
           id: `meal_${Date.now()}_1`,
           date: today.toISOString().split('T')[0],
+          mealType: 'breakfast',
+          recipe: {
+            id: 'recipe_breakfast_1',
+            title: 'Phở Gà Thanh Đạm',
+            image: 'https://images.unsplash.com/photo-1555126634-323283e090fa?w=300&h=200&fit=crop',
+            cookTime: '30 phút',
+            servings: 1,
+            difficulty: 'Dễ',
+            calories: 380,
+            ingredients: ['Bánh phở', 'Thịt gà', 'Hành lá', 'Ngò gai', 'Gừng'],
+            instructions: ['Luộc gà', 'Nấu nước dùng', 'Trần bánh phở', 'Bày bát và thưởng thức'],
+            category: 'Món Việt',
+            tags: ['healthy', 'vietnamese', 'soup']
+          },
+          notes: 'Bữa sáng nhẹ nhàng, bổ dưỡng'
+        },
+        {
+          id: `meal_${Date.now()}_2`,
+          date: today.toISOString().split('T')[0],
+          mealType: 'lunch',
+          recipe: {
+            id: 'recipe_lunch_1',
+            title: 'Salad Quinoa Tôm Nướng',
+            image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=300&h=200&fit=crop',
+            cookTime: '25 phút',
+            servings: 1,
+            difficulty: 'Trung bình',
+            calories: 450,
+            ingredients: ['Quinoa', 'Tôm sú', 'Rau xà lách', 'Cà chua cherry', 'Dầu olive'],
+            instructions: ['Nấu quinoa', 'Nướng tôm', 'Trộn salad', 'Trang trí và thưởng thức'],
+            category: 'Salad',
+            tags: ['healthy', 'protein', 'low-carb']
+          },
+          notes: 'Bữa trưa giàu protein, ít carb'
+        },
+        {
+          id: `meal_${Date.now()}_3`,
+          date: today.toISOString().split('T')[0],
+          mealType: 'dinner',
+          recipe: {
+            id: 'recipe_dinner_1',
+            title: 'Cá Hồi Nướng Rau Củ',
+            image: 'https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=300&h=200&fit=crop',
+            cookTime: '35 phút',
+            servings: 1,
+            difficulty: 'Trung bình',
+            calories: 520,
+            ingredients: ['Cá hồi', 'Bông cải xanh', 'Cà rốt', 'Khoai tây', 'Thảo mộc'],
+            instructions: ['Ướp cá hồi', 'Chuẩn bị rau củ', 'Nướng cùng lúc', 'Trang trí và thưởng thức'],
+            category: 'Món Âu',
+            tags: ['healthy', 'omega-3', 'grilled']
+          },
+          notes: 'Bữa tối giàu omega-3'
+        },
+        {
+          id: `meal_${Date.now()}_4`,
+          date: today.toISOString().split('T')[0],
+          mealType: 'snack',
+          recipe: {
+            id: 'recipe_snack_1',
+            title: 'Sinh Tố Bơ Chuối',
+            image: 'https://images.unsplash.com/photo-1553530666-ba11a7da3888?w=300&h=200&fit=crop',
+            cookTime: '5 phút',
+            servings: 1,
+            difficulty: 'Dễ',
+            calories: 280,
+            ingredients: ['Bơ chín', 'Chuối', 'Sữa tươi', 'Mật ong', 'Đá viên'],
+            instructions: ['Cho tất cả vào máy xay', 'Xay nhuyễn', 'Rót ly và thưởng thức'],
+            category: 'Đồ uống',
+            tags: ['healthy', 'smoothie', 'vitamin']
+          },
+          notes: 'Bữa phụ bổ sung vitamin'
+        },
+        // Ngày mai
+        {
+          id: `meal_${Date.now()}_5`,
+          date: new Date(today.getTime() + 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          mealType: 'breakfast',
+          recipe: {
+            id: 'recipe_breakfast_2',
+            title: 'Yến Mạch Trái Cây',
+            image: 'https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=300&h=200&fit=crop',
+            cookTime: '10 phút',
+            servings: 1,
+            difficulty: 'Dễ',
+            calories: 320,
+            ingredients: ['Yến mạch', 'Chuối', 'Dâu tây', 'Hạnh nhân', 'Sữa tươi'],
+            instructions: ['Nấu yến mạch', 'Thái trái cây', 'Trang trí đẹp mắt'],
+            category: 'Healthy',
+            tags: ['healthy', 'fiber', 'breakfast']
+          },
+          notes: 'Bữa sáng giàu chất xơ'
+        },
+        {
+          id: `meal_${Date.now()}_6`,
+          date: new Date(today.getTime() + 24 * 60 * 60 * 1000).toISOString().split('T')[0],
           mealType: 'lunch',
           recipe: sampleRecipes[0],
           notes: 'Món ăn truyền thống Việt Nam'
         },
         {
-          id: `meal_${Date.now()}_2`,
+          id: `meal_${Date.now()}_7`,
           date: new Date(today.getTime() + 24 * 60 * 60 * 1000).toISOString().split('T')[0],
           mealType: 'dinner',
           recipe: sampleRecipes[1],
           notes: 'Cơm chiều ngon miệng'
+        },
+        // Ngày kia
+        {
+          id: `meal_${Date.now()}_8`,
+          date: new Date(today.getTime() + 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          mealType: 'breakfast',
+          recipe: {
+            id: 'recipe_breakfast_3',
+            title: 'Bánh Mì Trứng Ốp La',
+            image: 'https://images.unsplash.com/photo-1586190848861-99aa4a171e90?w=300&h=200&fit=crop',
+            cookTime: '15 phút',
+            servings: 1,
+            difficulty: 'Dễ',
+            calories: 420,
+            ingredients: ['Bánh mì', 'Trứng gà', 'Bơ', 'Rau xà lách', 'Cà chua'],
+            instructions: ['Nướng bánh mì', 'Ốp la trứng', 'Kẹp bánh mì với rau'],
+            category: 'Món Việt',
+            tags: ['quick', 'breakfast', 'protein']
+          },
+          notes: 'Bữa sáng nhanh gọn'
+        },
+        {
+          id: `meal_${Date.now()}_9`,
+          date: new Date(today.getTime() + 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          mealType: 'lunch',
+          recipe: {
+            id: 'recipe_lunch_2',
+            title: 'Bún Chả Hà Nội',
+            image: 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=300&h=200&fit=crop',
+            cookTime: '40 phút',
+            servings: 1,
+            difficulty: 'Trung bình',
+            calories: 580,
+            ingredients: ['Bún tươi', 'Thịt nướng', 'Chả cá', 'Rau thơm', 'Nước mắm'],
+            instructions: ['Nướng thịt', 'Pha nước chấm', 'Bày bún và rau', 'Thưởng thức'],
+            category: 'Món Việt',
+            tags: ['vietnamese', 'traditional', 'grilled']
+          },
+          notes: 'Món ăn đặc trưng Hà Nội'
+        },
+        // Thêm một số bữa ăn cho các ngày tiếp theo
+        {
+          id: `meal_${Date.now()}_10`,
+          date: new Date(today.getTime() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          mealType: 'breakfast',
+          recipe: {
+            id: 'recipe_breakfast_4',
+            title: 'Chè Đậu Xanh',
+            image: 'https://images.unsplash.com/photo-1563379091339-03246963d96c?w=300&h=200&fit=crop',
+            cookTime: '20 phút',
+            servings: 1,
+            difficulty: 'Dễ',
+            calories: 250,
+            ingredients: ['Đậu xanh', 'Nước cốt dừa', 'Đường phèn', 'Lá dứa'],
+            instructions: ['Nấu đậu xanh', 'Pha nước cốt dừa', 'Trộn đều và thưởng thức'],
+            category: 'Chè',
+            tags: ['sweet', 'traditional', 'vietnamese']
+          },
+          notes: 'Bữa sáng nhẹ nhàng'
+        },
+        {
+          id: `meal_${Date.now()}_11`,
+          date: new Date(today.getTime() + 4 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          mealType: 'lunch',
+          recipe: {
+            id: 'recipe_lunch_3',
+            title: 'Cơm Gà Hải Nam',
+            image: 'https://images.unsplash.com/photo-1512058564366-18510be2db19?w=300&h=200&fit=crop',
+            cookTime: '45 phút',
+            servings: 1,
+            difficulty: 'Trung bình',
+            calories: 620,
+            ingredients: ['Gà ta', 'Gạo thơm', 'Hành tây', 'Gừng', 'Nước mắm'],
+            instructions: ['Luộc gà', 'Nấu cơm với nước luộc gà', 'Cắt gà và bày đĩa'],
+            category: 'Cơm',
+            tags: ['chicken', 'rice', 'comfort-food']
+          },
+          notes: 'Cơm trưa đầy đủ dinh dưỡng'
         }
       ],
       createdAt: new Date().toISOString(),
@@ -214,18 +394,48 @@ const createSampleMealPlans = (userId: string): MealPlan[] => {
 export const MealPlanningProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, isAuthenticated } = useAuth();
   const [currentPlan, setCurrentPlan] = useState<MealPlan | null>(null);
+  const [activePlan, setActivePlanState] = useState<MealPlan | null>(null);
   const [userMealPlans, setUserMealPlans] = useState<MealPlan[]>([]);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [viewMode, setViewMode] = useState<'week' | 'month'>('week');
   const [isLoading, setIsLoading] = useState(false);
 
+  // Function to set active plan with localStorage persistence
+  const setActivePlan = (plan: MealPlan | null) => {
+    setActivePlanState(plan);
+    if (user && plan) {
+      localStorage.setItem(`active_plan_${user.id}`, plan.id);
+    } else if (user) {
+      localStorage.removeItem(`active_plan_${user.id}`);
+    }
+  };
+
   // Load user's meal plans from localStorage
   useEffect(() => {
     if (isAuthenticated && user) {
       const savedPlans = localStorage.getItem(`meal_plans_${user.id}`);
+      const savedActivePlanId = localStorage.getItem(`active_plan_${user.id}`);
+
       if (savedPlans) {
         const plans = JSON.parse(savedPlans);
         setUserMealPlans(plans);
+
+        // Set active plan from saved ID
+        if (savedActivePlanId) {
+          const activePlan = plans.find((p: MealPlan) => p.id === savedActivePlanId);
+          if (activePlan) {
+            setActivePlanState(activePlan);
+          } else {
+            // If saved active plan not found, set first plan as active
+            if (plans.length > 0) {
+              setActivePlan(plans[0]);
+            }
+          }
+        } else if (plans.length > 0) {
+          // No saved active plan, set first as active
+          setActivePlan(plans[0]);
+        }
+
         // Set first plan as current if no current plan
         if (plans.length > 0 && !currentPlan) {
           setCurrentPlan(plans[0]);
@@ -237,6 +447,7 @@ export const MealPlanningProvider: React.FC<{ children: React.ReactNode }> = ({ 
         localStorage.setItem(`meal_plans_${user.id}`, JSON.stringify(samplePlans));
         if (samplePlans.length > 0) {
           setCurrentPlan(samplePlans[0]);
+          setActivePlan(samplePlans[0]); // Set first plan as active
         }
       }
     }
@@ -348,15 +559,24 @@ export const MealPlanningProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
   const getDayNutrition = (date: string): NutritionSummary => {
     if (!currentPlan) return { calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0 };
-    
+
     const dayMeals = currentPlan.meals.filter(m => m.date === date);
-    return dayMeals.reduce((total, meal) => ({
-      calories: total.calories + (meal.recipe?.calories || 0),
-      protein: total.protein + 0, // Would calculate from recipe data
-      carbs: total.carbs + 0,
-      fat: total.fat + 0,
-      fiber: total.fiber + 0
-    }), { calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0 });
+    return dayMeals.reduce((total, meal) => {
+      const calories = meal.recipe?.calories || 0;
+      // Ước tính các chất dinh dưỡng dựa trên calories và loại món ăn
+      const protein = Math.round(calories * 0.15 / 4); // 15% calories từ protein
+      const carbs = Math.round(calories * 0.50 / 4); // 50% calories từ carbs
+      const fat = Math.round(calories * 0.35 / 9); // 35% calories từ fat
+      const fiber = Math.round(calories * 0.02); // Ước tính fiber
+
+      return {
+        calories: total.calories + calories,
+        protein: total.protein + protein,
+        carbs: total.carbs + carbs,
+        fat: total.fat + fat,
+        fiber: total.fiber + fiber
+      };
+    }, { calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0 });
   };
 
   const getWeekNutrition = (startDate: string): NutritionSummary => {
@@ -369,7 +589,7 @@ export const MealPlanningProvider: React.FC<{ children: React.ReactNode }> = ({ 
     if (!plan) return {};
 
     const ingredients: { [category: string]: Set<string> } = {};
-    
+
     plan.meals.forEach(meal => {
       if (meal.recipe) {
         meal.recipe.ingredients.forEach(ingredient => {
@@ -391,9 +611,16 @@ export const MealPlanningProvider: React.FC<{ children: React.ReactNode }> = ({ 
     return result;
   };
 
+  const generateActiveShoppingList = (): { [category: string]: string[] } => {
+    if (!activePlan) return {};
+    return generateShoppingList(activePlan.id);
+  };
+
   const value: MealPlanningContextType = {
     currentPlan,
     setCurrentPlan,
+    activePlan,
+    setActivePlan,
     userMealPlans,
     availableRecipes: mockRecipes,
     currentDate,
@@ -410,6 +637,7 @@ export const MealPlanningProvider: React.FC<{ children: React.ReactNode }> = ({ 
     getDayNutrition,
     getWeekNutrition,
     generateShoppingList,
+    generateActiveShoppingList,
     isLoading
   };
 

@@ -77,7 +77,15 @@ const MealPlanDetailModal: React.FC<MealPlanDetailModalProps> = ({
     }
   };
 
-  const MealDetailCard = ({ meals, mealType }: { meals: any[], mealType: string }) => {
+  type MealItem = {
+    name: string;
+    image: string;
+    time: string;
+    difficulty: string;
+    description: string;
+  };
+
+  const MealDetailCard = ({ meals, mealType }: { meals: MealItem[], mealType: string }) => {
     const totalTime = meals.reduce((sum, meal) => sum + parseInt(meal.time), 0);
 
     return (
@@ -174,9 +182,9 @@ const MealPlanDetailModal: React.FC<MealPlanDetailModalProps> = ({
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-green-600">
-                {mealPlan.breakfast.reduce((sum: number, meal: any) => sum + parseInt(meal.time), 0) +
-                 mealPlan.lunch.reduce((sum: number, meal: any) => sum + parseInt(meal.time), 0) +
-                 mealPlan.dinner.reduce((sum: number, meal: any) => sum + parseInt(meal.time), 0)}
+                {mealPlan.breakfast.reduce((sum: number, meal: MealItem) => sum + parseInt(meal.time), 0) +
+                 mealPlan.lunch.reduce((sum: number, meal: MealItem) => sum + parseInt(meal.time), 0) +
+                 mealPlan.dinner.reduce((sum: number, meal: MealItem) => sum + parseInt(meal.time), 0)}
               </div>
               <div className="text-sm text-gray-600">Phút nấu</div>
             </div>

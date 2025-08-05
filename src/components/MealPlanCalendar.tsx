@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
-import { Recipe, MealSlot, useMealPlanning } from '@/contexts/MealPlanningContext';
+import { MealSlot, useMealPlanning } from '@/contexts/MealPlanningContext';
+import { Recipe } from '@/types/kitchen';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';

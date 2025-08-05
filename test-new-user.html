@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test New User Experience</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .button {
+            background: #ea580c;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .button:hover {
+            background: #dc2626;
+        }
+        .button.secondary {
+            background: #6b7280;
+        }
+        .button.secondary:hover {
+            background: #4b5563;
+        }
+        .success {
+            color: #059669;
+            font-weight: bold;
+        }
+        .warning {
+            color: #d97706;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>🧪 Test New User Experience</h1>
+        <p>Công cụ này giúp test trải nghiệm người dùng mới với ứng dụng Angiday.</p>
+    </div>
+
+    <div class="card">
+        <h2>🗑️ Xóa Dữ Liệu Người Dùng</h2>
+        <p>Xóa tất cả dữ liệu localStorage để mô phỏng người dùng mới:</p>
+        <button class="button" onclick="clearAllData()">Xóa Tất Cả Dữ Liệu</button>
+        <button class="button secondary" onclick="clearWelcomeGuide()">Chỉ Xóa Welcome Guide</button>
+        <div id="clearResult"></div>
+    </div>
+
+    <div class="card">
+        <h2>📊 Kiểm Tra Dữ Liệu Hiện Tại</h2>
+        <button class="button secondary" onclick="checkCurrentData()">Kiểm Tra Dữ Liệu</button>
+        <div id="dataStatus"></div>
+    </div>
+
+    <div class="card">
+        <h2>🚀 Mở Ứng Dụng</h2>
+        <p>Sau khi xóa dữ liệu, mở ứng dụng để test trải nghiệm người dùng mới:</p>
+        <button class="button" onclick="openApp()">Mở Angiday</button>
+        <button class="button secondary" onclick="openAppNewTab()">Mở Trong Tab Mới</button>
+    </div>
+
+    <div class="card">
+        <h2>📝 Hướng Dẫn Test</h2>
+        <ol>
+            <li><strong>Xóa dữ liệu:</strong> Nhấn "Xóa Tất Cả Dữ Liệu"</li>
+            <li><strong>Mở ứng dụng:</strong> Nhấn "Mở Angiday"</li>
+            <li><strong>Kiểm tra:</strong> Bạn sẽ thấy Welcome Guide xuất hiện</li>
+            <li><strong>Test flow:</strong> Làm theo hướng dẫn trong Welcome Guide</li>
+            <li><strong>Kết quả:</strong> Thực đơn sẽ được áp dụng và hiển thị</li>
+        </ol>
+    </div>
+
+    <script>
+        function clearAllData() {
+            try {
+                localStorage.clear();
+                sessionStorage.clear();
+                document.getElementById('clearResult').innerHTML = 
+                    '<p class="success">✅ Đã xóa tất cả dữ liệu localStorage và sessionStorage</p>';
+            } catch (error) {
+                document.getElementById('clearResult').innerHTML = 
+                    '<p class="warning">❌ Lỗi: ' + error.message + '</p>';
+            }
+        }
+
+        function clearWelcomeGuide() {
+            try {
+                localStorage.removeItem('hasSeenWelcomeGuide');
+                document.getElementById('clearResult').innerHTML = 
+                    '<p class="success">✅ Đã xóa Welcome Guide flag</p>';
+            } catch (error) {
+                document.getElementById('clearResult').innerHTML = 
+                    '<p class="warning">❌ Lỗi: ' + error.message + '</p>';
+            }
+        }
+
+        function checkCurrentData() {
+            const hasSeenGuide = localStorage.getItem('hasSeenWelcomeGuide');
+            const hasMealPlans = localStorage.getItem('userMealPlans');
+            const authData = localStorage.getItem('auth_user');
+            
+            let status = '<h3>Trạng thái dữ liệu:</h3><ul>';
+            status += '<li><strong>Welcome Guide:</strong> ' + (hasSeenGuide ? '✅ Đã xem' : '❌ Chưa xem') + '</li>';
+            status += '<li><strong>Meal Plans:</strong> ' + (hasMealPlans ? '✅ Có dữ liệu' : '❌ Không có') + '</li>';
+            status += '<li><strong>Auth User:</strong> ' + (authData ? '✅ Đã đăng nhập' : '❌ Chưa đăng nhập') + '</li>';
+            status += '</ul>';
+
+            if (!hasSeenGuide && !hasMealPlans) {
+                status += '<p class="success">🎯 Trạng thái: Người dùng mới - Welcome Guide sẽ hiển thị</p>';
+            } else {
+                status += '<p class="warning">⚠️ Trạng thái: Người dùng cũ - Welcome Guide sẽ không hiển thị</p>';
+            }
+
+            document.getElementById('dataStatus').innerHTML = status;
+        }
+
+        function openApp() {
+            window.location.href = 'http://localhost:8080';
+        }
+
+        function openAppNewTab() {
+            window.open('http://localhost:8080', '_blank');
+        }
+
+        // Auto check data on load
+        window.onload = function() {
+            checkCurrentData();
+        };
+    </script>
+</body>
+</html>

@@ -343,7 +343,7 @@ const SmartIngredientInput: React.FC<SmartIngredientInputProps> = ({
                         {standardIngredient?.name || ingredient.ingredientId}
                       </span>
                       {standardIngredient && (
-                        <Badge className={getCategoryColor(standardIngredient.category)} size="sm" className="ml-2">
+                        <Badge className={`${getCategoryColor(standardIngredient.category)} ml-2`} size="sm">
                           {standardIngredient.category}
                         </Badge>
                       )}

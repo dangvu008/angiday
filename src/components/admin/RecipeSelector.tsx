@@ -172,13 +172,13 @@ const RecipeSelector = ({
   const difficulties = ['all', 'Dễ', 'Trung bình', 'Khó'];
 
   const filteredRecipes = recipes.filter(recipe => {
-    const matchesSearch = recipe.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         recipe.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         recipe.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
-    
+    const matchesSearch = (recipe.title || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         (recipe.description || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         (recipe.tags || []).some(tag => (tag || '').toLowerCase().includes(searchTerm.toLowerCase()));
+
     const matchesCategory = selectedCategory === 'all' || recipe.category === selectedCategory;
     const matchesDifficulty = selectedDifficulty === 'all' || recipe.difficulty === selectedDifficulty;
-    
+
     return matchesSearch && matchesCategory && matchesDifficulty;
   });
 
@@ -299,7 +299,7 @@ const RecipeSelector = ({
                     {multiSelect ? (
                       <Checkbox
                         checked={tempSelectedIds.includes(recipe.id)}
-                        onChange={() => handleRecipeToggle(recipe)}
+                        onCheckedChange={() => handleRecipeToggle(recipe)}
                         className="bg-white"
                       />
                     ) : (

@@ -81,7 +81,7 @@ export class NutritionCalculatorService {
     servings: number = 1
   ): NutritionBreakdown {
     const ingredientNutritions: NutritionBreakdown['ingredients'] = [];
-    let totalNutrition: NutritionInfo = {
+    const totalNutrition: NutritionInfo = {
       calories: 0,
       protein: 0,
       carbs: 0,

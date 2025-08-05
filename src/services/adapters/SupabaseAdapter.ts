@@ -1,0 +1,464 @@
+import { SupabaseClient } from '@supabase/supabase-js';
+import { getSupabaseClient, supabaseHelpers } from '../../config/supabase';
+import {
+  DatabaseAdapter,
+  Recipe,
+  MealPlan,
+  MealSlot,
+  ShoppingList,
+  ShoppingItem,
+  InventoryItem
+} from '../kitchenService';
+
+// Helper functions for converting between snake_case (database) and camelCase (TypeScript)
+const toCamelCase = (str: string): string => {
+  return str.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
+};
+
+const toSnakeCase = (str: string): string => {
+  return str.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+};
+
+const convertKeysToCamelCase = (obj: any): any => {
+  if (obj === null || obj === undefined) return obj;
+  if (Array.isArray(obj)) return obj.map(convertKeysToCamelCase);
+  if (typeof obj !== 'object') return obj;
+
+  const converted: any = {};
+  for (const [key, value] of Object.entries(obj)) {
+    const camelKey = toCamelCase(key);
+    converted[camelKey] = convertKeysToCamelCase(value);
+  }
+  return converted;
+};
+
+const convertKeysToSnakeCase = (obj: any): any => {
+  if (obj === null || obj === undefined) return obj;
+  if (Array.isArray(obj)) return obj.map(convertKeysToSnakeCase);
+  if (typeof obj !== 'object') return obj;
+
+  const converted: any = {};
+  for (const [key, value] of Object.entries(obj)) {
+    const snakeKey = toSnakeCase(key);
+    converted[snakeKey] = convertKeysToSnakeCase(value);
+  }
+  return converted;
+};
+
+export class SupabaseAdapter implements DatabaseAdapter {
+  private supabase: SupabaseClient;
+
+  constructor() {
+    this.supabase = getSupabaseClient();
+    console.log('🔗 SupabaseAdapter initialized with secure config');
+  }
+
+  // Test connection on initialization
+  async initialize(): Promise<boolean> {
+    try {
+      const isConnected = await supabaseHelpers.testConnection();
+      if (isConnected) {
+        console.log('✅ SupabaseAdapter connection verified');
+      } else {
+        console.warn('⚠️ SupabaseAdapter connection test failed');
+      }
+      return isConnected;
+    } catch (error) {
+      console.error('❌ SupabaseAdapter initialization error:', error);
+      return false;
+    }
+  }
+
+  // Recipes
+  async getRecipes(): Promise<Recipe[]> {
+    const { data, error } = await this.supabase
+      .from('recipes')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return (data || []).map(convertKeysToCamelCase);
+  }
+
+  async getRecipe(id: string): Promise<Recipe | null> {
+    const { data, error } = await this.supabase
+      .from('recipes')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error) {
+      if (error.code === 'PGRST116') return null; // Not found
+      throw error;
+    }
+    return data ? convertKeysToCamelCase(data) : null;
+  }
+
+  async createRecipe(recipe: Omit<Recipe, 'id'>): Promise<Recipe> {
+    // Convert camelCase to snake_case for database
+    const dbRecipe = convertKeysToSnakeCase({
+      ...recipe,
+      created_at: new Date().toISOString()
+    });
+
+    const { data, error } = await this.supabase
+      .from('recipes')
+      .insert([dbRecipe])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return convertKeysToCamelCase(data);
+  }
+
+  async updateRecipe(id: string, updates: Partial<Recipe>): Promise<Recipe> {
+    // Convert camelCase to snake_case for database
+    const dbUpdates = convertKeysToSnakeCase(updates);
+
+    const { data, error } = await this.supabase
+      .from('recipes')
+      .update(dbUpdates)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return convertKeysToCamelCase(data);
+  }
+
+  async deleteRecipe(id: string): Promise<void> {
+    const { error } = await this.supabase
+      .from('recipes')
+      .delete()
+      .eq('id', id);
+    
+    if (error) throw error;
+  }
+
+  // Meal Plans
+  async getMealPlans(userId: string): Promise<MealPlan[]> {
+    const { data, error } = await this.supabase
+      .from('meal_plans')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return (data || []).map(convertKeysToCamelCase);
+  }
+
+  async getMealPlan(id: string): Promise<MealPlan | null> {
+    const { data, error } = await this.supabase
+      .from('meal_plans')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error) {
+      if (error.code === 'PGRST116') return null;
+      throw error;
+    }
+    return data ? convertKeysToCamelCase(data) : null;
+  }
+
+  async createMealPlan(mealPlan: Omit<MealPlan, 'id'>): Promise<MealPlan> {
+    // Convert camelCase to snake_case for database
+    const dbMealPlan = convertKeysToSnakeCase({
+      ...mealPlan,
+      created_at: new Date().toISOString()
+    });
+
+    const { data, error } = await this.supabase
+      .from('meal_plans')
+      .insert([dbMealPlan])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return convertKeysToCamelCase(data);
+  }
+
+  async updateMealPlan(id: string, updates: Partial<MealPlan>): Promise<MealPlan> {
+    // Convert camelCase to snake_case for database
+    const dbUpdates = convertKeysToSnakeCase(updates);
+
+    const { data, error } = await this.supabase
+      .from('meal_plans')
+      .update(dbUpdates)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return convertKeysToCamelCase(data);
+  }
+
+  async deleteMealPlan(id: string): Promise<void> {
+    const { error } = await this.supabase
+      .from('meal_plans')
+      .delete()
+      .eq('id', id);
+    
+    if (error) throw error;
+  }
+
+  // Meals
+  async getMeals(mealPlanId: string): Promise<MealSlot[]> {
+    const { data, error } = await this.supabase
+      .from('meals')
+      .select(`
+        *,
+        recipe:recipes(*)
+      `)
+      .eq('meal_plan_id', mealPlanId)
+      .order('meal_date', { ascending: true });
+
+    if (error) throw error;
+    return (data || []).map(convertKeysToCamelCase);
+  }
+
+  async getMeal(id: string): Promise<MealSlot | null> {
+    const { data, error } = await this.supabase
+      .from('meals')
+      .select(`
+        *,
+        recipe:recipes(*)
+      `)
+      .eq('id', id)
+      .single();
+
+    if (error) {
+      if (error.code === 'PGRST116') return null;
+      throw error;
+    }
+    return data ? convertKeysToCamelCase(data) : null;
+  }
+
+  async getMealsByDate(userId: string, date: string): Promise<MealSlot[]> {
+    // First get user's meal plans
+    const mealPlans = await this.getMealPlans(userId);
+    const mealPlanIds = mealPlans.map(plan => plan.id);
+
+    if (mealPlanIds.length === 0) return [];
+
+    const { data, error } = await this.supabase
+      .from('meals')
+      .select(`
+        *,
+        recipe:recipes(*)
+      `)
+      .in('meal_plan_id', mealPlanIds)
+      .eq('meal_date', date)
+      .order('meal_type');
+
+    if (error) throw error;
+    return (data || []).map(convertKeysToCamelCase);
+  }
+
+  async createMeal(meal: Omit<MealSlot, 'id' | 'createdAt'>): Promise<MealSlot> {
+    // Convert camelCase to snake_case for database
+    const dbMeal = convertKeysToSnakeCase({
+      ...meal,
+      created_at: new Date().toISOString()
+    });
+
+    const { data, error } = await this.supabase
+      .from('meals')
+      .insert([dbMeal])
+      .select(`
+        *,
+        recipe:recipes(*)
+      `)
+      .single();
+
+    if (error) throw error;
+    return convertKeysToCamelCase(data);
+  }
+
+  async updateMeal(id: string, updates: Partial<MealSlot>): Promise<MealSlot> {
+    // Convert camelCase to snake_case for database
+    const dbUpdates = convertKeysToSnakeCase(updates);
+
+    const { data, error } = await this.supabase
+      .from('meals')
+      .update(dbUpdates)
+      .eq('id', id)
+      .select(`
+        *,
+        recipe:recipes(*)
+      `)
+      .single();
+
+    if (error) throw error;
+    return convertKeysToCamelCase(data);
+  }
+
+  async deleteMeal(id: string): Promise<void> {
+    const { error } = await this.supabase
+      .from('meals')
+      .delete()
+      .eq('id', id);
+    
+    if (error) throw error;
+  }
+
+  // Shopping Lists
+  async getShoppingLists(): Promise<ShoppingList[]> {
+    const { data, error } = await this.supabase
+      .from('shopping_lists')
+      .select(`
+        *,
+        items:shopping_items(*)
+      `)
+      .order('created_at', { ascending: false });
+    
+    if (error) throw error;
+    return data || [];
+  }
+
+  async getShoppingList(id: string): Promise<ShoppingList | null> {
+    const { data, error } = await this.supabase
+      .from('shopping_lists')
+      .select(`
+        *,
+        items:shopping_items(*)
+      `)
+      .eq('id', id)
+      .single();
+    
+    if (error) {
+      if (error.code === 'PGRST116') return null;
+      throw error;
+    }
+    return data;
+  }
+
+  async createShoppingList(shoppingList: Omit<ShoppingList, 'id'>): Promise<ShoppingList> {
+    const { items, ...listData } = shoppingList;
+    
+    // Create shopping list
+    const { data: list, error: listError } = await this.supabase
+      .from('shopping_lists')
+      .insert([{
+        ...listData,
+        created_at: new Date().toISOString()
+      }])
+      .select()
+      .single();
+    
+    if (listError) throw listError;
+
+    // Create shopping items
+    if (items && items.length > 0) {
+      const { error: itemsError } = await this.supabase
+        .from('shopping_items')
+        .insert(
+          items.map(item => ({
+            ...item,
+            shopping_list_id: list.id
+          }))
+        );
+      
+      if (itemsError) throw itemsError;
+    }
+
+    // Return complete shopping list
+    return this.getShoppingList(list.id) as Promise<ShoppingList>;
+  }
+
+  async updateShoppingList(id: string, updates: Partial<ShoppingList>): Promise<ShoppingList> {
+    const { data, error } = await this.supabase
+      .from('shopping_lists')
+      .update(updates)
+      .eq('id', id)
+      .select(`
+        *,
+        items:shopping_items(*)
+      `)
+      .single();
+    
+    if (error) throw error;
+    return data;
+  }
+
+  async deleteShoppingList(id: string): Promise<void> {
+    const { error } = await this.supabase
+      .from('shopping_lists')
+      .delete()
+      .eq('id', id);
+    
+    if (error) throw error;
+  }
+
+  async updateShoppingItem(id: string, updates: Partial<ShoppingItem>): Promise<ShoppingItem> {
+    const { data, error } = await this.supabase
+      .from('shopping_items')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
+  }
+
+  // Inventory
+  async getInventory(): Promise<InventoryItem[]> {
+    const { data, error } = await this.supabase
+      .from('inventory')
+      .select('*')
+      .order('name');
+    
+    if (error) throw error;
+    return data || [];
+  }
+
+  async getInventoryItem(id: string): Promise<InventoryItem | null> {
+    const { data, error } = await this.supabase
+      .from('inventory')
+      .select('*')
+      .eq('id', id)
+      .single();
+    
+    if (error) {
+      if (error.code === 'PGRST116') return null;
+      throw error;
+    }
+    return data;
+  }
+
+  async createInventoryItem(item: Omit<InventoryItem, 'id'>): Promise<InventoryItem> {
+    const { data, error } = await this.supabase
+      .from('inventory')
+      .insert([{
+        ...item,
+        created_at: new Date().toISOString()
+      }])
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
+  }
+
+  async updateInventoryItem(id: string, updates: Partial<InventoryItem>): Promise<InventoryItem> {
+    const { data, error } = await this.supabase
+      .from('inventory')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
+  }
+
+  async deleteInventoryItem(id: string): Promise<void> {
+    const { error } = await this.supabase
+      .from('inventory')
+      .delete()
+      .eq('id', id);
+    
+    if (error) throw error;
+  }
+}

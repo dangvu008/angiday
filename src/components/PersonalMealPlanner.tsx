@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Recipe, MealPlan, useMealPlanning } from '@/contexts/MealPlanningContext';
+import { MealPlan, useMealPlanning } from '@/contexts/MealPlanningContext';
+import { Recipe } from '@/types/kitchen';
 import { UserPreferences, AIGeneratedPlan, aiMealPlanGenerator } from '@/services/aiMealPlanGenerator';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import Header from '@/components/Header';
@@ -144,14 +145,23 @@ const PersonalMealPlanner: React.FC = () => {
   };
 
   // Handle template selection
-  const handleSelectTemplate = (template: any) => {
+  interface TemplateType {
+    name: string;
+    meals: Array<{
+      id: string;
+      name: string;
+      type: string;
+    }>;
+  }
+
+  const handleSelectTemplate = (template: TemplateType) => {
     const startDate = new Date().toISOString().split('T')[0];
     const endDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
     const plan = createNewPlan(template.name, startDate, endDate);
 
     // Add template meals to plan (simplified)
-    template.meals.forEach((meal: any, index: number) => {
+    template.meals.forEach((meal, index: number) => {
       const mealDate = new Date(Date.now() + index * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
       // In real implementation, would map template recipes to actual recipes
     });

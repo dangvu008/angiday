@@ -18,8 +18,6 @@ export const useAuth = () => {
       const user = await authService.login(email, password);
       setUser(user);
       return user;
-    } catch (error) {
-      throw error;
     } finally {
       setLoading(false);
     }
@@ -36,8 +34,6 @@ export const useAuth = () => {
       const user = await authService.register(userData);
       setUser(user);
       return user;
-    } catch (error) {
-      throw error;
     } finally {
       setLoading(false);
     }
@@ -49,8 +45,6 @@ export const useAuth = () => {
       const updatedUser = await authService.updateProfile(userData);
       setUser(updatedUser);
       return updatedUser;
-    } catch (error) {
-      throw error;
     } finally {
       setLoading(false);
     }

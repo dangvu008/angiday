@@ -74,13 +74,15 @@ const PlanCreator = ({ isOpen, onClose, onCreatePlan, initialType = 'day' }: Pla
     switch (type) {
       case 'day':
         return startDate;
-      case 'week':
+      case 'week': {
         const weekEnd = new Date(start);
         weekEnd.setDate(start.getDate() + 6);
         return weekEnd.toISOString().split('T')[0];
-      case 'month':
+      }
+      case 'month': {
         const monthEnd = new Date(start.getFullYear(), start.getMonth() + 1, 0);
         return monthEnd.toISOString().split('T')[0];
+      }
       default:
         return startDate;
     }
@@ -190,7 +192,7 @@ const PlanCreator = ({ isOpen, onClose, onCreatePlan, initialType = 'day' }: Pla
         } as SingleDayPlan;
         break;
 
-      case 'week':
+      case 'week': {
         const weekDays = [];
         const startDate = new Date(formData.startDate);
         for (let i = 0; i < 7; i++) {
@@ -219,14 +221,15 @@ const PlanCreator = ({ isOpen, onClose, onCreatePlan, initialType = 'day' }: Pla
           averageCaloriesPerDay: 0
         } as WeekPlan;
         break;
+      }
 
-      case 'month':
+      case 'month': {
         const monthWeeks = [];
         const monthStart = new Date(formData.startDate);
         const monthEnd = new Date(formData.endDate);
-        
+
         // Generate weeks for the month (simplified)
-        let currentWeekStart = new Date(monthStart);
+        const currentWeekStart = new Date(monthStart);
         while (currentWeekStart <= monthEnd) {
           const weekEnd = new Date(currentWeekStart);
           weekEnd.setDate(currentWeekStart.getDate() + 6);
@@ -275,6 +278,7 @@ const PlanCreator = ({ isOpen, onClose, onCreatePlan, initialType = 'day' }: Pla
           averageCaloriesPerWeek: 0
         } as MonthPlan;
         break;
+      }
 
       default:
         return;

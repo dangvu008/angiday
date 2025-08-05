@@ -117,12 +117,14 @@ const PlanManager = ({ plans, onCreatePlan, onUpdatePlan, onDeletePlan, onSelect
         return `${(plan as MealPlan).cookingTime} phút`;
       case 'day':
         return formatDate((plan as SingleDayPlan).date);
-      case 'week':
+      case 'week': {
         const weekPlan = plan as WeekPlan;
         return `${formatDate(weekPlan.startDate)} - ${formatDate(weekPlan.endDate)}`;
-      case 'month':
+      }
+      case 'month': {
         const monthPlan = plan as MonthPlan;
         return `Tháng ${monthPlan.month}/${monthPlan.year}`;
+      }
       default:
         return '';
     }

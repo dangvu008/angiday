@@ -18,7 +18,16 @@ import {
 
 const BatchImportDemo = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [importedRecipes, setImportedRecipes] = useState<any[]>([]);
+  interface ImportedRecipe {
+    id: string;
+    title: string;
+    url: string;
+    status: 'success' | 'error' | 'pending';
+    data?: unknown;
+    error?: string;
+  }
+
+  const [importedRecipes, setImportedRecipes] = useState<ImportedRecipe[]>([]);
   const { toast } = useToast();
 
   // Sample data for testing

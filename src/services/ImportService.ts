@@ -599,7 +599,7 @@ export class ImportService {
           .filter(text => text && text.length > 10)
           .map((text, index) => {
             // Remove existing step numbering if present
-            const cleanText = text.replace(/^(bước\s*\d+[:\.]?\s*|step\s*\d+[:\.]?\s*|\d+[\.\)]\s*)/i, '');
+            const cleanText = text.replace(/^(bước\s*\d+[:.]?\s*|step\s*\d+[:.]?\s*|\d+[.)]\s*)/i, '');
             return `Bước ${index + 1}: ${cleanText}`;
           });
 
@@ -1982,7 +1982,7 @@ Bước 6: Rưới nước dùng nóng, thêm rau thơm`,
     contentType: 'recipe' | 'news' | 'blog' | 'product' | 'unknown';
   } {
     const warnings: string[] = [];
-    let score = 0;
+    const score = 0;
 
     if (expectedType === 'recipe') {
       return this.validateRecipeData(data);

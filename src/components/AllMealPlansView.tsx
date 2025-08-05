@@ -256,7 +256,13 @@ const AllMealPlansView: React.FC = () => {
   });
 
   // Meal Slider Component
-  const MealSlider = ({ meals, planTitle }: { meals: any[], planTitle: string }) => (
+  interface MealItem {
+    name: string;
+    image: string;
+    logo: boolean;
+  }
+
+  const MealSlider = ({ meals, planTitle }: { meals: MealItem[], planTitle: string }) => (
     <div className="mb-4">
       <Carousel className="w-full">
         <CarouselContent className="-ml-2 md:-ml-4">

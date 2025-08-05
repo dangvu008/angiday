@@ -1,0 +1,352 @@
+export interface MockRecipe {
+  id: string;
+  title: string;
+  description: string;
+  image: string;
+  category: string;
+  difficulty: 'Dễ' | 'Trung bình' | 'Khó';
+  cookingTime: string;
+  servings: number;
+  author: string;
+  status: 'published' | 'draft';
+  createdDate: string;
+  views: number;
+  ingredients: string[];
+  instructions: string[];
+  nutrition: {
+    calories: number;
+    protein: number;
+    carbs: number;
+    fat: number;
+    fiber: number;
+  };
+  tags: string[];
+  cuisine: string;
+  rating: number;
+  reviews: number;
+  cost: number;
+  isFavorite?: boolean;
+  isUserCreated?: boolean;
+  isPopular?: boolean;
+}
+
+export const mockRecipes: MockRecipe[] = [
+  // Món ăn gia đình phổ biến
+  {
+    id: '1',
+    title: 'Gà rang gừng',
+    description: 'Món gà rang gừng thơm ngon, đậm đà hương vị truyền thống',
+    image: 'https://images.unsplash.com/photo-1604503468506-a8da13d82791?w=400&h=300&fit=crop',
+    category: 'Món chính',
+    difficulty: 'Dễ',
+    cookingTime: '30 phút',
+    servings: 4,
+    author: 'Chef Minh',
+    status: 'published',
+    createdDate: '2024-01-15',
+    views: 1250,
+    ingredients: [
+      '1 con gà ta (khoảng 1.2kg)',
+      '50g gừng tươi',
+      '3 củ hành tím',
+      '2 thìa canh nước mắm',
+      '1 thìa canh đường',
+      '1 thìa cà phê tiêu',
+      '2 thìa canh dầu ăn',
+      'Rau thơm: ngò, hành lá'
+    ],
+    instructions: [
+      'Gà rửa sạch, chặt miếng vừa ăn',
+      'Gừng cạo vỏ, thái lát mỏng',
+      'Hành tím bóc vỏ, thái lát',
+      'Ướp gà với nước mắm, đường, tiêu trong 15 phút',
+      'Đun chảo với dầu, cho gừng và hành tím vào phi thơm',
+      'Cho gà vào rang đều tay đến khi chín vàng',
+      'Nêm nếm lại gia vị, rắc rau thơm lên trên'
+    ],
+    nutrition: { calories: 280, protein: 25, carbs: 8, fat: 15, fiber: 2 },
+    tags: ['Món chính', 'Gia đình', 'Dễ làm', 'Truyền thống'],
+    cuisine: 'Việt Nam',
+    rating: 4.8,
+    reviews: 156,
+    cost: 65000,
+    isPopular: true,
+    isFavorite: true
+  },
+  {
+    id: '2',
+    title: 'Đậu phụ nhồi thịt',
+    description: 'Đậu phụ nhồi thịt mềm ngon, giàu protein và tiết kiệm',
+    image: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=400&h=300&fit=crop',
+    category: 'Món chính',
+    difficulty: 'Dễ',
+    cookingTime: '25 phút',
+    servings: 4,
+    author: 'Cô Lan',
+    status: 'published',
+    createdDate: '2024-01-12',
+    views: 890,
+    ingredients: [
+      '4 miếng đậu phụ',
+      '200g thịt heo xay',
+      '2 củ hành tím',
+      '1 thìa canh nước mắm',
+      '1/2 thìa cà phê đường',
+      '1/4 thìa cà phê tiêu',
+      '1 quả trứng gà',
+      'Hành lá, ngò rí'
+    ],
+    instructions: [
+      'Đậu phụ rửa sạch, cắt đôi, khoét ruột tạo hốc',
+      'Thịt xay trộn với hành tím băm, nước mắm, đường, tiêu',
+      'Nhồi thịt vào hốc đậu phụ',
+      'Chiên đậu phụ nhồi thịt đến khi vàng đều',
+      'Đun nước dùng, cho đậu phụ vào om 10 phút',
+      'Nêm nếm gia vị, rắc hành lá'
+    ],
+    nutrition: { calories: 220, protein: 18, carbs: 12, fat: 12, fiber: 4 },
+    tags: ['Món chính', 'Tiết kiệm', 'Bổ dưỡng', 'Protein'],
+    cuisine: 'Việt Nam',
+    rating: 4.6,
+    reviews: 89,
+    cost: 45000,
+    isFavorite: true
+  },
+  {
+    id: '3',
+    title: 'Canh sườn non hầm rau củ',
+    description: 'Canh sườn non ngọt thanh với nhiều rau củ bổ dưỡng',
+    image: 'https://images.unsplash.com/photo-1547592166-23ac45744acd?w=400&h=300&fit=crop',
+    category: 'Canh',
+    difficulty: 'Dễ',
+    cookingTime: '45 phút',
+    servings: 4,
+    author: 'Bà Hoa',
+    status: 'published',
+    createdDate: '2024-01-10',
+    views: 670,
+    ingredients: [
+      '500g sườn non',
+      '1 củ cà rót',
+      '1 củ su hào',
+      '2 quả cà chua',
+      '1 củ hành tây',
+      'Ngò rí, hành lá',
+      'Muối, tiêu, nước mắm'
+    ],
+    instructions: [
+      'Sườn non rửa sạch, chặt khúc',
+      'Luộc sơ sườn để loại bỏ tạp chất',
+      'Rau củ gọt vỏ, thái miếng to',
+      'Hầm sườn với nước trong 30 phút',
+      'Cho rau củ vào hầm thêm 15 phút',
+      'Nêm gia vị, rắc rau thơm'
+    ],
+    nutrition: { calories: 180, protein: 15, carbs: 18, fat: 6, fiber: 5 },
+    tags: ['Canh', 'Bổ dưỡng', 'Rau củ', 'Thanh mát'],
+    cuisine: 'Việt Nam',
+    rating: 4.7,
+    reviews: 67,
+    cost: 55000
+  },
+  {
+    id: '4',
+    title: 'Thịt kho trứng cút',
+    description: 'Thịt kho trứng cút đậm đà, thấm vị, món ngon truyền thống',
+    image: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=400&h=300&fit=crop',
+    category: 'Món chính',
+    difficulty: 'Trung bình',
+    cookingTime: '40 phút',
+    servings: 4,
+    author: 'Chef Nam',
+    status: 'published',
+    createdDate: '2024-01-08',
+    views: 1100,
+    ingredients: [
+      '500g thịt ba chỉ',
+      '20 quả trứng cút',
+      '3 thìa canh nước mắm',
+      '2 thìa canh đường',
+      '1 thìa cà phê tiêu',
+      '3 củ hành tím',
+      'Nước dừa tươi'
+    ],
+    instructions: [
+      'Thịt thái miếng vuông vừa ăn',
+      'Trứng cút luộc chín, bóc vỏ',
+      'Ướp thịt với gia vị 20 phút',
+      'Rang thịt đến khi săn lại',
+      'Cho nước dừa vào kho 25 phút',
+      'Cho trứng cút vào kho thêm 10 phút'
+    ],
+    nutrition: { calories: 320, protein: 22, carbs: 10, fat: 20, fiber: 1 },
+    tags: ['Món chính', 'Truyền thống', 'Đậm đà', 'Kho'],
+    cuisine: 'Việt Nam',
+    rating: 4.9,
+    reviews: 134,
+    cost: 70000,
+    isPopular: true
+  },
+  {
+    id: '5',
+    title: 'Cá thu nướng lá chuối',
+    description: 'Cá thu nướng lá chuối thơm lừng, bổ dưỡng và hấp dẫn',
+    image: 'https://images.unsplash.com/photo-1544943910-4c1dc44aab44?w=400&h=300&fit=crop',
+    category: 'Món chính',
+    difficulty: 'Trung bình',
+    cookingTime: '35 phút',
+    servings: 4,
+    author: 'Anh Tuấn',
+    status: 'published',
+    createdDate: '2024-01-05',
+    views: 780,
+    ingredients: [
+      '1 con cá thu (800g)',
+      'Lá chuối tươi',
+      '3 thìa canh nước mắm',
+      '1 thìa canh dầu điều',
+      '2 thìa cà phê đường',
+      'Sả, gừng, tỏi',
+      'Ớt, tiêu'
+    ],
+    instructions: [
+      'Cá thu làm sạch, rạch dao',
+      'Ướp cá với gia vị 30 phút',
+      'Lá chuối rửa sạch, lau khô',
+      'Gói cá trong lá chuối',
+      'Nướng trên than hồng 30 phút',
+      'Lật đều để cá chín đều'
+    ],
+    nutrition: { calories: 250, protein: 28, carbs: 5, fat: 12, fiber: 1 },
+    tags: ['Cá', 'Nướng', 'Thơm ngon', 'Omega-3'],
+    cuisine: 'Việt Nam',
+    rating: 4.5,
+    reviews: 92,
+    cost: 80000
+  },
+  {
+    id: '6',
+    title: 'Rau muống xào tỏi',
+    description: 'Rau muống xào tỏi giòn ngon, nhanh gọn và bổ dưỡng',
+    image: 'https://images.unsplash.com/photo-1512058564366-18510be2db19?w=400&h=300&fit=crop',
+    category: 'Rau',
+    difficulty: 'Dễ',
+    cookingTime: '10 phút',
+    servings: 4,
+    author: 'Chị Mai',
+    status: 'published',
+    createdDate: '2024-01-03',
+    views: 450,
+    ingredients: [
+      '500g rau muống',
+      '4 tép tỏi',
+      '2 thìa canh dầu ăn',
+      '1 thìa cà phê muối',
+      '1/2 thìa cà phê đường',
+      'Nước mắm'
+    ],
+    instructions: [
+      'Rau muống nhặt sạch, rửa nhiều lần',
+      'Tỏi băm nhuyễn',
+      'Đun chảo với dầu, phi tỏi thơm',
+      'Cho rau muống vào xào nhanh tay',
+      'Nêm gia vị, xào đều trong 3 phút',
+      'Tắt bếp, múc ra đĩa'
+    ],
+    nutrition: { calories: 80, protein: 3, carbs: 8, fat: 4, fiber: 3 },
+    tags: ['Rau', 'Nhanh', 'Tiết kiệm', 'Vitamin'],
+    cuisine: 'Việt Nam',
+    rating: 4.3,
+    reviews: 45,
+    cost: 15000
+  },
+  {
+    id: '7',
+    title: 'Cơm chiên dương châu',
+    description: 'Cơm chiên dương châu đầy đủ dinh dưỡng, thơm ngon hấp dẫn',
+    image: 'https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=400&h=300&fit=crop',
+    category: 'Cơm',
+    difficulty: 'Trung bình',
+    cookingTime: '20 phút',
+    servings: 3,
+    author: 'Chef Hùng',
+    status: 'published',
+    createdDate: '2024-01-01',
+    views: 920,
+    ingredients: [
+      '3 chén cơm nguội',
+      '2 quả trứng',
+      '100g tôm',
+      '100g xúc xích',
+      '50g đậu Hà Lan',
+      'Hành tây, tỏi',
+      'Nước mắm, dầu ăn'
+    ],
+    instructions: [
+      'Cơm nguội tách hạt',
+      'Trứng đánh tan, chiên tơi',
+      'Tôm, xúc xích thái nhỏ',
+      'Phi thơm hành tỏi',
+      'Cho tôm, xúc xích vào xào',
+      'Cho cơm vào chiên đều, nêm gia vị'
+    ],
+    nutrition: { calories: 380, protein: 18, carbs: 45, fat: 14, fiber: 3 },
+    tags: ['Cơm', 'Đầy đủ', 'Nhanh gọn', 'Protein'],
+    cuisine: 'Hoa',
+    rating: 4.4,
+    reviews: 78,
+    cost: 50000
+  },
+  {
+    id: '8',
+    title: 'Bánh mì ốp la',
+    description: 'Bánh mì ốp la đơn giản, nhanh gọn cho bữa sáng bổ dưỡng',
+    image: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?w=400&h=300&fit=crop',
+    category: 'Bữa sáng',
+    difficulty: 'Dễ',
+    cookingTime: '15 phút',
+    servings: 2,
+    author: 'Bạn',
+    status: 'published',
+    createdDate: '2024-01-20',
+    views: 320,
+    ingredients: [
+      '4 lát bánh mì',
+      '2 quả trứng gà',
+      'Bơ hoặc dầu ăn',
+      'Muối, tiêu',
+      'Rau xà lách',
+      'Cà chua'
+    ],
+    instructions: [
+      'Bánh mì nướng vàng giòn',
+      'Đánh trứng với muối tiêu',
+      'Chiên trứng ốp la vàng đều',
+      'Rửa sạch rau, thái cà chua',
+      'Kẹp trứng và rau vào bánh mì',
+      'Ăn kèm với sữa hoặc cà phê'
+    ],
+    nutrition: { calories: 250, protein: 12, carbs: 28, fat: 10, fiber: 2 },
+    tags: ['Bữa sáng', 'Nhanh', 'Đơn giản', 'Protein'],
+    cuisine: 'Âu',
+    rating: 4.2,
+    reviews: 34,
+    cost: 25000,
+    isUserCreated: true
+  }
+];
+
+// Dữ liệu cho các thực đơn theo chủ đề
+export const menuThemes = {
+  budget: mockRecipes.filter(r => r.cost <= 50000),
+  quick: mockRecipes.filter(r => parseInt(r.cookingTime) <= 30),
+  healthy: mockRecipes.filter(r => r.nutrition.calories <= 250),
+  family: mockRecipes.filter(r => r.isPopular || r.rating >= 4.5)
+};
+
+// Dữ liệu cho sổ tay cá nhân
+export const personalRecipes = {
+  favorites: mockRecipes.filter(r => r.isFavorite),
+  userCreated: mockRecipes.filter(r => r.isUserCreated),
+  recent: mockRecipes.slice(0, 4)
+};

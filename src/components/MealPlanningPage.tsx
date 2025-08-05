@@ -24,7 +24,33 @@ import {
 const MealPlanningPage = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedMealTime, setSelectedMealTime] = useState('all');
-  const [selectedMealPlan, setSelectedMealPlan] = useState<any>(null);
+  interface MealPlanType {
+    id: number;
+    day: string;
+    breakfast: Array<{
+      name: string;
+      image: string;
+      time: string;
+      difficulty: string;
+      description: string;
+    }>;
+    lunch: Array<{
+      name: string;
+      image: string;
+      time: string;
+      difficulty: string;
+      description: string;
+    }>;
+    dinner: Array<{
+      name: string;
+      image: string;
+      time: string;
+      difficulty: string;
+      description: string;
+    }>;
+  }
+
+  const [selectedMealPlan, setSelectedMealPlan] = useState<MealPlanType | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
 
@@ -503,7 +529,15 @@ const MealPlanningPage = () => {
     }
   };
 
-  const MealSection = ({ meals, mealType }: { meals: any[], mealType: string }) => {
+  type MealItem = {
+    name: string;
+    image: string;
+    time: string;
+    difficulty: string;
+    description: string;
+  };
+
+  const MealSection = ({ meals, mealType }: { meals: MealItem[], mealType: string }) => {
     const getMealIcon = () => {
       switch (mealType) {
         case 'breakfast': return <Coffee className="h-4 w-4" />;
@@ -793,9 +827,9 @@ const MealPlanningPage = () => {
                       <div className="flex items-center gap-1">
                         <Clock className="h-4 w-4" />
                         <span>
-                          {plan.breakfast.reduce((sum: number, meal: any) => sum + parseInt(meal.time), 0) +
-                           plan.lunch.reduce((sum: number, meal: any) => sum + parseInt(meal.time), 0) +
-                           plan.dinner.reduce((sum: number, meal: any) => sum + parseInt(meal.time), 0)}p
+                          {plan.breakfast.reduce((sum: number, meal: MealItem) => sum + parseInt(meal.time), 0) +
+                           plan.lunch.reduce((sum: number, meal: MealItem) => sum + parseInt(meal.time), 0) +
+                           plan.dinner.reduce((sum: number, meal: MealItem) => sum + parseInt(meal.time), 0)}p
                         </span>
                       </div>
                     </div>

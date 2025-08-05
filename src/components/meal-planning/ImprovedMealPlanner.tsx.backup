@@ -1,0 +1,577 @@
+import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import {
+  ChevronLeft,
+  ChevronRight,
+  Plus,
+  MoreHorizontal,
+  Coffee,
+  UtensilsCrossed,
+  Moon,
+  ShoppingCart,
+  Sparkles,
+  Printer,
+  AlertCircle,
+  CheckCircle,
+  Clock
+} from 'lucide-react';
+import { format, addDays, subDays, startOfWeek, addWeeks, subWeeks } from 'date-fns';
+import { vi } from 'date-fns/locale';
+import AddDishModal from './AddDishModal';
+import ShoppingListSelectionMode from './ShoppingListSelectionMode';
+import ShoppingListGenerator from './ShoppingListGenerator';
+import { Recipe } from '@/types/meal-planning';
+
+interface Dish {
+  id: string;
+  name: string;
+  image?: string;
+  calories: number;
+  cost: number;
+  cookingTime: number;
+}
+
+interface MealSlot {
+  id: string;
+  dishes: Dish[];
+  totalCalories: number;
+  totalCost: number;
+  totalCookingTime: number;
+}
+
+interface DayPlan {
+  date: string;
+  breakfast: MealSlot;
+  lunch: MealSlot;
+  dinner: MealSlot;
+  totalCalories: number;
+  totalCost: number;
+  isPlanned: boolean;
+}
+
+const ImprovedMealPlanner: React.FC = () => {
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [currentWeek, setCurrentWeek] = useState(startOfWeek(new Date(), { weekStartsOn: 1 }));
+
+  // Modal states
+  const [showAddDishModal, setShowAddDishModal] = useState(false);
+  const [selectedMealSlot, setSelectedMealSlot] = useState<{
+    dayIndex: number;
+    mealType: 'breakfast' | 'lunch' | 'dinner';
+    date: string;
+  } | null>(null);
+
+  // Shopping list states
+  const [isSelectionMode, setIsSelectionMode] = useState(false);
+  const [showShoppingList, setShowShoppingList] = useState(false);
+  const [selectedMealsForShopping, setSelectedMealsForShopping] = useState<any[]>([]);
+  
+  // Mock data for demonstration
+  const [weekPlan, setWeekPlan] = useState<DayPlan[]>([
+    {
+      date: format(currentWeek, 'yyyy-MM-dd'),
+      breakfast: { id: 'b1', dishes: [{ id: '1', name: 'Xôi gấc', calories: 300, cost: 15000, cookingTime: 20 }], totalCalories: 300, totalCost: 15000, totalCookingTime: 20 },
+      lunch: { 
+        id: 'l1', 
+        dishes: [
+          { id: '2', name: 'Thịt rang cháy cạnh', calories: 250, cost: 35000, cookingTime: 30 },
+          { id: '3', name: 'Rau muống luộc', calories: 50, cost: 10000, cookingTime: 10 },
+          { id: '4', name: 'Đậu rán tẩm hành', calories: 180, cost: 20000, cookingTime: 15 }
+        ], 
+        totalCalories: 480, 
+        totalCost: 65000, 
+        totalCookingTime: 55 
+      },
+      dinner: { id: 'd1', dishes: [], totalCalories: 0, totalCost: 0, totalCookingTime: 0 },
+      totalCalories: 780,
+      totalCost: 80000,
+      isPlanned: true
+    },
+    {
+      date: format(addDays(currentWeek, 1), 'yyyy-MM-dd'),
+      breakfast: { id: 'b2', dishes: [], totalCalories: 0, totalCost: 0, totalCookingTime: 0 },
+      lunch: { id: 'l2', dishes: [], totalCalories: 0, totalCost: 0, totalCookingTime: 0 },
+      dinner: { id: 'd2', dishes: [], totalCalories: 0, totalCost: 0, totalCookingTime: 0 },
+      totalCalories: 0,
+      totalCost: 0,
+      isPlanned: true
+    },
+    {
+      date: format(addDays(currentWeek, 2), 'yyyy-MM-dd'),
+      breakfast: { id: 'b3', dishes: [], totalCalories: 0, totalCost: 0, totalCookingTime: 0 },
+      lunch: { id: 'l3', dishes: [], totalCalories: 0, totalCost: 0, totalCookingTime: 0 },
+      dinner: { id: 'd3', dishes: [], totalCalories: 0, totalCost: 0, totalCookingTime: 0 },
+      totalCalories: 0,
+      totalCost: 0,
+      isPlanned: false
+    },
+    // Add more days...
+  ]);
+
+  const [selectedDayIndex, setSelectedDayIndex] = useState(0);
+  const selectedDay = weekPlan[selectedDayIndex];
+
+  const navigateWeek = (direction: 'prev' | 'next') => {
+    if (direction === 'prev') {
+      setCurrentWeek(subWeeks(currentWeek, 1));
+    } else {
+      setCurrentWeek(addWeeks(currentWeek, 1));
+    }
+  };
+
+  const getDayName = (date: string) => {
+    return format(new Date(date), 'EEEE', { locale: vi });
+  };
+
+  const getFormattedDate = (date: string) => {
+    return format(new Date(date), 'dd/MM', { locale: vi });
+  };
+
+  const addDishToMeal = (mealType: 'breakfast' | 'lunch' | 'dinner') => {
+    const dayIndex = selectedDayIndex;
+    const date = weekPlan[dayIndex]?.date;
+
+    if (date) {
+      setSelectedMealSlot({ dayIndex, mealType, date });
+      setShowAddDishModal(true);
+    }
+  };
+
+  const handleAddDish = (recipe: Recipe) => {
+    if (!selectedMealSlot) return;
+
+    const { dayIndex, mealType } = selectedMealSlot;
+
+    // Convert Recipe to Dish format
+    const newDish: Dish = {
+      id: recipe.id,
+      name: recipe.title,
+      calories: recipe.nutrition?.calories || 200,
+      cost: 25000, // Default cost
+      cookingTime: parseInt(recipe.cookingTime) || 30
+    };
+
+    setWeekPlan(prev => prev.map((day, index) => {
+      if (index === dayIndex) {
+        const updatedMeal = {
+          ...day[mealType],
+          dishes: [...day[mealType].dishes, newDish],
+          totalCalories: day[mealType].totalCalories + newDish.calories,
+          totalCost: day[mealType].totalCost + newDish.cost,
+          totalCookingTime: day[mealType].totalCookingTime + newDish.cookingTime
+        };
+
+        return {
+          ...day,
+          [mealType]: updatedMeal,
+          totalCalories: day.totalCalories + newDish.calories,
+          totalCost: day.totalCost + newDish.cost
+        };
+      }
+      return day;
+    }));
+
+    setShowAddDishModal(false);
+    setSelectedMealSlot(null);
+  };
+
+  const replaceDish = (mealType: 'breakfast' | 'lunch' | 'dinner', dishId: string) => {
+    // Mock function - in real app, this would open a replacement selector
+    console.log(`Replace dish ${dishId} in ${mealType}`);
+  };
+
+  const removeDish = (mealType: 'breakfast' | 'lunch' | 'dinner', dishId: string) => {
+    setWeekPlan(prev => prev.map((day, index) => {
+      if (index === selectedDayIndex) {
+        const dishToRemove = day[mealType].dishes.find(d => d.id === dishId);
+        if (!dishToRemove) return day;
+
+        const updatedMeal = {
+          ...day[mealType],
+          dishes: day[mealType].dishes.filter(d => d.id !== dishId),
+          totalCalories: day[mealType].totalCalories - dishToRemove.calories,
+          totalCost: day[mealType].totalCost - dishToRemove.cost,
+          totalCookingTime: day[mealType].totalCookingTime - dishToRemove.cookingTime
+        };
+
+        return {
+          ...day,
+          [mealType]: updatedMeal,
+          totalCalories: day.totalCalories - dishToRemove.calories,
+          totalCost: day.totalCost - dishToRemove.cost
+        };
+      }
+      return day;
+    }));
+  };
+
+  // Shopping list functions
+  const handleEnterSelectionMode = () => {
+    setIsSelectionMode(true);
+  };
+
+  const handleExitSelectionMode = () => {
+    setIsSelectionMode(false);
+  };
+
+  const handleCreateShoppingListFromSelection = (selectedMeals: any[]) => {
+    setSelectedMealsForShopping(selectedMeals);
+    setIsSelectionMode(false);
+    setShowShoppingList(true);
+  };
+
+  const handleBackFromShoppingList = () => {
+    setShowShoppingList(false);
+    setSelectedMealsForShopping([]);
+  };
+
+  const MealSlotComponent: React.FC<{
+    title: string;
+    icon: React.ReactNode;
+    meal: MealSlot;
+    mealType: 'breakfast' | 'lunch' | 'dinner';
+  }> = ({ title, icon, meal, mealType }) => {
+    return (
+    <Card className="mb-6">
+      <CardHeader className="pb-3">
+        <CardTitle className="flex items-center gap-2 text-lg">
+          {icon}
+          {title}
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        {meal.dishes.length === 0 ? (
+          <Button
+            onClick={() => addDishToMeal(mealType)}
+            variant="dashed"
+            className="w-full h-20 border-2 border-dashed border-gray-300 hover:border-orange-400 hover:bg-orange-50 transition-all duration-200"
+          >
+            <Plus className="h-5 w-5 mr-2" />
+            Thêm món cho {title.toLowerCase()}
+          </Button>
+        ) : (
+          <div className="space-y-3">
+            {meal.dishes.map((dish) => (
+              <div key={dish.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors group">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                    <UtensilsCrossed className="h-5 w-5 text-orange-600" />
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-gray-900">{dish.name}</h4>
+                    <p className="text-sm text-gray-500">
+                      {dish.calories} kcal • {dish.cost.toLocaleString()}đ • {dish.cookingTime} phút
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => replaceDish(mealType, dish.id)}
+                    className="text-xs"
+                  >
+                    Thay thế
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => removeDish(mealType, dish.id)}
+                    className="text-xs text-red-600 hover:text-red-700"
+                  >
+                    Xóa
+                  </Button>
+                </div>
+              </div>
+            ))}
+            <Button
+              onClick={() => addDishToMeal(mealType)}
+              variant="ghost"
+              size="sm"
+              className="w-full text-orange-600 hover:text-orange-700 hover:bg-orange-50"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Thêm món
+            </Button>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+    );
+  };
+
+  // Show shopping list if requested
+  if (showShoppingList) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="mb-6">
+            <Button variant="outline" onClick={handleBackFromShoppingList}>
+              <ChevronLeft className="h-4 w-4 mr-2" />
+              Quay lại kế hoạch
+            </Button>
+          </div>
+          <ShoppingListGenerator selectedMeals={selectedMealsForShopping} />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Lập Kế Hoạch Bữa Ăn</h1>
+          <p className="text-gray-600">Quản lý thực đơn hàng ngày một cách thông minh và hiệu quả</p>
+        </div>
+
+        {/* Show selection mode if active */}
+        {isSelectionMode && (
+          <ShoppingListSelectionMode
+            isActive={isSelectionMode}
+            onExit={handleExitSelectionMode}
+            onCreateShoppingList={handleCreateShoppingListFromSelection}
+            weekPlan={weekPlan.map(day => ({
+              date: day.date,
+              meals: {
+                breakfast: {
+                  id: day.breakfast.id,
+                  date: day.date,
+                  mealType: 'breakfast' as const,
+                  recipe: day.breakfast.dishes.length > 0 ? {
+                    id: day.breakfast.dishes[0].id,
+                    title: day.breakfast.dishes[0].name,
+                    ingredients: ['Nguyên liệu mẫu'] // Mock ingredients
+                  } : undefined,
+                  selected: false
+                },
+                lunch: {
+                  id: day.lunch.id,
+                  date: day.date,
+                  mealType: 'lunch' as const,
+                  recipe: day.lunch.dishes.length > 0 ? {
+                    id: day.lunch.dishes[0].id,
+                    title: day.lunch.dishes[0].name,
+                    ingredients: ['Nguyên liệu mẫu'] // Mock ingredients
+                  } : undefined,
+                  selected: false
+                },
+                dinner: {
+                  id: day.dinner.id,
+                  date: day.date,
+                  mealType: 'dinner' as const,
+                  recipe: day.dinner.dishes.length > 0 ? {
+                    id: day.dinner.dishes[0].id,
+                    title: day.dinner.dishes[0].name,
+                    ingredients: ['Nguyên liệu mẫu'] // Mock ingredients
+                  } : undefined,
+                  selected: false
+                },
+                snacks: []
+              },
+              allSelected: false
+            }))}
+          />
+        )}
+
+        {!isSelectionMode && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Cột Trái - Không gian làm việc chính */}
+          <div className="lg:col-span-2">
+            {/* Week Navigation */}
+            <div className="flex items-center justify-between mb-6">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigateWeek('prev')}
+              >
+                <ChevronLeft className="h-4 w-4" />
+                Tuần trước
+              </Button>
+              
+              <h2 className="text-xl font-semibold text-gray-900">
+                Tuần {format(currentWeek, 'dd/MM')} - {format(addDays(currentWeek, 6), 'dd/MM/yyyy')}
+              </h2>
+              
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigateWeek('next')}
+              >
+                Tuần sau
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+
+            {/* Current Day Focus */}
+            <Card className="mb-6">
+              <CardHeader>
+                <CardTitle className="text-2xl text-center">
+                  Hôm nay: {getDayName(selectedDay?.date || '')} {getFormattedDate(selectedDay?.date || '')}
+                </CardTitle>
+              </CardHeader>
+            </Card>
+
+            {/* Meal Slots */}
+            {selectedDay && (
+              <>
+                <MealSlotComponent
+                  title="Bữa Sáng"
+                  icon={<Coffee className="h-5 w-5 text-amber-600" />}
+                  meal={selectedDay.breakfast}
+                  mealType="breakfast"
+                />
+                
+                <MealSlotComponent
+                  title="Bữa Trưa"
+                  icon={<UtensilsCrossed className="h-5 w-5 text-orange-600" />}
+                  meal={selectedDay.lunch}
+                  mealType="lunch"
+                />
+                
+                <MealSlotComponent
+                  title="Bữa Tối"
+                  icon={<Moon className="h-5 w-5 text-indigo-600" />}
+                  meal={selectedDay.dinner}
+                  mealType="dinner"
+                />
+              </>
+            )}
+          </div>
+
+          {/* Cột Phải - Trợ lý thông minh */}
+          <div className="space-y-6">
+            {/* Tổng Quan Tuần */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Tổng Quan Tuần</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {weekPlan.slice(0, 7).map((day, index) => (
+                    <div
+                      key={day.date}
+                      onClick={() => setSelectedDayIndex(index)}
+                      className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-all ${
+                        index === selectedDayIndex
+                          ? 'bg-orange-100 border-2 border-orange-300'
+                          : 'bg-gray-50 hover:bg-gray-100'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className={`w-3 h-3 rounded-full ${
+                          day.isPlanned ? 'bg-green-500' : 'bg-yellow-500'
+                        }`} />
+                        <span className="font-medium">
+                          {getDayName(day.date)}
+                        </span>
+                      </div>
+                      <div className="text-sm text-gray-600">
+                        {day.isPlanned ? (
+                          <div className="flex items-center gap-1">
+                            <CheckCircle className="h-4 w-4 text-green-500" />
+                            {day.breakfast.dishes.length + day.lunch.dishes.length + day.dinner.dishes.length} món
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-1">
+                            <AlertCircle className="h-4 w-4 text-yellow-500" />
+                            Cần lên kế hoạch
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Phân Tích Cho Ngày Hôm Nay */}
+            {selectedDay && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Phân Tích Hôm Nay</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <div className="flex justify-between text-sm mb-2">
+                      <span>Dinh dưỡng</span>
+                      <span>{selectedDay.totalCalories}/2200 kcal</span>
+                    </div>
+                    <Progress value={(selectedDay.totalCalories / 2200) * 100} className="h-2" />
+                  </div>
+                  
+                  <div>
+                    <div className="flex justify-between text-sm mb-2">
+                      <span>Chi phí (ước tính)</span>
+                      <span>{selectedDay.totalCost.toLocaleString()}đ/120.000đ</span>
+                    </div>
+                    <Progress value={(selectedDay.totalCost / 120000) * 100} className="h-2" />
+                  </div>
+
+                  {selectedDay.totalCalories < 1500 && (
+                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                      <div className="flex items-start gap-2">
+                        <AlertCircle className="h-4 w-4 text-yellow-600 mt-0.5" />
+                        <div className="text-sm">
+                          <p className="font-medium text-yellow-800">Gợi ý dinh dưỡng</p>
+                          <p className="text-yellow-700">Bữa ăn hôm nay hơi thiếu chất xơ. Thử thêm một món salad vào bữa tối nhé!</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Hành Động Chính */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Hành Động</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <Button
+                  className="w-full bg-orange-500 hover:bg-orange-600 text-white"
+                  onClick={handleEnterSelectionMode}
+                >
+                  <ShoppingCart className="h-4 w-4 mr-2" />
+                  🛒 Chọn Món Để Đi Chợ
+                </Button>
+
+                <Button variant="outline" className="w-full">
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  Nhờ AI Hoàn Tất Kế Hoạch Tuần
+                </Button>
+
+                <Button variant="outline" className="w-full">
+                  <Printer className="h-4 w-4 mr-2" />
+                  In Kế Hoạch Tuần
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+          </div>
+        )}
+
+        {/* Add Dish Modal */}
+        {selectedMealSlot && (
+          <AddDishModal
+            isOpen={showAddDishModal}
+            onClose={() => {
+              setShowAddDishModal(false);
+              setSelectedMealSlot(null);
+            }}
+            onAddDish={handleAddDish}
+            mealType={selectedMealSlot.mealType}
+            date={selectedMealSlot.date}
+          />
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default ImprovedMealPlanner;

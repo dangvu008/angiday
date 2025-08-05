@@ -1,8 +1,10 @@
 
 import { Link } from 'react-router-dom';
 import { ChefHat, User, Book } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Footer = () => {
+  const { user } = useAuth();
   return (
     <footer className="bg-gray-50 border-t">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -44,21 +46,50 @@ const Footer = () => {
           <div>
             <h3 className="font-semibold text-gray-900 mb-4">Tài khoản</h3>
             <ul className="space-y-2">
-              <li>
-                <Link to="/login" className="text-gray-600 hover:text-orange-600 transition-colors">
-                  Đăng nhập
-                </Link>
-              </li>
-              <li>
-                <Link to="/register" className="text-gray-600 hover:text-orange-600 transition-colors">
-                  Đăng ký
-                </Link>
-              </li>
-              <li>
-                <Link to="/my-recipes" className="text-gray-600 hover:text-orange-600 transition-colors">
-                  Công thức của tôi
-                </Link>
-              </li>
+              {user ? (
+                // Hiển thị khi đã đăng nhập
+                <>
+                  <li>
+                    <Link to="/profile" className="text-gray-600 hover:text-orange-600 transition-colors">
+                      Hồ sơ cá nhân
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/my-recipes" className="text-gray-600 hover:text-orange-600 transition-colors">
+                      Công thức của tôi
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/my-favorites" className="text-gray-600 hover:text-orange-600 transition-colors">
+                      Yêu thích
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/my-meal-plans" className="text-gray-600 hover:text-orange-600 transition-colors">
+                      Thực đơn của tôi
+                    </Link>
+                  </li>
+                </>
+              ) : (
+                // Hiển thị khi chưa đăng nhập
+                <>
+                  <li>
+                    <Link to="/login" className="text-gray-600 hover:text-orange-600 transition-colors">
+                      Đăng nhập
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/register" className="text-gray-600 hover:text-orange-600 transition-colors">
+                      Đăng ký
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/recipes" className="text-gray-600 hover:text-orange-600 transition-colors">
+                      Khám phá công thức
+                    </Link>
+                  </li>
+                </>
+              )}
             </ul>
           </div>
         </div>

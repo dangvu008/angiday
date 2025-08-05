@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
-import { Recipe, useMealPlanning } from '@/contexts/MealPlanningContext';
+import { useMealPlanning } from '@/contexts/MealPlanningContext';
+import { Recipe } from '@/types/kitchen';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -52,12 +53,12 @@ const RecipeSelector: React.FC<RecipeSelectorProps> = ({
 
   // Filter and sort recipes
   const filteredRecipes = useMemo(() => {
-    let filtered = availableRecipes.filter(recipe => {
-      const matchesSearch = recipe.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          recipe.ingredients.some(ing => ing.toLowerCase().includes(searchQuery.toLowerCase()));
+    const filtered = availableRecipes.filter(recipe => {
+      const matchesSearch = (recipe.title || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          (recipe.ingredients || []).some(ing => (ing || '').toLowerCase().includes(searchQuery.toLowerCase()));
       const matchesCategory = selectedCategory === 'all' || recipe.category === selectedCategory;
       const matchesDifficulty = selectedDifficulty === 'all' || recipe.difficulty === selectedDifficulty;
-      
+
       return matchesSearch && matchesCategory && matchesDifficulty;
     });
 
@@ -68,9 +69,10 @@ const RecipeSelector: React.FC<RecipeSelectorProps> = ({
           return a.title.localeCompare(b.title);
         case 'time':
           return parseInt(a.cookTime) - parseInt(b.cookTime);
-        case 'difficulty':
+        case 'difficulty': {
           const difficultyOrder = { 'Dễ': 1, 'Trung bình': 2, 'Khó': 3 };
           return difficultyOrder[a.difficulty] - difficultyOrder[b.difficulty];
+        }
         case 'calories':
           return (a.calories || 0) - (b.calories || 0);
         default:

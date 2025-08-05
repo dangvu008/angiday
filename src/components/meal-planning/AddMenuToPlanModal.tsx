@@ -56,7 +56,7 @@ const AddMenuToPlanModal = ({ isOpen, onClose, menu, onAddToPlan }: AddMenuToPla
   const generatePlanName = () => {
     const dateStr = new Date(date).toLocaleDateString('vi-VN');
     switch (planType) {
-      case 'meal':
+      case 'meal': {
         const mealTypeLabels = {
           breakfast: 'Bữa sáng',
           lunch: 'Bữa trưa', 
@@ -64,6 +64,7 @@ const AddMenuToPlanModal = ({ isOpen, onClose, menu, onAddToPlan }: AddMenuToPla
           snack: 'Ăn vặt'
         };
         return `${mealTypeLabels[mealType]} ${dateStr} - ${menu.name}`;
+      }
       case 'day':
         return `Kế hoạch ngày ${dateStr} - ${menu.name}`;
       case 'week':

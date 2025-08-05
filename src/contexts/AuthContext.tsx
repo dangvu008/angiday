@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { DataCleanupService } from '@/utils/cleanupOldData';
 
 export interface User {
   id: string;
@@ -54,7 +55,7 @@ const seedDemoAccounts = () => {
         email: 'demo@angiday.com',
         password: '123456',
         userData: {
-          id: 'demo-1',
+          id: '550e8400-e29b-41d4-a716-446655440000',
           email: 'demo@angiday.com',
           name: 'Demo User',
           avatar: 'https://ui-avatars.com/api/?name=Demo+User&background=f97316&color=fff',
@@ -79,7 +80,7 @@ const seedDemoAccounts = () => {
         email: 'admin@angiday.com',
         password: 'admin123',
         userData: {
-          id: 'admin-1',
+          id: '550e8400-e29b-41d4-a716-446655440001',
           email: 'admin@angiday.com',
           name: 'Admin User',
           avatar: 'https://ui-avatars.com/api/?name=Admin+User&background=dc2626&color=fff',
@@ -124,6 +125,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    // Clear old data with invalid UUIDs
+    DataCleanupService.clearLocalStorage();
+
     // Force recreate demo accounts for debugging
     forceRecreateDemoAccounts();
     checkAuthStatus();

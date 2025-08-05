@@ -23,7 +23,14 @@ import {
 const AntiBlockDemo = () => {
   const [url, setUrl] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [result, setResult] = useState<any>(null);
+  interface ResultType {
+    success: boolean;
+    data?: unknown;
+    error?: string;
+    method?: string;
+  }
+
+  const [result, setResult] = useState<ResultType | null>(null);
   const [progress, setProgress] = useState(0);
   const [currentMethod, setCurrentMethod] = useState('');
   const { toast } = useToast();

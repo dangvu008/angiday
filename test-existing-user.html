@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Existing User with Meal Plans</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .button {
+            background: #ea580c;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .button:hover {
+            background: #dc2626;
+        }
+        .button.secondary {
+            background: #6b7280;
+        }
+        .button.secondary:hover {
+            background: #4b5563;
+        }
+        .success {
+            color: #059669;
+            font-weight: bold;
+        }
+        .warning {
+            color: #d97706;
+            font-weight: bold;
+        }
+        .info {
+            color: #0369a1;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>🧪 Test Existing User with Meal Plans</h1>
+        <p>Công cụ này giúp test trường hợp người dùng đã có meal plans nhưng chưa có kế hoạch cho ngày hôm nay.</p>
+    </div>
+
+    <div class="card">
+        <h2>👤 Thiết Lập Người Dùng Có Meal Plans</h2>
+        <p>Tạo dữ liệu mô phỏng người dùng đã đăng nhập và có meal plans:</p>
+        <button class="button" onclick="setupExistingUser()">Thiết Lập Người Dùng Có Meal Plans</button>
+        <button class="button secondary" onclick="setupUserWithTodayPlan()">Thiết Lập Có Plan Cho Hôm Nay</button>
+        <div id="setupResult"></div>
+    </div>
+
+    <div class="card">
+        <h2>📊 Kiểm Tra Dữ Liệu Hiện Tại</h2>
+        <button class="button secondary" onclick="checkCurrentData()">Kiểm Tra Dữ Liệu</button>
+        <div id="dataStatus"></div>
+    </div>
+
+    <div class="card">
+        <h2>🚀 Mở Ứng Dụng</h2>
+        <p>Sau khi thiết lập dữ liệu, mở ứng dụng để test:</p>
+        <button class="button" onclick="openApp()">Mở Angiday</button>
+        <button class="button secondary" onclick="openAppNewTab()">Mở Trong Tab Mới</button>
+    </div>
+
+    <div class="card">
+        <h2>📝 Kịch Bản Test</h2>
+        <h3>🎯 Test Case 1: Người dùng có meal plans nhưng chưa có plan hôm nay</h3>
+        <ol>
+            <li><strong>Thiết lập:</strong> Nhấn "Thiết Lập Người Dùng Có Meal Plans"</li>
+            <li><strong>Mở app:</strong> Nhấn "Mở Angiday"</li>
+            <li><strong>Kết quả mong đợi:</strong>
+                <ul>
+                    <li>Thấy "Chưa có thực đơn hôm nay"</li>
+                    <li>Thấy nút "Áp dụng kế hoạch có sẵn" (màu cam)</li>
+                    <li>Thấy nút "Lên kế hoạch hôm nay" (outline)</li>
+                    <li>KHÔNG thấy WelcomeGuide</li>
+                </ul>
+            </li>
+            <li><strong>Test chức năng:</strong> Nhấn "Áp dụng kế hoạch có sẵn" → Chọn plan → Áp dụng</li>
+        </ol>
+
+        <h3>🎯 Test Case 2: Người dùng có plan cho hôm nay</h3>
+        <ol>
+            <li><strong>Thiết lập:</strong> Nhấn "Thiết Lập Có Plan Cho Hôm Nay"</li>
+            <li><strong>Mở app:</strong> Nhấn "Mở Angiday"</li>
+            <li><strong>Kết quả mong đợi:</strong>
+                <ul>
+                    <li>Thấy thực đơn đầy đủ cho hôm nay</li>
+                    <li>Có các bữa ăn hiển thị</li>
+                    <li>KHÔNG thấy thông báo "Chưa có thực đơn"</li>
+                </ul>
+            </li>
+        </ol>
+    </div>
+
+    <script>
+        function setupExistingUser() {
+            try {
+                // Clear existing data first
+                localStorage.clear();
+                
+                // Set up authenticated user
+                const user = {
+                    id: 'test_user_123',
+                    email: 'test@example.com',
+                    name: 'Test User'
+                };
+                localStorage.setItem('auth_user', JSON.stringify(user));
+                
+                // Set up meal plans (but not for today)
+                const today = new Date();
+                const yesterday = new Date(today);
+                yesterday.setDate(yesterday.getDate() - 1);
+                const tomorrow = new Date(today);
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                
+                const mealPlans = [
+                    {
+                        id: 'plan_1',
+                        userId: 'test_user_123',
+                        name: 'Kế hoạch tuần này',
+                        description: 'Thực đơn khỏe mạnh cho tuần',
+                        startDate: yesterday.toISOString().split('T')[0],
+                        endDate: tomorrow.toISOString().split('T')[0],
+                        meals: [
+                            {
+                                id: 'meal_1',
+                                date: yesterday.toISOString().split('T')[0],
+                                mealType: 'breakfast',
+                                recipe: {
+                                    id: 'recipe_1',
+                                    title: 'Phở bò',
+                                    image: 'https://images.unsplash.com/photo-1559847844-d721426d6edc?w=300&h=200&fit=crop',
+                                    cookTime: '30 phút',
+                                    servings: 2,
+                                    calories: 350
+                                }
+                            },
+                            {
+                                id: 'meal_2',
+                                date: tomorrow.toISOString().split('T')[0],
+                                mealType: 'lunch',
+                                recipe: {
+                                    id: 'recipe_2',
+                                    title: 'Cơm tấm sườn',
+                                    image: 'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=300&h=200&fit=crop',
+                                    cookTime: '45 phút',
+                                    servings: 1,
+                                    calories: 450
+                                }
+                            }
+                        ],
+                        createdAt: new Date().toISOString(),
+                        updatedAt: new Date().toISOString()
+                    },
+                    {
+                        id: 'plan_2',
+                        userId: 'test_user_123',
+                        name: 'Thực đơn tiết kiệm',
+                        description: 'Các món ăn đơn giản, tiết kiệm',
+                        startDate: yesterday.toISOString().split('T')[0],
+                        endDate: tomorrow.toISOString().split('T')[0],
+                        meals: [
+                            {
+                                id: 'meal_3',
+                                date: yesterday.toISOString().split('T')[0],
+                                mealType: 'dinner',
+                                recipe: {
+                                    id: 'recipe_3',
+                                    title: 'Mì tôm trứng',
+                                    image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=300&h=200&fit=crop',
+                                    cookTime: '15 phút',
+                                    servings: 1,
+                                    calories: 280
+                                }
+                            }
+                        ],
+                        createdAt: new Date().toISOString(),
+                        updatedAt: new Date().toISOString()
+                    }
+                ];
+                
+                localStorage.setItem(`meal_plans_${user.id}`, JSON.stringify(mealPlans));
+                localStorage.setItem('hasSeenWelcomeGuide', 'true'); // User has seen guide
+                
+                document.getElementById('setupResult').innerHTML = 
+                    '<p class="success">✅ Đã thiết lập người dùng có meal plans (không có plan cho hôm nay)</p>' +
+                    '<p class="info">📅 Có 2 meal plans với meals cho hôm qua và ngày mai, nhưng KHÔNG có cho hôm nay</p>';
+                    
+            } catch (error) {
+                document.getElementById('setupResult').innerHTML = 
+                    '<p class="warning">❌ Lỗi: ' + error.message + '</p>';
+            }
+        }
+
+        function setupUserWithTodayPlan() {
+            try {
+                // Clear existing data first
+                localStorage.clear();
+                
+                // Set up authenticated user
+                const user = {
+                    id: 'test_user_123',
+                    email: 'test@example.com',
+                    name: 'Test User'
+                };
+                localStorage.setItem('auth_user', JSON.stringify(user));
+                
+                // Set up meal plans WITH today's meals
+                const today = new Date().toISOString().split('T')[0];
+                
+                const mealPlans = [
+                    {
+                        id: 'plan_today',
+                        userId: 'test_user_123',
+                        name: 'Kế hoạch hôm nay',
+                        description: 'Thực đơn cho ngày hôm nay',
+                        startDate: today,
+                        endDate: today,
+                        meals: [
+                            {
+                                id: 'meal_breakfast',
+                                date: today,
+                                mealType: 'breakfast',
+                                recipe: {
+                                    id: 'recipe_breakfast',
+                                    title: 'Bánh mì pate',
+                                    image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=300&h=200&fit=crop',
+                                    cookTime: '10 phút',
+                                    servings: 1,
+                                    calories: 320
+                                }
+                            },
+                            {
+                                id: 'meal_lunch',
+                                date: today,
+                                mealType: 'lunch',
+                                recipe: {
+                                    id: 'recipe_lunch',
+                                    title: 'Cơm gà Hải Nam',
+                                    image: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=300&h=200&fit=crop',
+                                    cookTime: '60 phút',
+                                    servings: 2,
+                                    calories: 520
+                                }
+                            },
+                            {
+                                id: 'meal_dinner',
+                                date: today,
+                                mealType: 'dinner',
+                                recipe: {
+                                    id: 'recipe_dinner',
+                                    title: 'Bún bò Huế',
+                                    image: 'https://images.unsplash.com/photo-1559847844-d721426d6edc?w=300&h=200&fit=crop',
+                                    cookTime: '90 phút',
+                                    servings: 2,
+                                    calories: 480
+                                }
+                            }
+                        ],
+                        createdAt: new Date().toISOString(),
+                        updatedAt: new Date().toISOString()
+                    }
+                ];
+                
+                localStorage.setItem(`meal_plans_${user.id}`, JSON.stringify(mealPlans));
+                localStorage.setItem('activeMealPlan', JSON.stringify(mealPlans[0]));
+                localStorage.setItem('hasSeenWelcomeGuide', 'true');
+                
+                document.getElementById('setupResult').innerHTML = 
+                    '<p class="success">✅ Đã thiết lập người dùng có meal plan cho hôm nay</p>' +
+                    '<p class="info">📅 Có 1 meal plan với 3 bữa ăn cho ngày hôm nay</p>';
+                    
+            } catch (error) {
+                document.getElementById('setupResult').innerHTML = 
+                    '<p class="warning">❌ Lỗi: ' + error.message + '</p>';
+            }
+        }
+
+        function checkCurrentData() {
+            const hasSeenGuide = localStorage.getItem('hasSeenWelcomeGuide');
+            const authUser = localStorage.getItem('auth_user');
+            const mealPlansData = localStorage.getItem('meal_plans_test_user_123');
+            const activePlan = localStorage.getItem('activeMealPlan');
+            
+            let status = '<h3>Trạng thái dữ liệu:</h3><ul>';
+            status += '<li><strong>Welcome Guide:</strong> ' + (hasSeenGuide ? '✅ Đã xem' : '❌ Chưa xem') + '</li>';
+            status += '<li><strong>Auth User:</strong> ' + (authUser ? '✅ Đã đăng nhập' : '❌ Chưa đăng nhập') + '</li>';
+            status += '<li><strong>Meal Plans:</strong> ' + (mealPlansData ? '✅ Có dữ liệu' : '❌ Không có') + '</li>';
+            status += '<li><strong>Active Plan:</strong> ' + (activePlan ? '✅ Có plan đang hoạt động' : '❌ Không có plan hoạt động') + '</li>';
+            status += '</ul>';
+
+            if (mealPlansData) {
+                try {
+                    const plans = JSON.parse(mealPlansData);
+                    const today = new Date().toISOString().split('T')[0];
+                    const todayMeals = plans.flatMap(plan => 
+                        plan.meals.filter(meal => meal.date === today)
+                    );
+                    
+                    status += '<h4>Chi tiết:</h4>';
+                    status += '<li><strong>Số meal plans:</strong> ' + plans.length + '</li>';
+                    status += '<li><strong>Meals cho hôm nay:</strong> ' + todayMeals.length + '</li>';
+                    
+                    if (todayMeals.length > 0) {
+                        status += '<p class="success">🎯 Trạng thái: Có thực đơn cho hôm nay - Sẽ hiển thị meals</p>';
+                    } else {
+                        status += '<p class="warning">⚠️ Trạng thái: Có meal plans nhưng không có cho hôm nay - Sẽ hiển thị nút "Áp dụng kế hoạch có sẵn"</p>';
+                    }
+                } catch (e) {
+                    status += '<p class="warning">❌ Lỗi parse meal plans data</p>';
+                }
+            }
+
+            document.getElementById('dataStatus').innerHTML = status;
+        }
+
+        function openApp() {
+            window.location.href = 'http://localhost:8080';
+        }
+
+        function openAppNewTab() {
+            window.open('http://localhost:8080', '_blank');
+        }
+
+        // Auto check data on load
+        window.onload = function() {
+            checkCurrentData();
+        };
+    </script>
+</body>
+</html>

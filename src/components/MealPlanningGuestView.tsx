@@ -427,7 +427,7 @@ const MealPlanningGuestView: React.FC = () => {
   const [showSearchView, setShowSearchView] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isListening, setIsListening] = useState(false);
-  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [searchResults, setSearchResults] = useState<typeof mealPlansByTime.morning>([]);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
   // Validate meal plan titles on component mount
@@ -456,7 +456,13 @@ const MealPlanningGuestView: React.FC = () => {
   // Voice search functionality
   const startVoiceSearch = () => {
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-      const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
+      const SpeechRecognition = (window as typeof window & {
+        webkitSpeechRecognition?: typeof SpeechRecognition;
+        SpeechRecognition?: typeof SpeechRecognition;
+      }).webkitSpeechRecognition || (window as typeof window & {
+        webkitSpeechRecognition?: typeof SpeechRecognition;
+        SpeechRecognition?: typeof SpeechRecognition;
+      }).SpeechRecognition;
       const recognition = new SpeechRecognition();
 
       recognition.continuous = false;
@@ -467,7 +473,7 @@ const MealPlanningGuestView: React.FC = () => {
         setIsListening(true);
       };
 
-      recognition.onresult = (event: any) => {
+      recognition.onresult = (event: SpeechRecognitionEvent) => {
         const transcript = event.results[0][0].transcript;
         setSearchQuery(transcript);
         setIsListening(false);
@@ -532,7 +538,13 @@ const MealPlanningGuestView: React.FC = () => {
   };
 
   // Component for meal slider within each meal plan
-  const MealSlider = ({ meals, planTitle }: { meals: any[], planTitle: string }) => (
+  interface MealItem {
+    name: string;
+    image: string;
+    logo: boolean;
+  }
+
+  const MealSlider = ({ meals, planTitle }: { meals: MealItem[], planTitle: string }) => (
     <div className="mb-4">
       <Carousel className="w-full">
         <CarouselContent className="-ml-2 md:-ml-4">

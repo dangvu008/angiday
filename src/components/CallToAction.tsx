@@ -24,9 +24,29 @@ const CallToAction = () => {
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
               Bắt đầu hành trình ẩm thực của bạn
             </h2>
-            <p className="text-xl mb-8 opacity-90">
+            <p className="text-xl mb-6 opacity-90">
               Tham gia Angiday để truy cập đầy đủ các tính năng lập kế hoạch bữa ăn và quản lý công thức cá nhân
             </p>
+
+            {/* Testimonial */}
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 mb-8 max-w-2xl mx-auto">
+              <div className="flex items-center justify-center mb-4">
+                <Heart className="h-6 w-6 text-red-300 mr-2" />
+                <span className="text-lg font-semibold">Người dùng nói gì về Angiday</span>
+              </div>
+              <blockquote className="text-lg italic mb-4 opacity-95">
+                "Angiday đã thay đổi hoàn toàn việc bếp núc của gia đình mình. Giờ đây mình có nhiều thời gian hơn mà bữa ăn lại đa dạng, đủ chất. Đặc biệt là tính năng tạo danh sách đi chợ rất tiện lợi!"
+              </blockquote>
+              <div className="flex items-center justify-center">
+                <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center mr-3">
+                  <span className="text-sm font-semibold">LA</span>
+                </div>
+                <div>
+                  <p className="font-semibold">Chị Lan Anh</p>
+                  <p className="text-sm opacity-80">Hà Nội • Mẹ của 2 con</p>
+                </div>
+              </div>
+            </div>
           </>
         )}
 
@@ -74,14 +94,14 @@ const CallToAction = () => {
             </>
           ) : (
             <>
-              <Button size="lg" className="bg-white text-gray-900 hover:bg-gray-100 px-8" asChild>
+              <Button size="lg" className="bg-white text-gray-900 hover:bg-gray-100 px-10 py-4 text-lg font-bold shadow-xl hover:shadow-2xl transition-all duration-300" asChild>
                 <Link to="/register">
-                  Đăng ký miễn phí
+                  🚀 Đăng ký miễn phí - Trút bỏ gánh nặng bếp núc ngay!
                 </Link>
               </Button>
               <Button size="lg" className="bg-white/20 text-white border-white/30 hover:bg-white hover:text-gray-900 px-8" asChild>
                 <Link to="/login">
-                  Tìm hiểu thêm
+                  Đã có tài khoản? Đăng nhập
                 </Link>
               </Button>
             </>

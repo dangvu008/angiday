@@ -97,15 +97,17 @@ const ApplyPlanModal = ({ isOpen, onClose, plan, onApplyPlan }: ApplyPlanModalPr
         return start.toLocaleDateString('vi-VN');
       case 'day':
         return start.toLocaleDateString('vi-VN');
-      case 'week':
+      case 'week': {
         const weekEnd = new Date(start);
         weekEnd.setDate(weekEnd.getDate() + 6);
         return weekEnd.toLocaleDateString('vi-VN');
-      case 'month':
+      }
+      case 'month': {
         const monthEnd = new Date(start);
         monthEnd.setMonth(monthEnd.getMonth() + 1);
         monthEnd.setDate(monthEnd.getDate() - 1);
         return monthEnd.toLocaleDateString('vi-VN');
+      }
       default:
         return start.toLocaleDateString('vi-VN');
     }

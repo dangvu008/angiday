@@ -313,8 +313,14 @@ export interface ShoppingListItem {
   unit: string;
   category: string;
   estimatedCost: number;
+  actualCost?: number; // Giá thực tế (VND)
   isChecked: boolean;
+  isPurchased?: boolean; // Trạng thái đã mua
+  purchasedAt?: string; // Thời điểm mua
   notes?: string;
+  recipeId?: string; // ID của recipe
+  recipeName?: string; // Tên món ăn
+  mealType?: 'breakfast' | 'lunch' | 'dinner' | 'snack'; // Loại bữa ăn
 }
 
 export interface ShoppingList {

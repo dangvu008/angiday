@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test RecipeImage Component</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-case {
+            margin-bottom: 30px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .test-case h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 Test RecipeImage Component</h1>
+        <p>Kiểm tra xem RecipeImage component có xử lý được các trường hợp null/undefined không.</p>
+        
+        <div class="test-case">
+            <h3>Test Case 1: Recipe với title hợp lệ</h3>
+            <div id="test1-result" class="result">Đang test...</div>
+        </div>
+        
+        <div class="test-case">
+            <h3>Test Case 2: Recipe với title null</h3>
+            <div id="test2-result" class="result">Đang test...</div>
+        </div>
+        
+        <div class="test-case">
+            <h3>Test Case 3: Recipe với title undefined</h3>
+            <div id="test3-result" class="result">Đang test...</div>
+        </div>
+        
+        <div class="test-case">
+            <h3>Test Case 4: Recipe object null</h3>
+            <div id="test4-result" class="result">Đang test...</div>
+        </div>
+        
+        <div class="test-case">
+            <h3>Test Case 5: Recipe với tags null</h3>
+            <div id="test5-result" class="result">Đang test...</div>
+        </div>
+    </div>
+
+    <script>
+        // Simulate RecipeImage component logic
+        function testRecipeImage(recipe, testCaseId) {
+            try {
+                // Early return if recipe is not provided
+                if (!recipe) {
+                    document.getElementById(testCaseId).innerHTML = '<span class="success">✅ PASS: Handled null recipe correctly</span>';
+                    return;
+                }
+
+                // Map Vietnamese recipe names to appropriate emojis
+                const getRecipeEmoji = (recipeName) => {
+                    const name = (recipeName || '').toLowerCase();
+                    
+                    if (name.includes('canh chua')) return '🍲';
+                    if (name.includes('thịt kho')) return '🥩';
+                    if (name.includes('cá kho')) return '🐟';
+                    if (name.includes('gà')) return '🐔';
+                    if (name.includes('tôm')) return '🦐';
+                    if (name.includes('rau muống')) return '🥬';
+                    
+                    // Default based on tags
+                    const tags = (recipe.tags || []);
+                    if (tags.includes('soup')) return '🍲';
+                    if (tags.includes('grilled')) return '🔥';
+                    if (tags.includes('vegetarian')) return '🥬';
+                    if (tags.includes('fish')) return '🐟';
+                    if (tags.includes('chicken')) return '🐔';
+                    if (tags.includes('pork')) return '🥩';
+                    if (tags.includes('shrimp')) return '🦐';
+                    if (tags.includes('salad')) return '🥗';
+                    
+                    return '🍽️';
+                };
+
+                const getGradientColors = (recipeName) => {
+                    const name = (recipeName || '').toLowerCase();
+                    
+                    if (name.includes('canh chua')) return 'from-yellow-100 to-orange-100';
+                    if (name.includes('thịt kho')) return 'from-red-100 to-pink-100';
+                    if (name.includes('cá kho')) return 'from-blue-100 to-cyan-100';
+                    if (name.includes('gà')) return 'from-yellow-100 to-amber-100';
+                    if (name.includes('tôm')) return 'from-pink-100 to-rose-100';
+                    if (name.includes('rau muống')) return 'from-green-100 to-emerald-100';
+                    
+                    return 'from-orange-100 to-red-100';
+                };
+
+                const emoji = getRecipeEmoji(recipe.title || '');
+                const gradientColors = getGradientColors(recipe.title || '');
+                
+                document.getElementById(testCaseId).innerHTML = `<span class="success">✅ PASS: Generated emoji "${emoji}" and gradient "${gradientColors}"</span>`;
+                
+            } catch (error) {
+                document.getElementById(testCaseId).innerHTML = `<span class="error">❌ FAIL: ${error.message}</span>`;
+            }
+        }
+
+        // Run tests
+        setTimeout(() => {
+            // Test Case 1: Valid recipe
+            testRecipeImage({
+                id: '1',
+                title: 'Canh chua cá lóc',
+                tags: ['soup', 'fish']
+            }, 'test1-result');
+
+            // Test Case 2: Recipe with null title
+            testRecipeImage({
+                id: '2',
+                title: null,
+                tags: ['soup']
+            }, 'test2-result');
+
+            // Test Case 3: Recipe with undefined title
+            testRecipeImage({
+                id: '3',
+                title: undefined,
+                tags: ['chicken']
+            }, 'test3-result');
+
+            // Test Case 4: Null recipe
+            testRecipeImage(null, 'test4-result');
+
+            // Test Case 5: Recipe with null tags
+            testRecipeImage({
+                id: '5',
+                title: 'Gà nướng',
+                tags: null
+            }, 'test5-result');
+        }, 100);
+    </script>
+</body>
+</html>

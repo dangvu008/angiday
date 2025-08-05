@@ -6,15 +6,41 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAuth as useNewAuth } from '@/hooks/useAuth';
+import NotificationBell from '@/components/NotificationBell';
+import { useTheme } from '@/components/ui/theme-provider';
+import { cn } from '@/lib/utils';
 
-const Header = () => {
+interface HeaderProps {
+  className?: string;
+  variant?: 'default' | 'transparent' | 'elevated';
+  showSearch?: boolean;
+  showNotifications?: boolean;
+}
+
+const Header: React.FC<HeaderProps> = ({
+  className,
+  variant = 'default',
+  showSearch = true,
+  showNotifications = true
+}) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const { isAuthenticated, user, logout } = useAuth();
   const { user: newUser, isAdmin, isChef } = useNewAuth();
+  const { designTokens } = useTheme();
+
+  const headerVariants = {
+    default: 'bg-white shadow-sm border-b border-gray-200',
+    transparent: 'bg-transparent',
+    elevated: 'bg-white shadow-lg border-b border-gray-200'
+  };
 
   return (
-    <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+    <header className={cn(
+      'sticky top-0 z-50',
+      headerVariants[variant],
+      className
+    )}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo - Knorr Style */}
@@ -46,27 +72,18 @@ const Header = () => {
                   </div>
                   <span className="text-sm font-medium text-gray-700 group-hover:text-orange-600">Công thức</span>
                 </button>
-                <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 w-72 bg-white rounded-2xl shadow-2xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
+                <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 w-64 bg-white rounded-2xl shadow-2xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
                   <div className="p-6 space-y-3">
-                    <Link to="/recipes" className="flex items-center px-4 py-3 text-gray-700 hover:text-orange-600 hover:bg-orange-50 rounded-xl transition-colors group">
-                      <div className="w-2 h-2 bg-orange-400 rounded-full mr-3 group-hover:bg-orange-600"></div>
-                      <span className="font-medium">Toàn bộ công thức</span>
+                    {/* Tất cả công thức */}
+                    <Link to="/recipes" className="flex items-center px-4 py-3 text-gray-700 hover:text-orange-600 hover:bg-orange-50 rounded-xl transition-colors group border-l-4 border-orange-400">
+                      <ChefHat className="h-4 w-4 text-orange-500 mr-3 group-hover:text-orange-600" />
+                      <span className="font-medium">Tất cả công thức</span>
                     </Link>
-                    <Link to="/recipes/main-dishes" className="flex items-center px-4 py-3 text-gray-700 hover:text-orange-600 hover:bg-orange-50 rounded-xl transition-colors group">
-                      <div className="w-2 h-2 bg-red-400 rounded-full mr-3 group-hover:bg-red-600"></div>
-                      <span className="font-medium">Món chính</span>
-                    </Link>
-                    <Link to="/recipes/appetizers" className="flex items-center px-4 py-3 text-gray-700 hover:text-orange-600 hover:bg-orange-50 rounded-xl transition-colors group">
-                      <div className="w-2 h-2 bg-green-400 rounded-full mr-3 group-hover:bg-green-600"></div>
-                      <span className="font-medium">Món khai vị</span>
-                    </Link>
-                    <Link to="/recipes/desserts" className="flex items-center px-4 py-3 text-gray-700 hover:text-orange-600 hover:bg-orange-50 rounded-xl transition-colors group">
-                      <div className="w-2 h-2 bg-purple-400 rounded-full mr-3 group-hover:bg-purple-600"></div>
-                      <span className="font-medium">Món tráng miệng</span>
-                    </Link>
-                    <Link to="/recipes/tips" className="flex items-center px-4 py-3 text-gray-700 hover:text-orange-600 hover:bg-orange-50 rounded-xl transition-colors group">
+
+                    {/* Công thức của tôi */}
+                    <Link to="/my-recipes" className="flex items-center px-4 py-3 text-gray-700 hover:text-orange-600 hover:bg-orange-50 rounded-xl transition-colors group">
                       <div className="w-2 h-2 bg-blue-400 rounded-full mr-3 group-hover:bg-blue-600"></div>
-                      <span className="font-medium">Mẹo vặt</span>
+                      <span className="font-medium">Công thức của tôi</span>
                     </Link>
                   </div>
                 </div>
@@ -85,23 +102,27 @@ const Header = () => {
                 </button>
                 <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 w-72 bg-white rounded-2xl shadow-2xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
                   <div className="p-6 space-y-3">
-                    <Link to="/thuc-don" className="flex items-center px-4 py-3 text-gray-700 hover:text-orange-600 hover:bg-orange-50 rounded-xl transition-colors group">
-                      <div className="w-2 h-2 bg-orange-400 rounded-full mr-3 group-hover:bg-orange-600"></div>
-                      <span className="font-medium">Tất cả thực đơn</span>
+                    <Link to="/meal-plans" className="flex items-center px-4 py-3 text-gray-700 hover:text-orange-600 hover:bg-orange-50 rounded-xl transition-colors group border-l-4 border-orange-400">
+                      <Calendar className="h-4 w-4 text-orange-500 mr-3 group-hover:text-orange-600" />
+                      <div>
+                        <span className="font-medium block">Quản lý thực đơn</span>
+                        <span className="text-xs text-gray-500">Tất cả thực đơn & lập kế hoạch hàng ngày</span>
+                      </div>
                     </Link>
-                    <Link to="/thuc-don/category/an-chay" className="flex items-center px-4 py-3 text-gray-700 hover:text-orange-600 hover:bg-orange-50 rounded-xl transition-colors group">
+
+                    <Link to="/meal-plans?category=vegetarian" className="flex items-center px-4 py-3 text-gray-700 hover:text-orange-600 hover:bg-orange-50 rounded-xl transition-colors group">
                       <div className="w-2 h-2 bg-green-400 rounded-full mr-3 group-hover:bg-green-600"></div>
                       <span className="font-medium">Thực đơn ăn chay</span>
                     </Link>
-                    <Link to="/thuc-don/category/giam-can" className="flex items-center px-4 py-3 text-gray-700 hover:text-orange-600 hover:bg-orange-50 rounded-xl transition-colors group">
+                    <Link to="/meal-plans?category=diet" className="flex items-center px-4 py-3 text-gray-700 hover:text-orange-600 hover:bg-orange-50 rounded-xl transition-colors group">
                       <div className="w-2 h-2 bg-blue-400 rounded-full mr-3 group-hover:bg-blue-600"></div>
                       <span className="font-medium">Thực đơn giảm cân</span>
                     </Link>
-                    <Link to="/thuc-don/category/gia-dinh" className="flex items-center px-4 py-3 text-gray-700 hover:text-orange-600 hover:bg-orange-50 rounded-xl transition-colors group">
+                    <Link to="/meal-plans?category=family" className="flex items-center px-4 py-3 text-gray-700 hover:text-orange-600 hover:bg-orange-50 rounded-xl transition-colors group">
                       <div className="w-2 h-2 bg-purple-400 rounded-full mr-3 group-hover:bg-purple-600"></div>
                       <span className="font-medium">Thực đơn gia đình</span>
                     </Link>
-                    <Link to="/thuc-don/category/tiet-kiem" className="flex items-center px-4 py-3 text-gray-700 hover:text-orange-600 hover:bg-orange-50 rounded-xl transition-colors group">
+                    <Link to="/meal-plans?category=budget" className="flex items-center px-4 py-3 text-gray-700 hover:text-orange-600 hover:bg-orange-50 rounded-xl transition-colors group">
                       <div className="w-2 h-2 bg-red-400 rounded-full mr-3 group-hover:bg-red-600"></div>
                       <span className="font-medium">Thực đơn tiết kiệm</span>
                     </Link>
@@ -158,6 +179,13 @@ const Header = () => {
                 <Heart className="h-5 w-5" />
               </Link>
             </Button>
+
+            {/* Notifications - Only show when authenticated */}
+            {isAuthenticated && (
+              <div className="hidden md:flex">
+                <NotificationBell />
+              </div>
+            )}
 
             {/* User Menu */}
             <div className="hidden md:flex items-center space-x-2">
@@ -280,14 +308,14 @@ const Header = () => {
                     <span>Công thức</span>
                   </div>
                   <div className="ml-8 space-y-2">
-                    <Link to="/recipes" className="block text-gray-600 hover:text-orange-600 transition-colors py-1">
-                      Toàn bộ món
+                    {/* Tất cả công thức - Mobile */}
+                    <Link to="/recipes" className="block text-orange-600 hover:text-orange-700 transition-colors py-1 font-medium border-l-2 border-orange-400 pl-2">
+                      🍲 Tất cả công thức
                     </Link>
-                    <Link to="/recipes/featured" className="block text-gray-600 hover:text-orange-600 transition-colors py-1">
-                      Món nổi bật
-                    </Link>
-                    <Link to="/recipes/tips" className="block text-gray-600 hover:text-orange-600 transition-colors py-1">
-                      Mẹo vặt
+
+                    {/* Công thức của tôi - Mobile */}
+                    <Link to="/my-recipes" className="block text-gray-600 hover:text-orange-600 transition-colors py-1">
+                      📝 Công thức của tôi
                     </Link>
                   </div>
                 </div>
@@ -298,16 +326,17 @@ const Header = () => {
                     <span>Thực đơn</span>
                   </div>
                   <div className="ml-8 space-y-2">
-                    <Link to="/thuc-don" className="block text-gray-600 hover:text-orange-600 transition-colors py-1">
-                      Tất cả thực đơn
+                    <Link to="/meal-plans" className="block text-orange-600 hover:text-orange-700 transition-colors py-1 font-medium border-l-2 border-orange-400 pl-2">
+                      📋 Quản lý thực đơn
                     </Link>
-                    <Link to="/thuc-don/category/an-chay" className="block text-gray-600 hover:text-orange-600 transition-colors py-1">
+
+                    <Link to="/meal-plans?category=vegetarian" className="block text-gray-600 hover:text-orange-600 transition-colors py-1">
                       Thực đơn ăn chay
                     </Link>
-                    <Link to="/thuc-don/category/giam-can" className="block text-gray-600 hover:text-orange-600 transition-colors py-1">
+                    <Link to="/meal-plans?category=diet" className="block text-gray-600 hover:text-orange-600 transition-colors py-1">
                       Thực đơn giảm cân
                     </Link>
-                    <Link to="/thuc-don/category/gia-dinh" className="block text-gray-600 hover:text-orange-600 transition-colors py-1">
+                    <Link to="/meal-plans?category=family" className="block text-gray-600 hover:text-orange-600 transition-colors py-1">
                       Thực đơn gia đình
                     </Link>
                   </div>
@@ -342,6 +371,14 @@ const Header = () => {
                   <Heart className="h-5 w-5" />
                   <span>Yêu thích</span>
                 </Link>
+
+                {/* Mobile Notifications */}
+                {isAuthenticated && (
+                  <div className="flex items-center space-x-3 text-gray-700 font-medium py-2">
+                    <NotificationBell />
+                    <span>Thông báo</span>
+                  </div>
+                )}
               </nav>
 
               {/* Mobile User Actions */}

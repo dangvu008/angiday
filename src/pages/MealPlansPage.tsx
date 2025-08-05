@@ -1,21 +1,59 @@
 
+import React from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Calendar, Users, DollarSign, Heart, Clock } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Calendar, Users, DollarSign, Heart, Clock, CalendarDays } from 'lucide-react';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { mockMealPlans } from '@/data/mockMealPlans';
+import DailyMenuPlanner from '@/components/DailyMenuPlanner';
 
 const MealPlansPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [activeTab, setActiveTab] = useState('all-plans');
 
+  // Set default tab based on URL or search params
+  useEffect(() => {
+    const category = searchParams.get('category');
+    if (category) {
+      setSelectedCategory(category);
+    }
+
+    // If coming from daily-menu route, open daily-menu tab
+    if (location.pathname === '/daily-menu' || searchParams.get('tab') === 'daily-menu') {
+      setActiveTab('daily-menu');
+    }
+  }, [searchParams, location]);
+
+  // Chuyển đổi dữ liệu từ mockMealPlans
   const mealPlans = [
-    // Thực đơn lẻ (từng bữa)
+    // Từ mockMealPlans
+    ...mockMealPlans.map(plan => ({
+      id: plan.id,
+      title: plan.name,
+      image: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=400&h=300&fit=crop",
+      duration: `${Math.ceil((new Date(plan.endDate).getTime() - new Date(plan.startDate).getTime()) / (1000 * 60 * 60 * 24))} ngày`,
+      servings: "4 người",
+      budget: `${Math.round(plan.totalCost / 1000)}K`,
+      difficulty: "Trung bình",
+      type: plan.status === 'active' ? 'weekly' : 'daily',
+      category: plan.status === 'active' ? "Đang áp dụng" : "Thực đơn tuần",
+      tags: plan.status === 'active' ? ["Đang dùng", "Tuần này"] : ["Hoàn thành", "Lịch sử"],
+      description: plan.description,
+      meals: plan.meals.filter(m => m.recipe).length,
+      rating: 4.5,
+      status: plan.status
+    })),
+    // Thêm một số meal plans mẫu khác
     {
-      id: 1,
+      id: 'single-1',
       title: "Bữa sáng dinh dưỡng với trứng",
       image: "https://images.unsplash.com/photo-1506084868230-bb9d95c24759?w=400&h=300&fit=crop",
       duration: "30 phút",
@@ -229,160 +267,180 @@ const MealPlansPage = () => {
         <section className="bg-gradient-to-br from-orange-50 to-green-50 py-12 px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-              Thực đơn mẫu
+              Quản lý thực đơn
             </h1>
             <p className="text-xl text-gray-600 mb-8">
-              Các thực đơn được phân loại theo từng bữa ăn, ngày, tuần và tháng để phù hợp với nhu cầu của bạn
+              Khám phá thực đơn mẫu và lập kế hoạch bữa ăn hàng ngày của bạn
             </p>
           </div>
         </section>
 
-        {/* Categories Filter */}
-        <section className="py-12 px-4 bg-gradient-to-br from-orange-50 via-white to-red-50">
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Chọn loại thực đơn</h2>
-              <p className="text-gray-600">Tìm thực đơn phù hợp với nhu cầu và thời gian của bạn</p>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 max-w-5xl mx-auto">
-              {categories.map((category) => (
-                <div
-                  key={category.key}
-                  onClick={() => setSelectedCategory(category.key)}
-                  className={`relative group cursor-pointer rounded-2xl p-6 text-center transition-all duration-300 transform hover:scale-105 hover:shadow-xl ${
-                    selectedCategory === category.key
-                      ? `${category.color} ${category.hoverColor} text-white shadow-lg scale-105 ring-4 ring-orange-200`
-                      : 'bg-white text-gray-700 border-2 border-gray-200 hover:border-orange-300 hover:bg-orange-50 shadow-md'
-                  }`}
-                >
-                  {/* Icon */}
-                  <div className={`text-4xl mb-3 transition-transform duration-300 ${
-                    selectedCategory === category.key ? 'scale-110' : 'group-hover:scale-110'
-                  }`}>
-                    {category.icon}
-                  </div>
-
-                  {/* Label */}
-                  <h3 className={`font-bold text-lg mb-2 transition-colors duration-300 ${
-                    selectedCategory === category.key ? 'text-white' : 'text-gray-900 group-hover:text-orange-600'
-                  }`}>
-                    {category.label}
-                  </h3>
-
-                  {/* Description */}
-                  <p className={`text-sm transition-colors duration-300 ${
-                    selectedCategory === category.key ? 'text-white/90' : 'text-gray-500 group-hover:text-orange-500'
-                  }`}>
-                    {category.description}
-                  </p>
-
-                  {/* Active indicator */}
-                  {selectedCategory === category.key && (
-                    <div className="absolute -top-2 -right-2 w-6 h-6 bg-white rounded-full flex items-center justify-center shadow-lg">
-                      <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Meal Plans Grid */}
+        {/* Main Content with Tabs */}
         <section className="py-12 px-4 bg-white">
           <div className="max-w-6xl mx-auto">
-            {/* Results Header */}
-            <div className="text-center mb-12">
-              <div className="inline-flex items-center gap-3 bg-gradient-to-r from-orange-100 to-red-100 px-6 py-3 rounded-full mb-4">
-                <span className="text-2xl">{getCategoryIcon(selectedCategory)}</span>
-                <h2 className="text-xl font-bold text-gray-900">
-                  {categories.find(cat => cat.key === selectedCategory)?.label || 'Tất cả thực đơn'}
-                </h2>
-              </div>
-              <p className="text-gray-600">
-                Tìm thấy <span className="font-semibold text-orange-600">{filteredMealPlans.length}</span> thực đơn phù hợp
-              </p>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredMealPlans.map((plan) => (
-                <Card 
-                  key={plan.id} 
-                  className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
-                  onClick={() => navigate(`/meal-plans/${plan.id}`)}
-                >
-                  <div className="aspect-video overflow-hidden relative">
-                    <img 
-                      src={plan.image} 
-                      alt={plan.title}
-                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                    />
-                    <div className="absolute top-2 right-2">
-                      <Badge className="bg-yellow-500 text-white">
-                        ⭐ {plan.rating}
-                      </Badge>
-                    </div>
-                    <div className="absolute top-2 left-2">
-                      <Badge className={`text-white ${
-                        plan.type === 'single' ? 'bg-blue-600' :
-                        plan.type === 'daily' ? 'bg-green-600' :
-                        plan.type === 'weekly' ? 'bg-orange-600' :
-                        'bg-purple-600'
-                      }`}>
-                        {getCategoryIcon(plan.type)} {plan.category}
-                      </Badge>
-                    </div>
-                    <div className="absolute bottom-2 right-2">
-                      <Badge className="bg-black/70 text-white">
-                        {plan.meals} món
-                      </Badge>
-                    </div>
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <TabsList className="grid w-full grid-cols-2 mb-8">
+                <TabsTrigger value="all-plans" className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4" />
+                  Tất cả thực đơn
+                </TabsTrigger>
+                <TabsTrigger value="daily-menu" className="flex items-center gap-2">
+                  <CalendarDays className="h-4 w-4" />
+                  Thực đơn hàng ngày
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="all-plans" className="space-y-8">
+                {/* Categories Filter */}
+                <div className="bg-gradient-to-br from-orange-50 via-white to-red-50 rounded-2xl p-8">
+                  <div className="text-center mb-8">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-2">Chọn loại thực đơn</h2>
+                    <p className="text-gray-600">Tìm thực đơn phù hợp với nhu cầu và thời gian của bạn</p>
                   </div>
-                  <CardHeader>
-                    <CardTitle className="line-clamp-2 hover:text-orange-600 transition-colors">
-                      {plan.title}
-                    </CardTitle>
-                    <p className="text-gray-600 text-sm line-clamp-2">{plan.description}</p>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-2 gap-2 text-sm text-gray-600 mb-4">
-                      <div className="flex items-center space-x-1">
-                        <Calendar className="h-4 w-4" />
-                        <span>{plan.duration}</span>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 max-w-5xl mx-auto">
+                    {categories.map((category) => (
+                      <div
+                        key={category.key}
+                        onClick={() => setSelectedCategory(category.key)}
+                        className={`relative group cursor-pointer rounded-2xl p-6 text-center transition-all duration-300 transform hover:scale-105 hover:shadow-xl ${
+                          selectedCategory === category.key
+                            ? `${category.color} ${category.hoverColor} text-white shadow-lg scale-105 ring-4 ring-orange-200`
+                            : 'bg-white text-gray-700 border-2 border-gray-200 hover:border-orange-300 hover:bg-orange-50 shadow-md'
+                        }`}
+                      >
+                        {/* Icon */}
+                        <div className={`text-4xl mb-3 transition-transform duration-300 ${
+                          selectedCategory === category.key ? 'scale-110' : 'group-hover:scale-110'
+                        }`}>
+                          {category.icon}
+                        </div>
+
+                        {/* Label */}
+                        <h3 className={`font-bold text-lg mb-2 transition-colors duration-300 ${
+                          selectedCategory === category.key ? 'text-white' : 'text-gray-900 group-hover:text-orange-600'
+                        }`}>
+                          {category.label}
+                        </h3>
+
+                        {/* Description */}
+                        <p className={`text-sm transition-colors duration-300 ${
+                          selectedCategory === category.key ? 'text-white/90' : 'text-gray-500 group-hover:text-orange-500'
+                        }`}>
+                          {category.description}
+                        </p>
+
+                        {/* Active indicator */}
+                        {selectedCategory === category.key && (
+                          <div className="absolute -top-2 -right-2 w-6 h-6 bg-white rounded-full flex items-center justify-center shadow-lg">
+                            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                          </div>
+                        )}
                       </div>
-                      <div className="flex items-center space-x-1">
-                        <Users className="h-4 w-4" />
-                        <span>{plan.servings}</span>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <DollarSign className="h-4 w-4" />
-                        <span>{plan.budget}</span>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <Heart className="h-4 w-4" />
-                        <span>{plan.difficulty}</span>
-                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Meal Plans Grid */}
+                <div>
+                  {/* Results Header */}
+                  <div className="text-center mb-12">
+                    <div className="inline-flex items-center gap-3 bg-gradient-to-r from-orange-100 to-red-100 px-6 py-3 rounded-full mb-4">
+                      <span className="text-2xl">{getCategoryIcon(selectedCategory)}</span>
+                      <h2 className="text-xl font-bold text-gray-900">
+                        {categories.find(cat => cat.key === selectedCategory)?.label || 'Tất cả thực đơn'}
+                      </h2>
                     </div>
-                    <div className="flex flex-wrap gap-1 mb-4">
-                      {plan.tags.slice(0, 2).map((tag) => (
-                        <Badge key={tag} variant="secondary" className="text-xs">
-                          {tag}
-                        </Badge>
-                      ))}
-                    </div>
-                    <Button 
-                      className="w-full bg-green-600 hover:bg-green-700"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        navigate(`/meal-plans/${plan.id}`);
-                      }}
-                    >
-                      Sử dụng thực đơn
-                    </Button>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                    <p className="text-gray-600">
+                      Tìm thấy <span className="font-semibold text-orange-600">{filteredMealPlans.length}</span> thực đơn phù hợp
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {filteredMealPlans.map((plan) => (
+                      <Card
+                        key={plan.id}
+                        className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+                        onClick={() => navigate(`/meal-plans/${plan.id}`)}
+                      >
+                        <div className="aspect-video overflow-hidden relative">
+                          <img
+                            src={plan.image}
+                            alt={plan.title}
+                            className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                          />
+                          <div className="absolute top-2 right-2">
+                            <Badge className="bg-yellow-500 text-white">
+                              ⭐ {plan.rating}
+                            </Badge>
+                          </div>
+                          <div className="absolute top-2 left-2">
+                            <Badge className={`text-white ${
+                              plan.type === 'single' ? 'bg-blue-600' :
+                              plan.type === 'daily' ? 'bg-green-600' :
+                              plan.type === 'weekly' ? 'bg-orange-600' :
+                              'bg-purple-600'
+                            }`}>
+                              {getCategoryIcon(plan.type)} {plan.category}
+                            </Badge>
+                          </div>
+                          <div className="absolute bottom-2 right-2">
+                            <Badge className="bg-black/70 text-white">
+                              {plan.meals} món
+                            </Badge>
+                          </div>
+                        </div>
+                        <CardHeader>
+                          <CardTitle className="line-clamp-2 hover:text-orange-600 transition-colors">
+                            {plan.title}
+                          </CardTitle>
+                          <p className="text-gray-600 text-sm line-clamp-2">{plan.description}</p>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="grid grid-cols-2 gap-2 text-sm text-gray-600 mb-4">
+                            <div className="flex items-center space-x-1">
+                              <Calendar className="h-4 w-4" />
+                              <span>{plan.duration}</span>
+                            </div>
+                            <div className="flex items-center space-x-1">
+                              <Users className="h-4 w-4" />
+                              <span>{plan.servings}</span>
+                            </div>
+                            <div className="flex items-center space-x-1">
+                              <DollarSign className="h-4 w-4" />
+                              <span>{plan.budget}</span>
+                            </div>
+                            <div className="flex items-center space-x-1">
+                              <Heart className="h-4 w-4" />
+                              <span>{plan.difficulty}</span>
+                            </div>
+                          </div>
+                          <div className="flex flex-wrap gap-1 mb-4">
+                            {plan.tags.slice(0, 2).map((tag) => (
+                              <Badge key={tag} variant="secondary" className="text-xs">
+                                {tag}
+                              </Badge>
+                            ))}
+                          </div>
+                          <Button
+                            className="w-full bg-green-600 hover:bg-green-700"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigate(`/meal-plans/${plan.id}`);
+                            }}
+                          >
+                            Sử dụng thực đơn
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="daily-menu" className="space-y-8">
+                <DailyMenuPlanner />
+              </TabsContent>
+            </Tabs>
           </div>
         </section>
       </main>

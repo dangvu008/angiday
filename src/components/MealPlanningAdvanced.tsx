@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { useMealPlanning } from '@/contexts/MealPlanningContext';
+import { useMealPlanning, MealPlan } from '@/contexts/MealPlanningContext';
 import {
   Calendar,
   ChefHat,
@@ -65,7 +65,7 @@ const MealPlanningAdvanced: React.FC = () => {
   useEffect(() => {
     loadData();
     loadSampleFamilyMembers();
-  }, []);
+  }, [loadData]);
 
   // Debug: Log userMealPlans when it changes
   useEffect(() => {
@@ -73,7 +73,7 @@ const MealPlanningAdvanced: React.FC = () => {
     console.log('MealPlanningAdvanced - currentPlan:', currentPlan);
   }, [userMealPlans, currentPlan]);
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     try {
       setIsLoading(true);
       const [dishesData, templatesData] = await Promise.all([
@@ -91,7 +91,7 @@ const MealPlanningAdvanced: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [contextLoading]);
 
   const createNewWeekPlan = async () => {
     const startDate = new Date();
@@ -107,7 +107,7 @@ const MealPlanningAdvanced: React.FC = () => {
     saveMealPlan(newPlan);
   };
 
-  const handleWeekPlanSelect = (plan: any) => {
+  const handleWeekPlanSelect = (plan: MealPlan) => {
     // Convert to context format if needed
     setCurrentPlan(plan);
   };
@@ -252,7 +252,7 @@ const MealPlanningAdvanced: React.FC = () => {
     printWindow.print();
   };
 
-  const generatePrintableMealPlan = (plan: any) => {
+  const generatePrintableMealPlan = (plan: MealPlan) => {
     return `
       <!DOCTYPE html>
       <html>
@@ -270,7 +270,7 @@ const MealPlanningAdvanced: React.FC = () => {
           <p>Đến: ${new Date(plan.endDate).toLocaleDateString('vi-VN')}</p>
           <p>Số bữa ăn: ${plan.meals.length}</p>
           <div>
-            ${plan.meals.map((meal: any) => `
+            ${plan.meals.map((meal) => `
               <div class="meal">
                 <h3>${meal.recipe?.title || 'Chưa có món'}</h3>
                 <p>Ngày: ${new Date(meal.date).toLocaleDateString('vi-VN')}</p>
@@ -569,7 +569,7 @@ const MealPlanningAdvanced: React.FC = () => {
                     <CardContent>
                       {(() => {
                         // Extract all recipes from current plan meals
-                        const planRecipes: any[] = [];
+                        const planRecipes: typeof currentPlan.meals[0]['recipe'][] = [];
                         currentPlan.meals.forEach(meal => {
                           if (meal.recipe && !planRecipes.find(r => r.id === meal.recipe!.id)) {
                             planRecipes.push(meal.recipe);

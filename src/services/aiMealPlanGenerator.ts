@@ -1,4 +1,4 @@
-import { Recipe } from '@/contexts/MealPlanningContext';
+import { Recipe } from '@/types/kitchen';
 
 export interface UserPreferences {
   dietaryRestrictions: string[]; // ['vegetarian', 'gluten-free', 'dairy-free', etc.]

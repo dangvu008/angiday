@@ -195,7 +195,7 @@ const UserPreferencesModal: React.FC<UserPreferencesModalProps> = ({
                   <Label>Trình độ nấu ăn</Label>
                   <RadioGroup 
                     value={preferences.cookingSkill} 
-                    onValueChange={(value) => setPreferences(prev => ({ ...prev, cookingSkill: value as any }))}
+                    onValueChange={(value) => setPreferences(prev => ({ ...prev, cookingSkill: value as 'beginner' | 'intermediate' | 'advanced' }))}
                     className="flex space-x-6 mt-2"
                   >
                     <div className="flex items-center space-x-2">
@@ -217,7 +217,7 @@ const UserPreferencesModal: React.FC<UserPreferencesModalProps> = ({
                   <Label>Thời gian nấu ăn</Label>
                   <RadioGroup 
                     value={preferences.timeConstraints} 
-                    onValueChange={(value) => setPreferences(prev => ({ ...prev, timeConstraints: value as any }))}
+                    onValueChange={(value) => setPreferences(prev => ({ ...prev, timeConstraints: value as 'quick' | 'moderate' | 'flexible' }))}
                     className="flex space-x-6 mt-2"
                   >
                     <div className="flex items-center space-x-2">
@@ -239,7 +239,7 @@ const UserPreferencesModal: React.FC<UserPreferencesModalProps> = ({
                   <Label>Ngân sách</Label>
                   <RadioGroup 
                     value={preferences.budgetRange} 
-                    onValueChange={(value) => setPreferences(prev => ({ ...prev, budgetRange: value as any }))}
+                    onValueChange={(value) => setPreferences(prev => ({ ...prev, budgetRange: value as 'low' | 'medium' | 'high' }))}
                     className="flex space-x-6 mt-2"
                   >
                     <div className="flex items-center space-x-2">
