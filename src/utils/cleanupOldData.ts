@@ -2,7 +2,7 @@
  * Utility để xóa dữ liệu cũ với UUID không hợp lệ
  */
 
-import { supabase } from '@/config/supabase';
+import { getSupabaseClient } from '@/config/supabase';
 
 export class DataCleanupService {
   /**
@@ -11,6 +11,7 @@ export class DataCleanupService {
   static async cleanupInvalidUserIds(): Promise<void> {
     try {
       console.log('🧹 Bắt đầu dọn dẹp dữ liệu cũ...');
+      const supabase = getSupabaseClient();
 
       // Xóa meal_plans với user_id không hợp lệ
       const { error: mealPlansError } = await supabase
