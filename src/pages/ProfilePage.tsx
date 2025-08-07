@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import ProtectedRoute from '@/components/ProtectedRoute';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
+import StandardLayout from '@/components/layout/StandardLayout';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -37,14 +36,14 @@ const ProfilePage = () => {
 
   return (
     <ProtectedRoute requireAuth={true} showLoginRequired={true}>
-      <div className="min-h-screen bg-gray-50">
-        <Header />
-        <main className="py-8 px-4">
-          <div className="max-w-4xl mx-auto">
-            {/* Profile Header */}
-            <Card className="mb-8">
-              <CardContent className="p-8">
-                <div className="flex items-center space-x-6">
+      <StandardLayout
+        className="bg-gray-50"
+        containerClassName="max-w-4xl mx-auto px-4 py-8"
+      >
+        {/* Profile Header */}
+        <Card className="mb-8">
+          <CardContent className="p-8">
+            <div className="flex items-center space-x-6">
                   <img
                     src={user?.avatar}
                     alt={user?.name}
@@ -198,11 +197,8 @@ const ProfilePage = () => {
                 </Card>
               </div>
             </div>
-          </div>
-        </main>
-        <Footer />
-      </div>
-    </ProtectedRoute>
+        </StandardLayout>
+      </ProtectedRoute>
   );
 };
 

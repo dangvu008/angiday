@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, ChevronLeft, ChevronRight, Coffee, Sun, Moon, Clock, Users, Flame, X, Edit } from 'lucide-react';
+import { Plus, ChevronLeft, ChevronRight, Coffee, Sun, Moon, Clock, Users, Flame, X, Edit, RefreshCw } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -18,10 +18,12 @@ const MealPlanCalendarView: React.FC<MealPlanCalendarViewProps> = ({
   const { addMealToSlot, addDishToMeal, removeMealFromSlot, removeDishFromMeal, saveMealPlan } = useMealPlanning();
   const [currentWeekStart, setCurrentWeekStart] = useState(new Date());
   const [showAddDishModal, setShowAddDishModal] = useState(false);
+  const [showReplaceDishModal, setShowReplaceDishModal] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState<{
     date: string;
     mealType: string;
   } | null>(null);
+  const [dishToReplace, setDishToReplace] = useState<string | null>(null);
 
   // Generate week days
   const getWeekDays = () => {
@@ -101,6 +103,32 @@ const MealPlanCalendarView: React.FC<MealPlanCalendarViewProps> = ({
   const handleRemoveDish = (mealSlotId: string) => {
     if (!currentPlan) return;
     removeDishFromMeal(currentPlan.id, mealSlotId);
+  };
+
+  const handleReplaceDish = (mealSlotId: string, date: Date, mealType: string) => {
+    setDishToReplace(mealSlotId);
+    setSelectedSlot({
+      date: date.toISOString().split('T')[0],
+      mealType
+    });
+    setShowReplaceDishModal(true);
+  };
+
+  const handleReplaceDishConfirm = (recipe: any) => {
+    if (!selectedSlot || !currentPlan || !dishToReplace) return;
+
+    // Remove old dish and add new one
+    removeDishFromMeal(currentPlan.id, dishToReplace);
+    addDishToMeal(
+      currentPlan.id,
+      selectedSlot.date,
+      selectedSlot.mealType,
+      recipe
+    );
+
+    setDishToReplace(null);
+    setSelectedSlot(null);
+    setShowReplaceDishModal(false);
   };
 
   const handleRemoveMeal = (date: Date, mealType: string) => {
@@ -263,6 +291,15 @@ const MealPlanCalendarView: React.FC<MealPlanCalendarViewProps> = ({
                                   <Button
                                     size="sm"
                                     variant="ghost"
+                                    className="h-6 w-6 p-0 hover:bg-blue-100 hover:text-blue-600"
+                                    onClick={() => handleReplaceDish(meal.id, date, mealType.key)}
+                                    title="Thay thế món này"
+                                  >
+                                    <RefreshCw className="h-3 w-3" />
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
                                     className="h-6 w-6 p-0 hover:bg-red-100 hover:text-red-600"
                                     onClick={() => handleRemoveDish(meal.id)}
                                     title="Xóa món này"
@@ -312,6 +349,20 @@ const MealPlanCalendarView: React.FC<MealPlanCalendarViewProps> = ({
         onAddDish={handleAddDish}
         selectedDate={selectedSlot?.date}
         selectedMealType={selectedSlot?.mealType}
+      />
+
+      {/* Replace Dish Modal */}
+      <AddDishModal
+        isOpen={showReplaceDishModal}
+        onClose={() => {
+          setShowReplaceDishModal(false);
+          setSelectedSlot(null);
+          setDishToReplace(null);
+        }}
+        onAddDish={handleReplaceDishConfirm}
+        selectedDate={selectedSlot?.date}
+        selectedMealType={selectedSlot?.mealType}
+        title="Chọn món ăn thay thế"
       />
     </div>
   );

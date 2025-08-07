@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
+import StandardLayout from '@/components/layout/StandardLayout';
 import { Button } from '@/components/ui/button';
 import { Clock, Users, ChefHat, Star, ShoppingCart, Utensils } from 'lucide-react';
 
@@ -61,9 +60,7 @@ const RecipeDetailPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Header />
-      
+    <StandardLayout className="bg-gray-50">
       {/* Breadcrumb */}
       <nav className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 py-3">
@@ -232,9 +229,7 @@ const RecipeDetailPage = () => {
           </div>
         </div>
       </div>
-      
-      <Footer />
-    </div>
+    </StandardLayout>
   );
 };
 

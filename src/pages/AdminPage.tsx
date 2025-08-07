@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Users, BookOpen, Newspaper, BarChart3, Settings, Home, ChefHat, Activity, Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import StandardLayout from '@/components/layout/StandardLayout';
 import UserManagement from '@/components/admin/UserManagement';
 import MealPlanManagement from '@/components/admin/MealPlanManagement';
 import MenuManagement from '@/components/admin/MenuManagement';
@@ -218,9 +219,9 @@ const AdminPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
+    <StandardLayout className="bg-gray-50">
+      {/* Admin Header */}
+      <div className="bg-white shadow-sm border-b mb-6">
         <div className="px-6 py-4">
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
@@ -230,7 +231,7 @@ const AdminPage = () => {
             </Button>
           </div>
         </div>
-      </header>
+      </div>
 
       <div className="flex">
         {/* Sidebar */}
@@ -263,7 +264,7 @@ const AdminPage = () => {
           {renderContent()}
         </main>
       </div>
-    </div>
+    </StandardLayout>
   );
 };
 

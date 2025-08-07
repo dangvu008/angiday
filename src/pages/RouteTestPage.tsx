@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import DemoLayout from '@/components/layout/DemoLayout';
 
 const RouteTestPage = () => {
   const routes = [
@@ -52,11 +53,15 @@ const RouteTestPage = () => {
   const categories = [...new Set(routes.map(route => route.category))];
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <DemoLayout
+      title="🎉 Tất cả các trang đã được khôi phục!"
+      description="Test tất cả các routes và navigation trong ứng dụng"
+      mainClassName="py-8"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            🎉 Tất cả các trang đã được khôi phục!
+            Route Test - Navigation Check
           </h1>
           <p className="text-lg text-gray-600">
             Dưới đây là danh sách tất cả các trang có sẵn trong ứng dụng
@@ -98,7 +103,7 @@ const RouteTestPage = () => {
           </Link>
         </div>
       </div>
-    </div>
+    </DemoLayout>
   );
 };
 

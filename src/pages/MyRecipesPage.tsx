@@ -1,6 +1,5 @@
 
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
+import StandardLayout from '@/components/layout/StandardLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -44,9 +43,7 @@ const MyRecipesPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-white">
-      <Header />
-      <main>
+    <StandardLayout>
         {/* Hero Section */}
         <section className="bg-gradient-to-br from-orange-50 to-green-50 py-12 px-4">
           <div className="max-w-6xl mx-auto">
@@ -171,9 +168,7 @@ const MyRecipesPage = () => {
             )}
           </div>
         </section>
-      </main>
-      <Footer />
-    </div>
+    </StandardLayout>
   );
 };
 

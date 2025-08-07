@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
+import StandardLayout from '@/components/layout/StandardLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -504,10 +503,10 @@ const MealPlanningPage = () => {
   const stats = getStats();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-      <Header />
-
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <StandardLayout
+      className="bg-gradient-to-br from-blue-50 via-white to-purple-50"
+      containerClassName="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
+    >
         {/* Breadcrumb */}
         <nav className="mb-6">
           <div className="flex items-center space-x-2 text-sm text-gray-600">
@@ -606,12 +605,7 @@ const MealPlanningPage = () => {
             />
           )
         )}
-      </main>
-
-
-
-      <Footer />
-    </div>
+    </StandardLayout>
   );
 };
 

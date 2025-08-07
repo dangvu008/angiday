@@ -5,7 +5,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { ArrowLeft, Calculator, Zap, Activity, Wheat, Droplets } from 'lucide-react';
+import { Calculator, Zap, Activity, Wheat, Droplets } from 'lucide-react';
+import DemoLayout from '@/components/layout/DemoLayout';
 import SmartIngredientInput from '@/components/admin/SmartIngredientInput';
 import NutritionDisplay from '@/components/admin/NutritionDisplay';
 import { NutritionInfo } from '@/services/NutritionCalculatorService';
@@ -61,7 +62,11 @@ const NutritionCalculatorTestPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <DemoLayout
+      title="Nutrition Calculator Test"
+      description="Test tính toán dinh dưỡng và calories"
+      mainClassName="py-6"
+    >
       {/* Header */}
       <header className="bg-white shadow-sm border-b">
         <div className="px-6 py-4">
@@ -267,8 +272,7 @@ const NutritionCalculatorTestPage = () => {
             </CardContent>
           </Card>
         </div>
-      </main>
-    </div>
+    </DemoLayout>
   );
 };
 

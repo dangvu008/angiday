@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
+import StandardLayout from '@/components/layout/StandardLayout';
 import { 
   Clock, Users, Star, ChefHat, Heart, Share2, Download, 
   Play, ArrowLeft, Plus, Check, ShoppingCart, Calendar 
@@ -172,10 +171,10 @@ const MenuDetailPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Header />
-      
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <StandardLayout
+      className="bg-gray-50"
+      containerClassName="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
+    >
         {/* Breadcrumb */}
         <nav className="flex items-center space-x-2 text-sm text-gray-600 mb-6">
           <Link to="/" className="hover:text-orange-600">Trang chủ</Link>
@@ -494,10 +493,7 @@ const MenuDetailPage = () => {
             </Card>
           </div>
         </div>
-      </main>
-
-      <Footer />
-    </div>
+    </StandardLayout>
   );
 };
 

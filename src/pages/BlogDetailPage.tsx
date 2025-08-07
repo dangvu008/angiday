@@ -1,7 +1,6 @@
 
 import { useParams } from 'react-router-dom';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
+import StandardLayout from '@/components/layout/StandardLayout';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Calendar, Clock, Eye, User, Share2 } from 'lucide-react';
@@ -65,9 +64,7 @@ const BlogDetailPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-white">
-      <Header />
-      <main>
+    <StandardLayout>
         {/* Hero Section */}
         <section className="relative">
           <div className="aspect-video md:aspect-[21/9] overflow-hidden">
@@ -197,9 +194,7 @@ const BlogDetailPage = () => {
             </div>
           </div>
         </section>
-      </main>
-      <Footer />
-    </div>
+    </StandardLayout>
   );
 };
 

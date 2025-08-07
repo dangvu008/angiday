@@ -26,7 +26,68 @@ const MenuSelector = ({ isOpen, onClose, onSelectMenu, selectedDate, mealType }:
       name: 'Thực đơn ăn chay',
       description: 'Tập hợp các món ăn chay bổ dưỡng và ngon miệng',
       type: 'full_day',
-      recipes: [],
+      recipes: [
+        {
+          id: 'recipe-1',
+          title: 'Phở chay nấm hương',
+          description: 'Phở chay thơm ngon với nấm hương và rau củ',
+          category: 'Ăn chay',
+          difficulty: 'Trung bình',
+          cookingTime: '45 phút',
+          servings: 4,
+          author: 'Chef Minh',
+          status: 'published',
+          createdDate: '2024-01-15',
+          views: 150,
+          ingredients: ['Bánh phở', 'Nấm hương', 'Hành tây', 'Gừng', 'Nước tương chay'],
+          instructions: ['Nấu nước dashi chay', 'Xào nấm hương', 'Trụng bánh phở', 'Trang trí và thưởng thức'],
+          nutrition: { calories: 350, protein: 12, carbs: 65, fat: 8, fiber: 6 },
+          tags: ['chay', 'phở', 'nấm'],
+          cuisine: 'Việt Nam',
+          rating: 4.6,
+          reviews: 25
+        },
+        {
+          id: 'recipe-2',
+          title: 'Gỏi cuốn chay',
+          description: 'Gỏi cuốn tươi mát với rau củ và đậu hũ',
+          category: 'Ăn chay',
+          difficulty: 'Dễ',
+          cookingTime: '20 phút',
+          servings: 4,
+          author: 'Chef Minh',
+          status: 'published',
+          createdDate: '2024-01-15',
+          views: 120,
+          ingredients: ['Bánh tráng', 'Đậu hũ', 'Rau sống', 'Bún tươi', 'Nước chấm chay'],
+          instructions: ['Chuẩn bị rau sống', 'Chiên đậu hũ', 'Cuốn bánh tráng', 'Chấm nước mắm chay'],
+          nutrition: { calories: 180, protein: 8, carbs: 25, fat: 6, fiber: 4 },
+          tags: ['chay', 'gỏi cuốn', 'tươi mát'],
+          cuisine: 'Việt Nam',
+          rating: 4.4,
+          reviews: 18
+        },
+        {
+          id: 'recipe-3',
+          title: 'Cơm âm phủ chay',
+          description: 'Cơm âm phủ chay đầy đủ dinh dưỡng',
+          category: 'Ăn chay',
+          difficulty: 'Trung bình',
+          cookingTime: '60 phút',
+          servings: 4,
+          author: 'Chef Minh',
+          status: 'published',
+          createdDate: '2024-01-15',
+          views: 200,
+          ingredients: ['Gạo tám', 'Nấm các loại', 'Rau củ', 'Đậu hũ', 'Gia vị chay'],
+          instructions: ['Nấu cơm', 'Xào nấm và rau', 'Trộn đều', 'Trang trí đẹp mắt'],
+          nutrition: { calories: 420, protein: 15, carbs: 70, fat: 12, fiber: 8 },
+          tags: ['chay', 'cơm âm phủ', 'dinh dưỡng'],
+          cuisine: 'Việt Nam',
+          rating: 4.7,
+          reviews: 32
+        }
+      ],
       totalCalories: 1800,
       totalCost: 150000,
       servings: 4,
@@ -56,7 +117,68 @@ const MenuSelector = ({ isOpen, onClose, onSelectMenu, selectedDate, mealType }:
       name: 'Thực đơn hải sản',
       description: 'Các món hải sản tươi ngon cho bữa tiệc',
       type: 'dinner',
-      recipes: [],
+      recipes: [
+        {
+          id: 'recipe-4',
+          title: 'Tôm nướng muối ớt',
+          description: 'Tôm tươi nướng với muối ớt thơm lừng',
+          category: 'Hải sản',
+          difficulty: 'Trung bình',
+          cookingTime: '30 phút',
+          servings: 6,
+          author: 'Chef Hải',
+          status: 'published',
+          createdDate: '2024-01-12',
+          views: 180,
+          ingredients: ['Tôm sú', 'Muối', 'Ớt', 'Tỏi', 'Lá chanh'],
+          instructions: ['Sơ chế tôm', 'Ướp gia vị', 'Nướng tôm', 'Trang trí'],
+          nutrition: { calories: 250, protein: 35, carbs: 5, fat: 8, fiber: 1 },
+          tags: ['hải sản', 'nướng', 'tôm'],
+          cuisine: 'Việt Nam',
+          rating: 4.8,
+          reviews: 42
+        },
+        {
+          id: 'recipe-5',
+          title: 'Cua rang me',
+          description: 'Cua biển rang me chua ngọt hấp dẫn',
+          category: 'Hải sản',
+          difficulty: 'Khó',
+          cookingTime: '45 phút',
+          servings: 6,
+          author: 'Chef Hải',
+          status: 'published',
+          createdDate: '2024-01-12',
+          views: 220,
+          ingredients: ['Cua biển', 'Me', 'Đường', 'Nước mắm', 'Ớt'],
+          instructions: ['Sơ chế cua', 'Nấu nước me', 'Rang cua', 'Trang trí đẹp mắt'],
+          nutrition: { calories: 320, protein: 28, carbs: 15, fat: 18, fiber: 2 },
+          tags: ['hải sản', 'cua', 'rang me'],
+          cuisine: 'Việt Nam',
+          rating: 4.9,
+          reviews: 38
+        },
+        {
+          id: 'recipe-6',
+          title: 'Cá hấp xì dầu',
+          description: 'Cá tươi hấp xì dầu thanh đạm',
+          category: 'Hải sản',
+          difficulty: 'Dễ',
+          cookingTime: '25 phút',
+          servings: 6,
+          author: 'Chef Hải',
+          status: 'published',
+          createdDate: '2024-01-12',
+          views: 160,
+          ingredients: ['Cá tươi', 'Xì dầu', 'Gừng', 'Hành lá', 'Dầu ăn'],
+          instructions: ['Sơ chế cá', 'Ướp gia vị', 'Hấp cá', 'Rưới nước sốt'],
+          nutrition: { calories: 280, protein: 32, carbs: 8, fat: 12, fiber: 1 },
+          tags: ['hải sản', 'cá', 'hấp'],
+          cuisine: 'Việt Nam',
+          rating: 4.6,
+          reviews: 28
+        }
+      ],
       totalCalories: 2200,
       totalCost: 300000,
       servings: 6,
@@ -283,6 +405,28 @@ const MenuSelector = ({ isOpen, onClose, onSelectMenu, selectedDate, mealType }:
                         <span className="font-medium">{formatCurrency(menu.totalCost)}</span>
                       </div>
                     </div>
+
+                    {/* Recipes List */}
+                    {menu.recipes && menu.recipes.length > 0 && (
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <ChefHat className="h-4 w-4" />
+                          <span className="text-sm font-medium">Các món ăn ({menu.recipes.length}):</span>
+                        </div>
+                        <div className="space-y-1 max-h-32 overflow-y-auto">
+                          {menu.recipes.map((recipe, index) => (
+                            <div key={recipe.id} className="flex items-center justify-between p-2 bg-gray-50 rounded text-xs">
+                              <div className="flex-1">
+                                <span className="font-medium">{recipe.title}</span>
+                                <div className="text-gray-500 mt-1">
+                                  {recipe.cookingTime} • {recipe.difficulty} • {recipe.nutrition.calories} cal
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
 
                     {/* Tags */}
                     <div className="flex flex-wrap gap-1">

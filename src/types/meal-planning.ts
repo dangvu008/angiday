@@ -131,6 +131,38 @@ export interface MonthPlan extends BasePlan {
 // Union type for all plan types
 export type AnyPlan = MealPlan | SingleDayPlan | WeekPlan | MonthPlan;
 
+// Cooking Mode - Chế độ nấu ăn
+export interface CookingSession {
+  id: string;
+  planId: string;
+  planType: 'meal' | 'day' | 'week' | 'month';
+  recipes: Recipe[];
+  currentRecipeIndex: number;
+  status: 'preparing' | 'cooking' | 'completed' | 'paused';
+  startTime: string;
+  endTime?: string;
+  totalCookingTime: number; // Thời gian nấu ước tính (phút)
+  actualCookingTime?: number; // Thời gian nấu thực tế (phút)
+  notes?: string;
+  completedSteps: { [recipeId: string]: number[] }; // Các bước đã hoàn thành
+}
+
+// Enhanced Plan Status - Trạng thái mở rộng cho kế hoạch
+export interface EnhancedPlanStatus {
+  planId: string;
+  planType: 'meal' | 'day' | 'week' | 'month';
+  shoppingStatus: PlanShoppingStatus;
+  cookingStatus?: CookingSession;
+  phase: 'planning' | 'shopping' | 'ready_to_cook' | 'cooking' | 'completed';
+  progress: {
+    planning: boolean;
+    shopping: boolean;
+    cooking: boolean;
+    completed: boolean;
+  };
+  lastUpdated: string;
+}
+
 // Individual Meal Template - Bữa ăn riêng lẻ
 // Recipe - Công thức nấu ăn cụ thể
 export interface Recipe {
@@ -322,8 +354,82 @@ export interface ShoppingList {
   weekPlanId: string;
   items: ShoppingListItem[];
   totalCost: number;
+  actualTotalCost?: number; // Tổng chi phí thực tế sau khi cập nhật
   createdAt: string;
   updatedAt: string;
+  status: 'pending' | 'shopping' | 'completed'; // Trạng thái đi chợ
+  completedAt?: string; // Thời gian hoàn thành mua sắm
+  expenseRecord?: ExpenseRecord; // Bản ghi chi tiêu
+}
+
+// Expense Tracking - Theo dõi chi tiêu
+export interface ExpenseRecord {
+  id: string;
+  shoppingListId: string;
+  userId: string;
+  date: string; // YYYY-MM-DD
+  totalBudget: number; // Ngân sách dự kiến
+  actualSpent: number; // Chi tiêu thực tế
+  savings: number; // Tiết kiệm được (budget - actual)
+  categories: ExpenseCategory[];
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ExpenseCategory {
+  category: string; // Thịt cá, Rau củ, Gia vị, etc.
+  budgetAmount: number;
+  actualAmount: number;
+  items: ExpenseItem[];
+}
+
+export interface ExpenseItem {
+  itemId: string;
+  name: string;
+  quantity: number;
+  unit: string;
+  estimatedCost: number;
+  actualCost: number;
+  store?: string; // Cửa hàng mua
+  notes?: string;
+}
+
+// Inventory Management - Quản lý kho nguyên liệu
+export interface InventoryItem {
+  id: string;
+  ingredientId: string; // Link to StandardIngredient
+  name: string;
+  quantity: number;
+  unit: string;
+  category: string;
+  expiryDate?: string; // Ngày hết hạn
+  purchaseDate: string; // Ngày mua
+  location: 'fridge' | 'freezer' | 'pantry' | 'cabinet'; // Vị trí lưu trữ
+  cost: number; // Giá mua
+  notes?: string;
+  isLowStock: boolean; // Cảnh báo sắp hết
+  minimumQuantity: number; // Số lượng tối thiểu cần có
+}
+
+export interface Inventory {
+  id: string;
+  userId: string;
+  items: InventoryItem[];
+  lastUpdated: string;
+  totalValue: number; // Tổng giá trị kho
+}
+
+// Shopping Status for Plans - Trạng thái đi chợ cho kế hoạch
+export interface PlanShoppingStatus {
+  planId: string;
+  planType: 'meal' | 'day' | 'week' | 'month';
+  hasAllIngredients: boolean; // Đã đủ nguyên liệu chưa
+  missingIngredients: string[]; // Danh sách nguyên liệu thiếu
+  shoppingListId?: string; // ID của shopping list nếu có
+  lastChecked: string; // Lần cuối kiểm tra
+  canStartCooking: boolean; // Có thể bắt đầu nấu không
+  estimatedShoppingCost: number; // Chi phí ước tính để mua thiếu
 }
 
 // Template Library với search và filter

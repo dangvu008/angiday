@@ -4,7 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft, Image as ImageIcon, CheckCircle, AlertTriangle, Info } from 'lucide-react';
+import { Image as ImageIcon, CheckCircle, AlertTriangle, Info } from 'lucide-react';
+import DemoLayout from '@/components/layout/DemoLayout';
 import ImageUpload from '@/components/admin/ImageUpload';
 import { RecipeCardImage, RecipeHeroImage, AvatarImage } from '@/components/ui/ResponsiveImage';
 
@@ -49,7 +50,11 @@ const ImageValidationTestPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <DemoLayout
+      title="Test Validation Hình Ảnh"
+      description="Kiểm tra hệ thống validation và tối ưu hóa hình ảnh"
+      mainClassName="py-6"
+    >
       {/* Header */}
       <header className="bg-white shadow-sm border-b">
         <div className="px-6 py-4">
@@ -310,8 +315,7 @@ const ImageValidationTestPage = () => {
             </div>
           </CardContent>
         </Card>
-      </main>
-    </div>
+    </DemoLayout>
   );
 };
 

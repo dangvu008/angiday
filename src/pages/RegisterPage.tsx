@@ -3,8 +3,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import ProtectedRoute from '@/components/ProtectedRoute';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
+import StandardLayout from '@/components/layout/StandardLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChefHat, Mail, Lock, User, Eye, EyeOff, AlertCircle } from 'lucide-react';
@@ -62,8 +61,7 @@ const RegisterPage = () => {
 
   return (
     <ProtectedRoute requireAuth={false} redirectTo="/">
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-green-50">
-        <Header />
+      <StandardLayout className="bg-gradient-to-br from-orange-50 to-green-50">
         <main className="flex items-center justify-center py-12 px-4">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
@@ -241,8 +239,7 @@ const RegisterPage = () => {
           </CardContent>
         </Card>
         </main>
-        <Footer />
-      </div>
+      </StandardLayout>
     </ProtectedRoute>
   );
 };

@@ -1,8 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
+import StandardLayout from '@/components/layout/StandardLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -289,9 +288,7 @@ const RecipesPage = () => {
   }, [searchParams]);
 
   return (
-    <div className="min-h-screen bg-white">
-      <Header />
-      <main>
+    <StandardLayout>
         {/* Hero Section - Knorr Style */}
         <section className="bg-gradient-to-br from-orange-50 via-white to-red-50 py-12 px-4">
           <div className="max-w-4xl mx-auto text-center">
@@ -443,9 +440,7 @@ const RecipesPage = () => {
             )}
           </div>
         </section>
-      </main>
-      <Footer />
-    </div>
+    </StandardLayout>
   );
 };
 

@@ -14,12 +14,13 @@ import BatchImportDemoPage from "./pages/BatchImportDemoPage";
 import BlogPage from "./pages/BlogPage";
 import BlogDetailPage from "./pages/BlogDetailPage";
 import ErrorHandlingPage from "./pages/ErrorHandlingPage";
-import ImageValidationTestPage from "./pages/ImageValidationTestPage";
+// TEMPORARILY COMMENTED OUT - JSX SYNTAX ERRORS
+// import ImageValidationTestPage from "./pages/ImageValidationTestPage";
 import ImportDemoPage from "./pages/ImportDemoPage";
 import ImportTestDemoPage from "./pages/ImportTestDemoPage";
-import IngredientOptimizationPage from "./pages/IngredientOptimizationPage";
+// import IngredientOptimizationPage from "./pages/IngredientOptimizationPage";
 import KnorrStyleDemo from "./pages/KnorrStyleDemo";
-import KnorrSystemDemo from "./pages/KnorrSystemDemo";
+
 import LoginPage from "./pages/LoginPage";
 import MealDetailPage from "./pages/MealDetailPage";
 import MealPlanDetailPage from "./pages/MealPlanDetailPage";
@@ -29,7 +30,7 @@ import MultiLanguageImportPage from "./pages/MultiLanguageImportPage";
 import MyFavoritesPage from "./pages/MyFavoritesPage";
 import MyRecipesPage from "./pages/MyRecipesPage";
 import NotFound from "./pages/NotFound";
-import NutritionCalculatorTestPage from "./pages/NutritionCalculatorTestPage";
+// import NutritionCalculatorTestPage from "./pages/NutritionCalculatorTestPage";
 import ProfilePage from "./pages/ProfilePage";
 import RecipeDetailPage from "./pages/RecipeDetailPage";
 import RecipesPage from "./pages/RecipesPage";
@@ -44,6 +45,7 @@ import PersonalMealPlanner from "./components/PersonalMealPlanner";
 import MenuSystemDemo from "./components/MenuSystemDemo";
 import MenuCatalogPage from "./pages/MenuCatalogPage";
 import MenuDetailPage from "./pages/MenuDetailPage";
+import SmartMealPlanningDemo from "./pages/SmartMealPlanningDemo";
 
 const queryClient = new QueryClient();
 
@@ -99,14 +101,16 @@ const App = () => (
               <Route path="/meal-plan-importer" element={<MealPlanImporterPage />} />
               <Route path="/smart-extraction" element={<SmartExtractionPage />} />
               <Route path="/anti-block" element={<AntiBlockPage />} />
-              <Route path="/ingredient-optimization" element={<IngredientOptimizationPage />} />
+              {/* TEMPORARILY COMMENTED OUT - JSX SYNTAX ERRORS */}
+              {/* <Route path="/ingredient-optimization" element={<IngredientOptimizationPage />} /> */}
               <Route path="/knorr-style-demo" element={<KnorrStyleDemo />} />
-              <Route path="/knorr-system-demo" element={<KnorrSystemDemo />} />
-              <Route path="/image-validation-test" element={<ImageValidationTestPage />} />
-              <Route path="/nutrition-calculator-test" element={<NutritionCalculatorTestPage />} />
+
+              {/* <Route path="/image-validation-test" element={<ImageValidationTestPage />} /> */}
+              {/* <Route path="/nutrition-calculator-test" element={<NutritionCalculatorTestPage />} /> */}
               <Route path="/validation-test" element={<ValidationTestPage />} />
               <Route path="/error-handling" element={<ErrorHandlingPage />} />
               <Route path="/menu-system-demo" element={<MenuSystemDemo />} />
+              <Route path="/smart-meal-planning-demo" element={<SmartMealPlanningDemo />} />
 
               {/* 404 Page */}
               <Route path="*" element={<NotFound />} />

@@ -1,8 +1,13 @@
 import React from 'react';
+import DemoLayout from '@/components/layout/DemoLayout';
 
 const BatchImportDemoPage = () => {
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <DemoLayout
+      title="Demo Batch Import"
+      description="Demo import hàng loạt công thức và thực đơn"
+      mainClassName="py-8"
+    >
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-8">
@@ -79,7 +84,7 @@ const BatchImportDemoPage = () => {
           </div>
         </div>
       </div>
-    </div>
+    </DemoLayout>
   );
 };
 

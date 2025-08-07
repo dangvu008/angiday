@@ -18,7 +18,9 @@ import {
   Filter,
   Search,
   Menu,
-  TrendingUp
+  TrendingUp,
+  Clock,
+  Users
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -34,6 +36,7 @@ import MealTemplates from '@/components/meal-planning/MealTemplates';
 import MenuSelector from '@/components/meal-planning/MenuSelector';
 import NutritionStats from '@/components/meal-planning/NutritionStats';
 import ShoppingListView from '@/components/meal-planning/ShoppingListView';
+import MultiMenuShoppingList from '@/components/meal-planning/MultiMenuShoppingList';
 import UserPreferencesModal from '@/components/meal-planning/UserPreferencesModal';
 import { FamilyMemberManager } from '@/components/meal-planning/FamilyMemberManager';
 import { CalorieDistributionView } from '@/components/meal-planning/CalorieDistributionView';
@@ -60,6 +63,7 @@ const MealPlanningAdvanced: React.FC = () => {
   const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showPreferences, setShowPreferences] = useState(false);
+  const [showMultiMenuShoppingList, setShowMultiMenuShoppingList] = useState(false);
   const [activeTab, setActiveTab] = useState('dashboard');
 
   useEffect(() => {
@@ -182,6 +186,126 @@ const MealPlanningAdvanced: React.FC = () => {
     );
 
     setFamilyMembers(membersWithCalories);
+  };
+
+  // Sample menus for shopping list generation
+  const getSampleMenus = () => {
+    return [
+      {
+        id: '1',
+        name: 'Thực đơn ăn chay',
+        description: 'Tập hợp các món ăn chay bổ dưỡng và ngon miệng',
+        type: 'full_day' as const,
+        recipes: [
+          {
+            id: 'recipe-1',
+            title: 'Phở chay nấm hương',
+            description: 'Phở chay thơm ngon với nấm hương và rau củ',
+            category: 'Ăn chay',
+            difficulty: 'Trung bình' as const,
+            cookingTime: '45 phút',
+            servings: 4,
+            author: 'Chef Minh',
+            status: 'published' as const,
+            createdDate: '2024-01-15',
+            views: 150,
+            ingredients: ['Bánh phở', 'Nấm hương', 'Hành tây', 'Gừng', 'Nước tương chay'],
+            instructions: ['Nấu nước dashi chay', 'Xào nấm hương', 'Trụng bánh phở', 'Trang trí và thưởng thức'],
+            nutrition: { calories: 350, protein: 12, carbs: 65, fat: 8, fiber: 6 },
+            tags: ['chay', 'phở', 'nấm'],
+            cuisine: 'Việt Nam',
+            rating: 4.6,
+            reviews: 25
+          },
+          {
+            id: 'recipe-2',
+            title: 'Gỏi cuốn chay',
+            description: 'Gỏi cuốn tươi mát với rau củ và đậu hũ',
+            category: 'Ăn chay',
+            difficulty: 'Dễ' as const,
+            cookingTime: '20 phút',
+            servings: 4,
+            author: 'Chef Minh',
+            status: 'published' as const,
+            createdDate: '2024-01-15',
+            views: 120,
+            ingredients: ['Bánh tráng', 'Đậu hũ', 'Rau sống', 'Bún tươi', 'Nước chấm chay'],
+            instructions: ['Chuẩn bị rau sống', 'Chiên đậu hũ', 'Cuốn bánh tráng', 'Chấm nước mắm chay'],
+            nutrition: { calories: 180, protein: 8, carbs: 25, fat: 6, fiber: 4 },
+            tags: ['chay', 'gỏi cuốn', 'tươi mát'],
+            cuisine: 'Việt Nam',
+            rating: 4.4,
+            reviews: 18
+          }
+        ],
+        totalCalories: 1800,
+        totalCost: 150000,
+        servings: 4,
+        tags: ['chay', 'healthy', 'gia đình'],
+        difficulty: 'Trung bình' as const,
+        totalCookingTime: 120,
+        nutrition: { protein: 60, carbs: 250, fat: 50, fiber: 35 },
+        isPublic: true,
+        createdBy: 'Admin',
+        createdByName: 'Admin',
+        createdAt: '2024-01-15T00:00:00Z',
+        updatedAt: '2024-01-15T00:00:00Z',
+        category: 'Ăn chay',
+        cuisine: 'Việt Nam',
+        targetAudience: ['family'],
+        dietaryRestrictions: ['vegetarian'],
+        usageCount: 45,
+        rating: 4.5,
+        reviews: 12
+      },
+      {
+        id: '2',
+        name: 'Thực đơn hải sản',
+        description: 'Các món hải sản tươi ngon cho bữa tiệc',
+        type: 'dinner' as const,
+        recipes: [
+          {
+            id: 'recipe-4',
+            title: 'Tôm nướng muối ớt',
+            description: 'Tôm tươi nướng với muối ớt thơm lừng',
+            category: 'Hải sản',
+            difficulty: 'Trung bình' as const,
+            cookingTime: '30 phút',
+            servings: 6,
+            author: 'Chef Hải',
+            status: 'published' as const,
+            createdDate: '2024-01-12',
+            views: 180,
+            ingredients: ['Tôm sú', 'Muối', 'Ớt', 'Tỏi', 'Lá chanh'],
+            instructions: ['Sơ chế tôm', 'Ướp gia vị', 'Nướng tôm', 'Trang trí'],
+            nutrition: { calories: 250, protein: 35, carbs: 5, fat: 8, fiber: 1 },
+            tags: ['hải sản', 'nướng', 'tôm'],
+            cuisine: 'Việt Nam',
+            rating: 4.8,
+            reviews: 42
+          }
+        ],
+        totalCalories: 2200,
+        totalCost: 300000,
+        servings: 6,
+        tags: ['hải sản', 'tiệc tùng', 'cao cấp'],
+        difficulty: 'Khó' as const,
+        totalCookingTime: 180,
+        nutrition: { protein: 120, carbs: 180, fat: 80, fiber: 20 },
+        isPublic: true,
+        createdBy: 'Chef Hải',
+        createdByName: 'Chef Hải',
+        createdAt: '2024-01-12T00:00:00Z',
+        updatedAt: '2024-01-12T00:00:00Z',
+        category: 'Hải sản',
+        cuisine: 'Việt Nam',
+        targetAudience: ['family', 'couple'],
+        dietaryRestrictions: [],
+        usageCount: 23,
+        rating: 4.2,
+        reviews: 8
+      }
+    ];
   };
 
   const handleDuplicateWeekPlan = async (planId: string) => {
@@ -532,24 +656,84 @@ const MealPlanningAdvanced: React.FC = () => {
             </TabsContent>
 
             <TabsContent value="menus" className="mt-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Menu className="h-5 w-5" />
-                    Thư viện thực đơn
-                  </CardTitle>
-                  <p className="text-sm text-muted-foreground">
-                    Chọn thực đơn có sẵn để thêm vào kế hoạch ăn uống của bạn
-                  </p>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-center text-muted-foreground py-8">
-                    Tính năng thư viện thực đơn sẽ được tích hợp ở đây.
-                    <br />
-                    Bạn có thể chọn thực đơn từ thư viện và thêm vào lịch kế hoạch ăn.
-                  </p>
-                </CardContent>
-              </Card>
+              <div className="space-y-6">
+                {/* Shopping List Generator */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <ShoppingCart className="h-5 w-5" />
+                      Tạo danh sách mua sắm từ thực đơn
+                    </CardTitle>
+                    <p className="text-sm text-muted-foreground">
+                      Chọn món ăn từ nhiều thực đơn để tạo danh sách mua sắm tổng hợp
+                    </p>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex flex-col sm:flex-row gap-4">
+                      <Button
+                        onClick={() => setShowMultiMenuShoppingList(true)}
+                        className="flex items-center gap-2"
+                      >
+                        <ShoppingCart className="h-4 w-4" />
+                        Tạo danh sách mua sắm
+                      </Button>
+                      <div className="text-sm text-muted-foreground">
+                        Chọn từ {getSampleMenus().length} thực đơn có sẵn
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Menu Library */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Menu className="h-5 w-5" />
+                      Thư viện thực đơn
+                    </CardTitle>
+                    <p className="text-sm text-muted-foreground">
+                      Chọn thực đơn có sẵn để thêm vào kế hoạch ăn uống của bạn
+                    </p>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {getSampleMenus().map(menu => (
+                        <Card key={menu.id} className="border hover:shadow-md transition-shadow">
+                          <CardHeader className="pb-3">
+                            <CardTitle className="text-lg">{menu.name}</CardTitle>
+                            <p className="text-sm text-muted-foreground">{menu.description}</p>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="space-y-2">
+                              <div className="flex items-center gap-4 text-sm text-gray-600">
+                                <div className="flex items-center gap-1">
+                                  <ChefHat className="h-4 w-4" />
+                                  <span>{menu.recipes.length} món</span>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  <Clock className="h-4 w-4" />
+                                  <span>{menu.totalCookingTime} phút</span>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  <Users className="h-4 w-4" />
+                                  <span>{menu.servings} người</span>
+                                </div>
+                              </div>
+                              <div className="flex flex-wrap gap-1">
+                                {menu.tags.slice(0, 3).map((tag, index) => (
+                                  <Badge key={index} variant="secondary" className="text-xs">
+                                    {tag}
+                                  </Badge>
+                                ))}
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
             </TabsContent>
 
             <TabsContent value="dishes" className="mt-6">
@@ -758,6 +942,14 @@ const MealPlanningAdvanced: React.FC = () => {
             }}
           />
         )}
+
+        {/* Multi Menu Shopping List Modal */}
+        <MultiMenuShoppingList
+          isOpen={showMultiMenuShoppingList}
+          onClose={() => setShowMultiMenuShoppingList(false)}
+          availableMenus={getSampleMenus()}
+          selectedDate={new Date().toISOString().split('T')[0]}
+        />
 
         <Footer />
       </div>

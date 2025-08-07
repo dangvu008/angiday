@@ -4,9 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  Clock, Users, Star, ChefHat, Plus, Edit, Trash2, 
-  ArrowLeft, Share2, Download, Eye, Utensils 
+import {
+  Clock, Users, Star, ChefHat, Plus, Edit, Trash2,
+  ArrowLeft, Share2, Download, Eye, Utensils, RefreshCw
 } from 'lucide-react';
 import { Menu, Recipe } from '@/types/meal-planning';
 import RecipeSelector from './RecipeSelector';
@@ -23,6 +23,8 @@ interface MenuDetailViewProps {
 
 const MenuDetailView = ({ isOpen, onClose, menu, onUpdateMenu, onDeleteMenu }: MenuDetailViewProps) => {
   const [showRecipeSelector, setShowRecipeSelector] = useState(false);
+  const [showReplaceRecipeSelector, setShowReplaceRecipeSelector] = useState(false);
+  const [recipeToReplace, setRecipeToReplace] = useState<string | null>(null);
   const [showAddToPlanModal, setShowAddToPlanModal] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
   const { user, canEditMenu, canDeleteMenu: canDelete, canAddMenuToPersonalPlan } = useAuth();
@@ -82,6 +84,41 @@ const MenuDetailView = ({ isOpen, onClose, menu, onUpdateMenu, onDeleteMenu }: M
     }), { protein: 0, carbs: 0, fat: 0, fiber: 0 });
 
     onUpdateMenu(updatedMenu);
+  };
+
+  const handleReplaceRecipe = (recipeId: string) => {
+    if (!canEdit) return;
+    setRecipeToReplace(recipeId);
+    setShowReplaceRecipeSelector(true);
+  };
+
+  const handleReplaceRecipeConfirm = (selectedRecipes: Recipe[]) => {
+    if (!canEdit || !recipeToReplace || selectedRecipes.length === 0) return;
+
+    const updatedMenu = {
+      ...menu,
+      recipes: menu.recipes.map(recipe =>
+        recipe.id === recipeToReplace ? selectedRecipes[0] : recipe
+      ),
+      updatedAt: new Date().toISOString()
+    };
+
+    // Recalculate totals
+    updatedMenu.totalCalories = updatedMenu.recipes.reduce((sum, recipe) => sum + recipe.nutrition.calories, 0);
+    updatedMenu.totalCookingTime = updatedMenu.recipes.reduce((sum, recipe) => {
+      const time = parseInt(recipe.cookingTime.replace(/\D/g, '')) || 0;
+      return sum + time;
+    }, 0);
+    updatedMenu.nutrition = updatedMenu.recipes.reduce((acc, recipe) => ({
+      protein: acc.protein + recipe.nutrition.protein,
+      carbs: acc.carbs + recipe.nutrition.carbs,
+      fat: acc.fat + recipe.nutrition.fat,
+      fiber: acc.fiber + recipe.nutrition.fiber
+    }), { protein: 0, carbs: 0, fat: 0, fiber: 0 });
+
+    onUpdateMenu(updatedMenu);
+    setRecipeToReplace(null);
+    setShowReplaceRecipeSelector(false);
   };
 
   const handleAddToPlan = (planData: any) => {
@@ -352,14 +389,26 @@ const MenuDetailView = ({ isOpen, onClose, menu, onUpdateMenu, onDeleteMenu }: M
                                   <Eye className="h-4 w-4" />
                                 </Button>
                                 {canEdit && (
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => handleRemoveRecipe(recipe.id)}
-                                    className="text-red-600 hover:text-red-700"
-                                  >
-                                    <Trash2 className="h-4 w-4" />
-                                  </Button>
+                                  <>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => handleReplaceRecipe(recipe.id)}
+                                      className="text-blue-600 hover:text-blue-700"
+                                      title="Thay thế món này"
+                                    >
+                                      <RefreshCw className="h-4 w-4" />
+                                    </Button>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => handleRemoveRecipe(recipe.id)}
+                                      className="text-red-600 hover:text-red-700"
+                                      title="Xóa món này"
+                                    >
+                                      <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                  </>
                                 )}
                               </div>
                             </div>
@@ -472,6 +521,21 @@ const MenuDetailView = ({ isOpen, onClose, menu, onUpdateMenu, onDeleteMenu }: M
             selectedRecipeIds={menu.recipes.map(r => r.id)}
             multiSelect={true}
             title="Thêm công thức vào thực đơn"
+          />
+        )}
+
+        {/* Replace Recipe Selector Modal */}
+        {canEdit && (
+          <RecipeSelector
+            isOpen={showReplaceRecipeSelector}
+            onClose={() => {
+              setShowReplaceRecipeSelector(false);
+              setRecipeToReplace(null);
+            }}
+            onSelectRecipes={handleReplaceRecipeConfirm}
+            selectedRecipeIds={[]}
+            multiSelect={false}
+            title="Chọn món ăn thay thế"
           />
         )}
 

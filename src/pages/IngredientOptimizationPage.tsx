@@ -3,7 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { ArrowLeft, Download, Upload, RefreshCw } from 'lucide-react';
+import { Download, Upload, RefreshCw } from 'lucide-react';
+import DemoLayout from '@/components/layout/DemoLayout';
 import IngredientOptimization from '@/components/admin/IngredientOptimization';
 
 interface Recipe {
@@ -174,7 +175,11 @@ const IngredientOptimizationPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <DemoLayout
+      title="Tối Ưu Hóa Nguyên Liệu"
+      description="Demo tối ưu hóa nguyên liệu và giảm lãng phí"
+      mainClassName="py-6"
+    >
       {/* Header */}
       <header className="bg-white shadow-sm border-b">
         <div className="px-6 py-4">
@@ -295,8 +300,7 @@ const IngredientOptimizationPage = () => {
 
         {/* Main Optimization Component */}
         <IngredientOptimization recipes={recipes} />
-      </main>
-    </div>
+    </DemoLayout>
   );
 };
 

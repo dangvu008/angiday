@@ -1,7 +1,6 @@
 import { useParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
+import StandardLayout from '@/components/layout/StandardLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -110,9 +109,7 @@ const MealPlanDetailPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      <Header />
-      <main>
+    <StandardLayout>
         {/* Hero Section */}
         <section className="relative">
           <div className="aspect-video md:aspect-[21/9] overflow-hidden">
@@ -291,9 +288,7 @@ const MealPlanDetailPage = () => {
             </div>
           </div>
         </section>
-      </main>
-      <Footer />
-    </div>
+    </StandardLayout>
   );
 };
 

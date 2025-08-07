@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
+import DemoLayout from '@/components/layout/DemoLayout';
 import KnorrStyleRecipeCard from '@/components/recipe/KnorrStyleRecipeCard';
 import KnorrNutritionFacts from '@/components/recipe/KnorrNutritionFacts';
 
@@ -55,23 +55,12 @@ const KnorrStyleDemo = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="px-6 py-4">
-          <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold text-gray-900">Demo Knorr Style Components</h1>
-            <Button variant="outline" onClick={() => window.history.back()}>
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Quay lại
-            </Button>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="py-8">
-        <div className="max-w-7xl mx-auto px-4 space-y-12">
+    <DemoLayout
+      title="Demo Knorr Style Components"
+      description="Trình diễn các component UI theo phong cách Knorr với thiết kế hiện đại và tương tác mượt mà"
+      mainClassName="py-8"
+    >
+      <div className="max-w-7xl mx-auto px-4 space-y-12">
           
           {/* Recipe Cards Section */}
           <section>
@@ -240,8 +229,7 @@ const KnorrStyleDemo = () => {
             </div>
           </section>
         </div>
-      </main>
-    </div>
+    </DemoLayout>
   );
 };
 

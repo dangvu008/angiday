@@ -1,6 +1,5 @@
 
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
+import StandardLayout from '@/components/layout/StandardLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Clock, Eye } from 'lucide-react';
@@ -55,9 +54,7 @@ const BlogPage = () => {
   const categories = ["Tất cả", "Mẹo vặt", "Kiến thức", "Tin tức", "Dinh dưỡng"];
 
   return (
-    <div className="min-h-screen bg-white">
-      <Header />
-      <main>
+    <StandardLayout>
         {/* Hero Section */}
         <section className="bg-gradient-to-br from-orange-50 to-green-50 py-12 px-4">
           <div className="max-w-4xl mx-auto text-center">
@@ -128,9 +125,7 @@ const BlogPage = () => {
             </div>
           </div>
         </section>
-      </main>
-      <Footer />
-    </div>
+    </StandardLayout>
   );
 };
 
