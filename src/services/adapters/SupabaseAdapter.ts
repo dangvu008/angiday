@@ -458,7 +458,152 @@ export class SupabaseAdapter implements DatabaseAdapter {
       .from('inventory')
       .delete()
       .eq('id', id);
-    
+
+    if (error) throw error;
+  }
+
+  // Daily Shopping Status Methods
+  async getDailyShoppingStatus(userId: string, menuDate: string): Promise<DailyMenuShoppingStatus | null> {
+    const { data, error } = await this.supabase
+      .from('daily_shopping_status')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('menu_date', menuDate)
+      .single();
+
+    if (error) {
+      if (error.code === 'PGRST116') return null; // Not found
+      throw error;
+    }
+    return data ? convertKeysToCamelCase(data) : null;
+  }
+
+  async getDailyShoppingStatusById(id: string): Promise<DailyMenuShoppingStatus | null> {
+    const { data, error } = await this.supabase
+      .from('daily_shopping_status')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error) {
+      if (error.code === 'PGRST116') return null; // Not found
+      throw error;
+    }
+    return data ? convertKeysToCamelCase(data) : null;
+  }
+
+  async createDailyShoppingStatus(status: Omit<DailyMenuShoppingStatus, 'id' | 'createdAt' | 'updatedAt'>): Promise<DailyMenuShoppingStatus> {
+    const { data, error } = await this.supabase
+      .from('daily_shopping_status')
+      .insert([{
+        user_id: status.userId,
+        menu_date: status.menuDate,
+        status: status.status,
+        total_estimated_cost: status.totalEstimatedCost,
+        total_actual_cost: status.totalActualCost,
+        shopping_completed_at: status.shoppingCompletedAt,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return convertKeysToCamelCase(data);
+  }
+
+  async updateDailyShoppingStatus(id: string, updates: Partial<DailyMenuShoppingStatus>): Promise<DailyMenuShoppingStatus> {
+    const updateData: any = {
+      updated_at: new Date().toISOString()
+    };
+
+    if (updates.status !== undefined) updateData.status = updates.status;
+    if (updates.totalEstimatedCost !== undefined) updateData.total_estimated_cost = updates.totalEstimatedCost;
+    if (updates.totalActualCost !== undefined) updateData.total_actual_cost = updates.totalActualCost;
+    if (updates.shoppingCompletedAt !== undefined) updateData.shopping_completed_at = updates.shoppingCompletedAt;
+
+    const { data, error } = await this.supabase
+      .from('daily_shopping_status')
+      .update(updateData)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return convertKeysToCamelCase(data);
+  }
+
+  async deleteDailyShoppingStatus(id: string): Promise<void> {
+    const { error } = await this.supabase
+      .from('daily_shopping_status')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+  }
+
+  // Meal Shopping Items Methods
+  async getMealShoppingItems(dailyShoppingStatusId: string): Promise<MealShoppingItem[]> {
+    const { data, error } = await this.supabase
+      .from('meal_shopping_items')
+      .select('*')
+      .eq('daily_shopping_status_id', dailyShoppingStatusId)
+      .order('created_at');
+
+    if (error) throw error;
+    return (data || []).map(convertKeysToCamelCase);
+  }
+
+  async createMealShoppingItem(item: Omit<MealShoppingItem, 'id' | 'createdAt' | 'updatedAt'>): Promise<MealShoppingItem> {
+    const { data, error } = await this.supabase
+      .from('meal_shopping_items')
+      .insert([{
+        daily_shopping_status_id: item.dailyShoppingStatusId,
+        ingredient_name: item.ingredientName,
+        quantity: item.quantity,
+        unit: item.unit,
+        estimated_price: item.estimatedPrice,
+        actual_price: item.actualPrice,
+        is_purchased: item.isPurchased,
+        recipe_id: item.recipeId,
+        recipe_name: item.recipeName,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return convertKeysToCamelCase(data);
+  }
+
+  async updateMealShoppingItem(id: string, updates: Partial<MealShoppingItem>): Promise<MealShoppingItem> {
+    const updateData: any = {
+      updated_at: new Date().toISOString()
+    };
+
+    if (updates.quantity !== undefined) updateData.quantity = updates.quantity;
+    if (updates.estimatedPrice !== undefined) updateData.estimated_price = updates.estimatedPrice;
+    if (updates.actualPrice !== undefined) updateData.actual_price = updates.actualPrice;
+    if (updates.isPurchased !== undefined) updateData.is_purchased = updates.isPurchased;
+
+    const { data, error } = await this.supabase
+      .from('meal_shopping_items')
+      .update(updateData)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return convertKeysToCamelCase(data);
+  }
+
+  async deleteMealShoppingItem(id: string): Promise<void> {
+    const { error } = await this.supabase
+      .from('meal_shopping_items')
+      .delete()
+      .eq('id', id);
+
     if (error) throw error;
   }
 }

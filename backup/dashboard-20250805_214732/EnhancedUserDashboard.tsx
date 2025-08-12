@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useMealPlanning } from '@/contexts/MealPlanningContext';
-import TodayMealPlanWidget from './TodayMealPlanWidget';
+import EnhancedTodayMealPlan from './EnhancedTodayMealPlan';
 import EnhancedActionButtons from './EnhancedActionButtons';
 import SmartWeeklyInsights from './SmartWeeklyInsights';
 import EnhancedSmartRecommendations from './EnhancedSmartRecommendations';
@@ -93,8 +93,14 @@ const EnhancedUserDashboard = () => {
         </p>
       </div>
 
-      {/* Widget Thực Đơn Hôm Nay */}
-      <TodayMealPlanWidget />
+      {/* Khu vực trung tâm - Thực đơn hôm nay */}
+      <EnhancedTodayMealPlan
+        todayMealPlan={todayMealPlan}
+        currentPlan={currentPlan}
+        todayDate={todayDate}
+        onMarkComplete={handleMarkComplete}
+        onReplaceMeal={handleReplaceMeal}
+      />
 
       {/* Khu vực Hành Động Chính */}
       <EnhancedActionButtons

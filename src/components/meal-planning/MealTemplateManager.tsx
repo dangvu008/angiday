@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { toast } from 'sonner';
 import { MealTemplate, LibrarySearchFilters, LibrarySortOptions } from '@/types/meal-planning';
 import { templateLibraryService } from '@/services/template-library.service';
@@ -166,6 +166,9 @@ const MealTemplateManager: React.FC<MealTemplateManagerProps> = ({
             <DialogTitle className="text-2xl">
               {selectionMode ? 'Chọn template bữa ăn' : 'Quản lý templates bữa ăn'}
             </DialogTitle>
+            <DialogDescription>
+              {selectionMode ? 'Chọn template từ thư viện để áp dụng' : 'Quản lý và chỉnh sửa templates bữa ăn'}
+            </DialogDescription>
           </DialogHeader>
 
           {/* Search và Filters */}

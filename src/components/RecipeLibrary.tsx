@@ -22,6 +22,7 @@ import { useKitchen } from '@/contexts/KitchenContext';
 import { Recipe } from '@/types/kitchen';
 import RecipeImage from './RecipeImage';
 import AddToMealPlanModal from './meal-planning/AddToMealPlanModal';
+import { CreateRecipeModal } from './recipe/CreateRecipeModal';
 
 // Recipe Detail Modal Component
 const RecipeDetailModal: React.FC<{
@@ -176,7 +177,8 @@ const RecipeLibrary: React.FC = () => {
     addMealToSlot,
     activeMealPlan,
     refreshTodayMeals,
-    refreshMealPlans
+    refreshMealPlans,
+    refreshRecipes
   } = useKitchen();
 
   const location = useLocation();
@@ -360,6 +362,13 @@ const RecipeLibrary: React.FC = () => {
             <span className="text-orange-600"> • Hiển thị {filteredRecipes.length} kết quả</span>
           )}
         </p>
+
+        {/* Create Recipe Button */}
+        {isMyRecipes && (
+          <div className="flex justify-center">
+            <CreateRecipeModal onRecipeCreated={refreshRecipes} />
+          </div>
+        )}
 
         {/* Quick Stats */}
         <div className="flex justify-center gap-6 text-sm text-gray-600">

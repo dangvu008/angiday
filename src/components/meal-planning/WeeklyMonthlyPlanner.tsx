@@ -17,7 +17,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { toast } from 'sonner';
 import { WeekPlan, DayPlan, DayPlanTemplate, CalculationResult } from '@/types/meal-planning';
 import { mealPlanningService } from '@/services/meal-planning.service';
@@ -284,10 +284,15 @@ const WeeklyMonthlyPlanner: React.FC<WeeklyMonthlyPlannerProps> = ({
         <DialogContent className="max-w-[95vw] max-h-[95vh] flex flex-col">
           <DialogHeader>
             <div className="flex items-center justify-between">
-              <DialogTitle className="text-2xl">
-                Kế hoạch {viewMode === 'week' ? 'tuần' : 'tháng'}
-              </DialogTitle>
-              
+              <div>
+                <DialogTitle className="text-2xl">
+                  Kế hoạch {viewMode === 'week' ? 'tuần' : 'tháng'}
+                </DialogTitle>
+                <DialogDescription>
+                  Lập kế hoạch bữa ăn cho {viewMode === 'week' ? 'tuần' : 'tháng'} với drag & drop
+                </DialogDescription>
+              </div>
+
               <div className="flex items-center gap-2">
                 <Tabs value={viewMode} onValueChange={(value) => setViewMode(value as any)}>
                   <TabsList>

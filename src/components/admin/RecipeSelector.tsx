@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -227,6 +227,9 @@ const RecipeSelector = ({
             <ChefHat className="h-5 w-5" />
             {title}
           </DialogTitle>
+          <DialogDescription>
+            Chọn công thức từ danh sách có sẵn
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">

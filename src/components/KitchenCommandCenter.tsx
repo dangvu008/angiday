@@ -86,15 +86,17 @@ const KitchenCommandCenter: React.FC = () => {
     });
   };
 
-  const completedMeals = todayMeals.filter(meal => meal.completed).length;
-  const totalMeals = todayMeals.filter(meal => meal.recipe).length;
+  // Safe access to todayMeals data
+  const mealsArray = todayMeals?.meals ? Object.values(todayMeals.meals).filter(Boolean) : [];
+  const completedMeals = mealsArray.filter(meal => meal?.completed).length;
+  const totalMeals = mealsArray.filter(meal => meal?.recipe).length;
   const progressPercentage = totalMeals > 0 ? (completedMeals / totalMeals) * 100 : 0;
-  
+
   const today = new Date().toISOString().split('T')[0];
 
   // Group meals by type for display
   const mealSlots = ['breakfast', 'lunch', 'dinner'].map(type => {
-    const meal = todayMeals.find(m => m.mealType === type);
+    const meal = todayMeals?.meals?.[type as keyof typeof todayMeals.meals];
     return {
       id: meal?.id || `empty_${type}`,
       type,
@@ -332,7 +334,7 @@ const KitchenCommandCenter: React.FC = () => {
                 <AlertCircle className="h-5 w-5 text-amber-600" />
                 <div>
                   <h3 className="font-medium">Nguyên liệu sắp hết hạn</h3>
-                  <p className="text-sm text-gray-600">{expiringItems.length} món cần sử dụng sớm</p>
+                  <p className="text-sm text-gray-600">{expiringItems?.length || 0} món cần sử dụng sớm</p>
                 </div>
               </div>
               <Button variant="outline" size="sm">

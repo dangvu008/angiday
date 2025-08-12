@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { toast } from 'sonner';
 import { MealTemplate, DayPlanTemplate, CalculationResult } from '@/types/meal-planning';
 import { templateLibraryService } from '@/services/template-library.service';
@@ -237,6 +237,9 @@ const DayPlanComposer: React.FC<DayPlanComposerProps> = ({
             <DialogTitle className="text-2xl">
               {template ? 'Chỉnh sửa thực đơn ngày' : 'Tạo thực đơn ngày mới'}
             </DialogTitle>
+            <DialogDescription>
+              {template ? 'Chỉnh sửa template thực đơn ngày hiện tại' : 'Tạo template thực đơn ngày mới với drag & drop'}
+            </DialogDescription>
           </DialogHeader>
 
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">

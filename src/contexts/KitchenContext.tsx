@@ -111,10 +111,11 @@ export const KitchenProvider: React.FC<KitchenProviderProps> = ({ children }) =>
   const [dailyShoppingStatus, setDailyShoppingStatus] = useState<DailyMenuShoppingStatus | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Initialize sample data
+  // Initialize sample data (temporarily disabled for debugging)
   useEffect(() => {
     if (isAuthenticated && user) {
-      initializeSampleData();
+      console.log('⚠️ Sample data initialization disabled for debugging');
+      // initializeSampleData();
     }
   }, [isAuthenticated, user]);
 
@@ -202,31 +203,35 @@ export const KitchenProvider: React.FC<KitchenProviderProps> = ({ children }) =>
           endDate: nextWeek.toISOString().split('T')[0]
         });
         
-        // Add sample meals for today using Vietnamese recipes
+        // Add sample meals for today using existing recipes
         const todayStr = today.toISOString().split('T')[0];
-        await kitchenService.createMeal({
-          mealPlanId: samplePlan.id,
-          mealDate: todayStr,
-          mealType: 'breakfast',
-          recipeId: 'vn_001', // Canh Chua Cá Lóc
-          completed: false
-        });
+        const availableRecipes = await kitchenService.getRecipes();
 
-        await kitchenService.createMeal({
-          mealPlanId: samplePlan.id,
-          mealDate: todayStr,
-          mealType: 'lunch',
-          recipeId: 'vn_002', // Thịt Kho Tàu
-          completed: false
-        });
+        if (availableRecipes.length >= 3) {
+          await kitchenService.createMeal({
+            mealPlanId: samplePlan.id,
+            mealDate: todayStr,
+            mealType: 'breakfast',
+            recipeId: availableRecipes[0].id,
+            completed: false
+          });
 
-        await kitchenService.createMeal({
-          mealPlanId: samplePlan.id,
-          mealDate: todayStr,
-          mealType: 'dinner',
-          recipeId: 'vn_003', // Cá Kho Tộ
-          completed: false
-        });
+          await kitchenService.createMeal({
+            mealPlanId: samplePlan.id,
+            mealDate: todayStr,
+            mealType: 'lunch',
+            recipeId: availableRecipes[1].id,
+            completed: false
+          });
+
+          await kitchenService.createMeal({
+            mealPlanId: samplePlan.id,
+            mealDate: todayStr,
+            mealType: 'dinner',
+            recipeId: availableRecipes[2].id,
+            completed: false
+          });
+        }
         
         setActiveMealPlan(samplePlan);
       } else {

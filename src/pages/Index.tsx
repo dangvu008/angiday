@@ -6,7 +6,7 @@ import PopularRecipes from '@/components/PopularRecipes';
 import EasyDinnerRecipes from '@/components/EasyDinnerRecipes';
 import FeatureShowcase from '@/components/FeatureShowcase';
 import FeaturedMealPackages from '@/components/FeaturedMealPackages';
-import TodayMenuDisplay from '@/components/TodayMenuDisplay';
+import TodayMealPlanWidget from '@/components/dashboard/TodayMealPlanWidget';
 import ShoppingStatusManager from '@/components/ShoppingStatusManager';
 import UnifiedShoppingListModal from '@/components/UnifiedShoppingListModal';
 import WelcomeGuide from '@/components/WelcomeGuide';
@@ -97,24 +97,11 @@ const Index = () => {
         </div>
       )}
 
-      {/* Today's Menu Section - Only show for authenticated users */}
+      {/* Today's Meal Plan Widget - Only show for authenticated users */}
       {isAuthenticated && (
-        <section className="py-12 bg-gray-50">
+        <section className="py-12 bg-gradient-to-br from-orange-50 to-green-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              {/* Today's Menu Display - Takes 2 columns */}
-              <div className="lg:col-span-2">
-                <TodayMenuDisplay />
-              </div>
-
-              {/* Shopping Status Manager - Takes 1 column */}
-              <div>
-                <ShoppingStatusManager
-                  onGoShopping={handleGoShopping}
-                  onStartCooking={handleStartCooking}
-                />
-              </div>
-            </div>
+            <TodayMealPlanWidget />
           </div>
         </section>
       )}

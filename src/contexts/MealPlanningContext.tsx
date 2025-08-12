@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
+import { kitchenService } from '@/services/kitchenService';
+import { SupabaseAdapter } from '@/services/adapters/SupabaseAdapter';
 
 export interface Recipe {
   id: string;
@@ -396,9 +398,58 @@ export const MealPlanningProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const [currentPlan, setCurrentPlan] = useState<MealPlan | null>(null);
   const [activePlan, setActivePlanState] = useState<MealPlan | null>(null);
   const [userMealPlans, setUserMealPlans] = useState<MealPlan[]>([]);
+  const [availableRecipes, setAvailableRecipes] = useState<Recipe[]>(mockRecipes);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [viewMode, setViewMode] = useState<'week' | 'month'>('week');
   const [isLoading, setIsLoading] = useState(false);
+
+  // Initialize Supabase adapter (with error handling)
+  const [supabaseAdapter, setSupabaseAdapter] = useState<SupabaseAdapter | null>(null);
+
+  useEffect(() => {
+    // Temporarily disable Supabase for debugging
+    console.log('⚠️ SupabaseAdapter disabled for debugging - using localStorage only');
+    // try {
+    //   const adapter = new SupabaseAdapter();
+    //   setSupabaseAdapter(adapter);
+    //   console.log('✅ SupabaseAdapter initialized successfully');
+    // } catch (error) {
+    //   console.error('❌ Failed to initialize SupabaseAdapter:', error);
+    //   console.log('⚠️ Will use localStorage fallback only');
+    // }
+  }, []);
+
+  // Load recipes from kitchenService
+  useEffect(() => {
+    const loadRecipes = async () => {
+      try {
+        const recipes = await kitchenService.getRecipes();
+        if (recipes && recipes.length > 0) {
+          setAvailableRecipes(recipes);
+          console.log('✅ Loaded recipes from database:', recipes.length);
+        } else {
+          console.log('⚠️ No recipes found in database, using mock data');
+        }
+      } catch (error) {
+        console.error('❌ Error loading recipes:', error);
+        console.log('🔄 Using mock recipes as fallback');
+      }
+    };
+
+    loadRecipes();
+  }, []);
+
+  // Debug logging for state changes
+  useEffect(() => {
+    console.log('🔄 MealPlanningContext state changed:', {
+      hasActivePlan: !!activePlan,
+      activePlanId: activePlan?.id,
+      userMealPlansCount: userMealPlans.length,
+      availableRecipesCount: availableRecipes.length,
+      isAuthenticated,
+      userId: user?.id
+    });
+  }, [activePlan, userMealPlans, availableRecipes, isAuthenticated, user]);
 
   // Function to set active plan with localStorage persistence
   const setActivePlan = (plan: MealPlan | null) => {
@@ -413,26 +464,31 @@ export const MealPlanningProvider: React.FC<{ children: React.ReactNode }> = ({ 
   // Load user's meal plans from localStorage
   useEffect(() => {
     if (isAuthenticated && user) {
+      console.log('🔄 Loading meal plans for user:', user.id);
       const savedPlans = localStorage.getItem(`meal_plans_${user.id}`);
       const savedActivePlanId = localStorage.getItem(`active_plan_${user.id}`);
 
       if (savedPlans) {
         const plans = JSON.parse(savedPlans);
+        console.log('📋 Found saved plans:', plans.length);
         setUserMealPlans(plans);
 
         // Set active plan from saved ID
         if (savedActivePlanId) {
           const activePlan = plans.find((p: MealPlan) => p.id === savedActivePlanId);
           if (activePlan) {
+            console.log('✅ Setting saved active plan:', activePlan.name);
             setActivePlanState(activePlan);
           } else {
             // If saved active plan not found, set first plan as active
             if (plans.length > 0) {
+              console.log('⚠️ Saved active plan not found, using first plan:', plans[0].name);
               setActivePlan(plans[0]);
             }
           }
         } else if (plans.length > 0) {
           // No saved active plan, set first as active
+          console.log('📌 No saved active plan, using first plan:', plans[0].name);
           setActivePlan(plans[0]);
         }
 
@@ -442,10 +498,12 @@ export const MealPlanningProvider: React.FC<{ children: React.ReactNode }> = ({ 
         }
       } else {
         // Create sample meal plans for new users
+        console.log('🆕 Creating sample meal plans for new user');
         const samplePlans = createSampleMealPlans(user.id);
         setUserMealPlans(samplePlans);
         localStorage.setItem(`meal_plans_${user.id}`, JSON.stringify(samplePlans));
         if (samplePlans.length > 0) {
+          console.log('✅ Setting sample plan as active:', samplePlans[0].name);
           setCurrentPlan(samplePlans[0]);
           setActivePlan(samplePlans[0]); // Set first plan as active
         }
@@ -469,19 +527,69 @@ export const MealPlanningProvider: React.FC<{ children: React.ReactNode }> = ({ 
     return newPlan;
   };
 
-  const saveMealPlan = (plan: MealPlan) => {
-    if (!user) return;
-    
+  const saveMealPlan = async (plan: MealPlan) => {
+    if (!user) {
+      console.error('❌ No user found, cannot save meal plan');
+      return;
+    }
+
+    console.log('💾 Saving meal plan:', { planId: plan.id, userId: user.id, mealsCount: plan.meals.length });
+
     const updatedPlan = { ...plan, updatedAt: new Date().toISOString() };
+
+    // Try to save to database if adapter is available
+    if (supabaseAdapter) {
+      try {
+        // Check if plan exists in database
+        const existingPlan = await supabaseAdapter.getMealPlan(plan.id);
+
+        let savedPlan: MealPlan;
+        if (existingPlan) {
+          console.log('🔄 Updating existing plan in database');
+          savedPlan = await supabaseAdapter.updateMealPlan(plan.id, updatedPlan);
+        } else {
+          console.log('➕ Creating new plan in database');
+          // For new plans, we need to exclude the id and let database generate it
+          const { id, ...planWithoutId } = updatedPlan;
+          savedPlan = await supabaseAdapter.createMealPlan({
+            ...planWithoutId,
+            userId: user.id
+          });
+        }
+
+        // Update local state with database result
+        const updatedPlans = userMealPlans.filter(p => p.id !== plan.id);
+        updatedPlans.push(savedPlan);
+        setUserMealPlans(updatedPlans);
+
+        // Also save to localStorage as backup
+        localStorage.setItem(`meal_plans_${user.id}`, JSON.stringify(updatedPlans));
+
+        if (currentPlan?.id === plan.id) {
+          setCurrentPlan(savedPlan);
+        }
+
+        console.log('✅ Meal plan saved to database successfully:', savedPlan.id);
+        return;
+
+      } catch (error) {
+        console.error('❌ Error saving meal plan to database:', error);
+        console.log('⚠️ Falling back to localStorage only');
+      }
+    }
+
+    // Fallback to localStorage only (or if no supabase adapter)
     const updatedPlans = userMealPlans.filter(p => p.id !== plan.id);
     updatedPlans.push(updatedPlan);
-    
+
     setUserMealPlans(updatedPlans);
     localStorage.setItem(`meal_plans_${user.id}`, JSON.stringify(updatedPlans));
-    
+
     if (currentPlan?.id === plan.id) {
       setCurrentPlan(updatedPlan);
     }
+
+    console.log('✅ Meal plan saved to localStorage:', updatedPlan.id);
   };
 
   const deleteMealPlan = (planId: string) => {
@@ -497,9 +605,14 @@ export const MealPlanningProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }
   };
 
-  const addMealToSlot = (planId: string, date: string, mealType: string, recipe: Recipe) => {
+  const addMealToSlot = async (planId: string, date: string, mealType: string, recipe: Recipe) => {
+    console.log('🏪 MealPlanningContext.addMealToSlot:', { planId, date, mealType, recipeTitle: recipe.title });
+
     const plan = userMealPlans.find(p => p.id === planId);
-    if (!plan) return;
+    if (!plan) {
+      console.error('❌ Plan not found:', planId, 'Available plans:', userMealPlans.map(p => p.id));
+      return;
+    }
 
     const existingMealIndex = plan.meals.findIndex(
       m => m.date === date && m.mealType === mealType
@@ -512,13 +625,38 @@ export const MealPlanningProvider: React.FC<{ children: React.ReactNode }> = ({ 
       recipe
     };
 
+    console.log('📝 Creating meal slot:', { newMeal, existingMealIndex });
+
+    // Try to save meal to database if adapter is available
+    if (supabaseAdapter && user) {
+      try {
+        console.log('💾 Saving meal to database...');
+        const savedMeal = await supabaseAdapter.createMeal({
+          mealPlanId: planId,
+          date: date,
+          mealType: mealType as MealSlot['mealType'],
+          recipeId: recipe.id,
+          recipe: recipe
+        });
+        console.log('✅ Meal saved to database:', savedMeal.id);
+
+        // Use the saved meal with database-generated ID
+        newMeal.id = savedMeal.id;
+      } catch (error) {
+        console.error('⚠️ Error saving meal to database, continuing with local storage:', error);
+      }
+    }
+
     if (existingMealIndex >= 0) {
+      console.log('🔄 Replacing existing meal');
       plan.meals[existingMealIndex] = newMeal;
     } else {
+      console.log('➕ Adding new meal');
       plan.meals.push(newMeal);
     }
 
-    saveMealPlan(plan);
+    console.log('💾 Saving plan with meals:', plan.meals.length);
+    await saveMealPlan(plan);
   };
 
   // New function to add multiple dishes to a meal
@@ -622,7 +760,7 @@ export const MealPlanningProvider: React.FC<{ children: React.ReactNode }> = ({ 
     activePlan,
     setActivePlan,
     userMealPlans,
-    availableRecipes: mockRecipes,
+    availableRecipes,
     currentDate,
     setCurrentDate,
     viewMode,

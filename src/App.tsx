@@ -28,16 +28,18 @@ import KitchenCommandCenter from "./components/KitchenCommandCenter";
 import RecipeLibraryPage from "./pages/RecipeLibraryPage";
 import MyRecipesPageNew from "./pages/MyRecipesPageNew";
 import MealPlansPage from "./pages/MealPlansPage";
+import DashboardPage from "./pages/DashboardPage";
 import DatabaseTester from "./components/DatabaseTester";
 import SimpleDbTester from "./components/SimpleDbTester";
 import ConnectionDiagnosticPage from "./pages/ConnectionDiagnosticPage";
+import CookingMode from "./components/cooking/CookingMode";
+import CookingModeDemo from "./components/cooking/CookingModeDemo";
+import MealPlanManager from "./components/meal-planning/MealPlanManager";
+import DebugMealPlanning from "./debug-meal-planning";
 import ConnectionTestPage from "./pages/ConnectionTestPage";
 import SupabaseTestPage from "./pages/SupabaseTestPage";
 import AutoDataInitializer from "./components/AutoDataInitializer";
 import ConnectionStatusIndicator from "./components/ConnectionStatusIndicator";
-import CookingMode from "./components/cooking/CookingMode";
-import CookingModeDemo from "./components/cooking/CookingModeDemo";
-import MealPlanManager from "./components/meal-planning/MealPlanManager";
 
 // Error Boundary Component
 class ErrorBoundary extends React.Component<{children: React.ReactNode}, {hasError: boolean, error: Error | null}> {
@@ -156,6 +158,9 @@ const App = () => {
                           <Route path="/register" element={<RegisterPage />} />
                           <Route path="/profile" element={<ProfilePage />} />
 
+                          {/* Dashboard */}
+                          <Route path="/dashboard" element={<DashboardPage />} />
+
                   {/* Blog */}
                   <Route path="/blog" element={<BlogPage />} />
                   <Route path="/blog/:id" element={<BlogDetailPage />} />
@@ -174,10 +179,11 @@ const App = () => {
                   <Route path="/daily-menu" element={<Navigate to="/meal-plans" replace />} />
                   <Route path="/meal-plans" element={<MealPlansPage />} />
                   <Route path="/thuc-don" element={<Navigate to="/meal-plans" replace />} />
-                  {/* Cooking routes - commented out until components exist */}
-                  {/* <Route path="/cooking-mode" element={<CookingMode />} /> */}
-                  {/* <Route path="/cooking-demo" element={<CookingModeDemo />} /> */}
-                  {/* <Route path="/meal-planning" element={<MealPlanManager />} /> */}
+
+                  {/* Cooking routes */}
+                  <Route path="/cooking-mode" element={<CookingMode />} />
+                  <Route path="/cooking-demo" element={<CookingModeDemo />} />
+                  <Route path="/meal-planning" element={<MealPlanManager />} />
                   <Route path="/database-tester" element={<DatabaseTester />} />
                   <Route path="/connection-diagnostic" element={<ConnectionDiagnosticPage />} />
                   <Route path="/connection-test" element={<ConnectionTestPage />} />
@@ -187,8 +193,8 @@ const App = () => {
                   {/* Test */}
                   <Route path="/test" element={<TestPage />} />
 
-                  {/* Debug page - commented out until component exists */}
-                  {/* <Route path="/debug" element={<TestHomePage />} /> */}
+                  {/* Debug page */}
+                  <Route path="/debug" element={<DebugMealPlanning />} />
 
                           {/* 404 Page */}
                           <Route path="*" element={<NotFound />} />
