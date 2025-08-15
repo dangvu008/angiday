@@ -5,6 +5,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { MealPlanningProvider } from "@/contexts/MealPlanningContext";
 import { KitchenProvider } from "@/contexts/KitchenContext";
 import { CookingModeProvider } from "@/contexts/CookingModeContext";
+import { ShoppingCartProvider } from "@/contexts/ShoppingCartContext";
 
 // Import cơ bản trước
 import { Toaster } from "@/components/ui/toaster";
@@ -43,6 +44,7 @@ import AutoDataInitializer from "./components/AutoDataInitializer";
 import ConnectionStatusIndicator from "./components/ConnectionStatusIndicator";
 import MobileCookingMode from "./components/cooking/MobileCookingMode";
 import AllInOneCookingMode from "./components/cooking/AllInOneCookingMode";
+import ShoppingCartDemoPage from "./pages/ShoppingCartDemoPage";
 
 // Error Boundary Component
 class ErrorBoundary extends React.Component<{children: React.ReactNode}, {hasError: boolean, error: Error | null}> {
@@ -147,7 +149,8 @@ const App = () => {
               <MealPlanningProvider>
                 <KitchenProvider>
                   <CookingModeProvider>
-                    <TooltipProvider>
+                    <ShoppingCartProvider>
+                      <TooltipProvider>
                       <Toaster />
                       <Sonner />
                       <ConnectionStatusIndicator position="top-right" autoHide={true} />
@@ -198,6 +201,7 @@ const App = () => {
 
                   {/* Test */}
                   <Route path="/test" element={<TestPage />} />
+                  <Route path="/shopping-cart-demo" element={<ShoppingCartDemoPage />} />
 
                   {/* Debug page */}
                   <Route path="/meal-planner-test" element={<ImprovedMealPlannerPage />} />
@@ -207,7 +211,8 @@ const App = () => {
                           <Route path="*" element={<NotFound />} />
                         </Routes>
                       </BrowserRouter>
-                    </TooltipProvider>
+                      </TooltipProvider>
+                    </ShoppingCartProvider>
                   </CookingModeProvider>
                 </KitchenProvider>
               </MealPlanningProvider>
