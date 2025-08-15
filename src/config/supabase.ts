@@ -1,10 +1,28 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
+// Debug environment variables
+console.log('=== Supabase Config Debug ===');
+console.log('VITE_SUPABASE_URL:', import.meta.env.VITE_SUPABASE_URL);
+console.log('VITE_SUPABASE_ANON_KEY:', import.meta.env.VITE_SUPABASE_ANON_KEY);
+console.log('All env vars:', import.meta.env);
+console.log('=== End Debug ===');
+
 // Environment validation
 const validateEnvironment = () => {
+  // Use process.env for Node.js environment, import.meta.env for browser
+  const getEnvVar = (key: string) => {
+    if (typeof process !== 'undefined' && process.env) {
+      return process.env[key];
+    }
+    if (typeof import.meta !== 'undefined' && import.meta.env) {
+      return import.meta.env[key];
+    }
+    return undefined;
+  };
+
   const requiredVars = {
-    VITE_SUPABASE_URL: import.meta.env.VITE_SUPABASE_URL,
-    VITE_SUPABASE_ANON_KEY: import.meta.env.VITE_SUPABASE_ANON_KEY,
+    VITE_SUPABASE_URL: getEnvVar('VITE_SUPABASE_URL'),
+    VITE_SUPABASE_ANON_KEY: getEnvVar('VITE_SUPABASE_ANON_KEY'),
   };
 
   const missing = Object.entries(requiredVars)
@@ -66,7 +84,12 @@ class SupabaseConfig {
   private isInitialized = false;
 
   constructor() {
-    const encryptionKey = import.meta.env.VITE_ENCRYPTION_KEY || 'default-key';
+    // Use process.env for Node.js environment, import.meta.env for browser
+    const encryptionKey = (typeof process !== 'undefined' && process.env)
+      ? process.env.VITE_ENCRYPTION_KEY || 'default-key'
+      : (typeof import.meta !== 'undefined' && import.meta.env)
+        ? import.meta.env.VITE_ENCRYPTION_KEY || 'default-key'
+        : 'default-key';
     this.encryption = new SimpleEncryption(encryptionKey);
   }
 
@@ -95,6 +118,13 @@ class SupabaseConfig {
           global: {
             headers: {
               'X-Client-Info': 'kitchen-command-center',
+              'X-Requested-With': 'XMLHttpRequest',
+              'Origin': window.location.origin,
+            },
+          },
+          realtime: {
+            params: {
+              eventsPerSecond: 10,
             },
           },
         }
@@ -144,10 +174,13 @@ class SupabaseConfig {
 
         if (testError && testError.message?.includes('relation "public.recipes" does not exist')) {
           details.basicConnection = true; // Connection works, table just doesn't exist yet
-          console.log('✅ Basic Supabase connection successful (recipes table not found is expected)');
+          console.log('✅ Basic Supabase connection successful (recipes table not found - please run schema setup)');
         } else if (testError && testError.message?.includes('schema cache')) {
           details.basicConnection = true; // Connection works, schema cache issue is normal
           console.log('✅ Basic Supabase connection successful (schema cache issue is normal)');
+        } else if (testError && testError.code === 'PGRST116') {
+          details.basicConnection = true; // Connection works, just no data
+          console.log('✅ Basic Supabase connection successful (table exists but empty)');
         } else if (testError) {
           details.error = `Basic connection failed: ${testError.message}`;
           console.error('❌ Basic Supabase connection failed:', testError.message);

@@ -364,11 +364,20 @@ export const KitchenProvider: React.FC<KitchenProviderProps> = ({ children }) =>
   const refreshTodayMenuStatus = async () => {
     if (!user) return;
     try {
+      console.log('🔄 KitchenContext: Refreshing today menu status for user:', user.id);
       const status = await kitchenService.getTodayMenuStatus(user.id);
+      console.log('✅ KitchenContext: Got today menu status:', status);
       setTodayMenuStatus(status);
       setDailyShoppingStatus(status.shoppingStatus || null);
     } catch (error) {
-      console.error('Error refreshing today menu status:', error);
+      console.error('❌ KitchenContext: Error refreshing today menu status:', error);
+      // Set fallback status to prevent UI errors
+      setTodayMenuStatus({
+        hasMenu: false,
+        currentMealTime: 'breakfast',
+        nextAction: 'create_menu'
+      });
+      setDailyShoppingStatus(null);
     }
   };
 
@@ -582,7 +591,11 @@ export const KitchenProvider: React.FC<KitchenProviderProps> = ({ children }) =>
       };
     } catch (error) {
       console.error('Error creating today shopping list:', error);
-      throw error;
+      // Return fallback data instead of throwing
+      return {
+        statusId: 'fallback',
+        itemCount: 0
+      };
     }
   };
 

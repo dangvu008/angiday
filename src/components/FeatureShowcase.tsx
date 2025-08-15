@@ -137,12 +137,12 @@ const FeatureShowcase: React.FC = () => {
                     </div>
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
-                        <input type="checkbox" className="rounded" />
+                        <input type="checkbox" className="rounded" readOnly />
                         <span className="text-sm">500g thịt ba chỉ</span>
                         <span className="text-xs text-gray-500 ml-auto">~80.000đ</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <input type="checkbox" checked className="rounded" />
+                        <input type="checkbox" defaultChecked className="rounded" readOnly />
                         <span className="text-sm line-through text-gray-500">300g cá thu</span>
                         <span className="text-xs text-gray-400 ml-auto">~60.000đ</span>
                       </div>
@@ -156,12 +156,12 @@ const FeatureShowcase: React.FC = () => {
                     </div>
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
-                        <input type="checkbox" className="rounded" />
+                        <input type="checkbox" className="rounded" readOnly />
                         <span className="text-sm">1 bó rau muống</span>
                         <span className="text-xs text-gray-500 ml-auto">~8.000đ</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <input type="checkbox" className="rounded" />
+                        <input type="checkbox" className="rounded" readOnly />
                         <span className="text-sm">2 quả cà chua</span>
                         <span className="text-xs text-gray-500 ml-auto">~12.000đ</span>
                       </div>

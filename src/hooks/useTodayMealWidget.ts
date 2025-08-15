@@ -17,7 +17,8 @@ export const useTodayMealWidget = () => {
     createNewPlan,
     saveMealPlan,
     addMealToSlot,
-    removeMealFromSlot,
+    removeMealFromSlot: removeMealFromSlotContext,
+    removeDishFromMeal,
     generateActiveShoppingList,
     userMealPlans
   } = useMealPlanning();
@@ -83,9 +84,9 @@ export const useTodayMealWidget = () => {
   }, []);
 
   // Helper function to convert Recipe to MealItem
-  const convertRecipeToMealItem = useCallback((recipe: any): any => {
+  const convertRecipeToMealItem = useCallback((recipe: any, mealId?: string): any => {
     return {
-      id: recipe.id,
+      id: mealId || recipe.id, // Use mealId if provided, otherwise fallback to recipe.id
       name: recipe.title,
       image: recipe.image,
       thumbnail: recipe.image, // Use same image as thumbnail for now
@@ -138,8 +139,17 @@ export const useTodayMealWidget = () => {
     // Populate meals from activePlan
     todayMeals.forEach(meal => {
       if (meal.recipe && mealSlots[meal.mealType]) {
-        const mealItem = convertRecipeToMealItem(meal.recipe);
+        // Pass the actual meal ID from activePlan, not the recipe ID
+        const mealItem = convertRecipeToMealItem(meal.recipe, meal.id);
         mealSlots[meal.mealType].meals.push(mealItem);
+
+        // Debug: Log the meal conversion
+        console.log('🔄 Converting meal:', {
+          originalMealId: meal.id,
+          recipeId: meal.recipe.id,
+          convertedMealItemId: mealItem.id,
+          mealType: meal.mealType
+        });
       }
     });
 
@@ -326,19 +336,60 @@ export const useTodayMealWidget = () => {
     },
 
     removeMealFromSlot: async (mealType: string, mealId?: string) => {
-      if (!activePlan) return;
+      console.log('🗑️ useTodayMealWidget.removeMealFromSlot called:', { mealType, mealId });
 
-      const today = new Date().toISOString().split('T')[0];
+      if (!activePlan) {
+        console.error('❌ No active plan found for removing meal');
+        return;
+      }
 
-      if (mealId) {
-        // Remove specific meal - since context only supports one recipe per slot,
-        // we'll remove the entire slot for now
-        // TODO: Enhance context to support multiple recipes per slot
-        console.log(`Removing specific meal ${mealId} from ${mealType}`);
-        removeMealFromSlot(activePlan.id, today, mealType);
-      } else {
-        // Remove entire meal slot
-        removeMealFromSlot(activePlan.id, today, mealType);
+      console.log('🔍 DEBUG - useTodayMealWidget.removeMealFromSlot:');
+      console.log('- activePlan.id:', activePlan.id);
+      console.log('- activePlan meals count:', activePlan.meals.length);
+      console.log('- mealType:', mealType);
+      console.log('- mealId:', mealId);
+      console.log('- typeof mealId:', typeof mealId);
+
+      try {
+        const today = new Date().toISOString().split('T')[0];
+        console.log('- today date:', today);
+
+        // Kiểm tra meals hiện tại trong activePlan
+        const todayMeals = activePlan.meals.filter(m => m.date === today);
+        console.log('- Today meals in activePlan:', todayMeals.map(m => ({
+          id: m.id,
+          mealType: m.mealType,
+          recipeTitle: m.recipe?.title
+        })));
+
+        if (mealId) {
+          // Remove specific meal using the new removeDishFromMeal function
+          console.log(`🗑️ Removing specific meal ${mealId} from ${mealType}`);
+
+          // Kiểm tra xem meal có tồn tại không
+          const mealExists = activePlan.meals.find(m => m.id === mealId);
+          console.log('- Meal exists in activePlan:', !!mealExists);
+          if (mealExists) {
+            console.log('- Meal details:', {
+              id: mealExists.id,
+              mealType: mealExists.mealType,
+              date: mealExists.date,
+              recipeTitle: mealExists.recipe?.title
+            });
+          }
+
+          removeDishFromMeal(activePlan.id, mealId);
+          console.log(`✅ Successfully removed meal ${mealId}`);
+        } else {
+          // Remove entire meal slot
+          console.log(`🗑️ Removing entire meal slot ${mealType}`);
+          removeMealFromSlotContext(activePlan.id, today, mealType);
+          console.log(`✅ Successfully removed meal slot ${mealType}`);
+        }
+      } catch (error) {
+        console.error('❌ Error removing meal:', error);
+        console.error('Error details:', error);
+        throw error;
       }
     },
 
@@ -384,7 +435,8 @@ export const useTodayMealWidget = () => {
     saveMealPlan,
     availableRecipes,
     addMealToSlot,
-    removeMealFromSlot,
+    removeMealFromSlotContext,
+    removeDishFromMeal,
     generateActiveShoppingList
   ]);
 

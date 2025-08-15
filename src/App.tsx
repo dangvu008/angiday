@@ -35,11 +35,14 @@ import ConnectionDiagnosticPage from "./pages/ConnectionDiagnosticPage";
 import CookingMode from "./components/cooking/CookingMode";
 import CookingModeDemo from "./components/cooking/CookingModeDemo";
 import MealPlanManager from "./components/meal-planning/MealPlanManager";
-import DebugMealPlanning from "./debug-meal-planning";
+import ImprovedMealPlannerPage from "./components/meal-planning/ImprovedMealPlannerPage";
+import EnhancedMealPlannerMain from "./components/meal-planning/EnhancedMealPlannerMain";
 import ConnectionTestPage from "./pages/ConnectionTestPage";
 import SupabaseTestPage from "./pages/SupabaseTestPage";
 import AutoDataInitializer from "./components/AutoDataInitializer";
 import ConnectionStatusIndicator from "./components/ConnectionStatusIndicator";
+import MobileCookingMode from "./components/cooking/MobileCookingMode";
+import AllInOneCookingMode from "./components/cooking/AllInOneCookingMode";
 
 // Error Boundary Component
 class ErrorBoundary extends React.Component<{children: React.ReactNode}, {hasError: boolean, error: Error | null}> {
@@ -182,7 +185,10 @@ const App = () => {
 
                   {/* Cooking routes */}
                   <Route path="/cooking-mode" element={<CookingMode />} />
+                  <Route path="/mobile-cooking" element={<MobileCookingMode />} />
+                  <Route path="/all-in-one-cooking" element={<AllInOneCookingMode />} />
                   <Route path="/cooking-demo" element={<CookingModeDemo />} />
+
                   <Route path="/meal-planning" element={<MealPlanManager />} />
                   <Route path="/database-tester" element={<DatabaseTester />} />
                   <Route path="/connection-diagnostic" element={<ConnectionDiagnosticPage />} />
@@ -194,7 +200,8 @@ const App = () => {
                   <Route path="/test" element={<TestPage />} />
 
                   {/* Debug page */}
-                  <Route path="/debug" element={<DebugMealPlanning />} />
+                  <Route path="/meal-planner-test" element={<ImprovedMealPlannerPage />} />
+                  <Route path="/enhanced-planner" element={<EnhancedMealPlannerMain />} />
 
                           {/* 404 Page */}
                           <Route path="*" element={<NotFound />} />

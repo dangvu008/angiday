@@ -1,5 +1,6 @@
-import { DatabaseAdapter, LocalStorageAdapter } from '../kitchenService';
+import { DatabaseAdapter } from '../interfaces/DatabaseAdapter';
 import { SupabaseAdapter } from './SupabaseAdapter';
+import { LocalStorageAdapter } from './LocalStorageAdapter';
 
 export type AdapterType = 'localStorage' | 'supabase' | 'firebase' | 'pocketbase';
 
@@ -39,7 +40,12 @@ export class AdapterFactory {
   }
 
   static getAdapterFromEnv(): DatabaseAdapter {
-    const adapterType = (import.meta.env.VITE_DATABASE_ADAPTER || 'localStorage') as AdapterType;
+    // Use process.env for Node.js environment, import.meta.env for browser
+    const adapterType = ((typeof process !== 'undefined' && process.env)
+      ? process.env.VITE_DATABASE_ADAPTER || 'localStorage'
+      : (typeof import.meta !== 'undefined' && import.meta.env)
+        ? import.meta.env.VITE_DATABASE_ADAPTER || 'localStorage'
+        : 'localStorage') as AdapterType;
     return this.createAdapter(adapterType);
   }
 }

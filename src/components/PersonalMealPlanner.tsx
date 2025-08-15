@@ -11,6 +11,8 @@ import ShoppingListModal from '@/components/ShoppingListModal';
 import MealPlanTemplates from '@/components/MealPlanTemplates';
 import UserPreferencesModal from '@/components/UserPreferencesModal';
 import AIPlanPreview from '@/components/AIPlanPreview';
+import CookingModeButton from '@/components/cooking/CookingModeButton';
+import ShoppingListButton from '@/components/shopping/ShoppingListButton';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -53,6 +55,7 @@ const PersonalMealPlanner: React.FC = () => {
     deleteMealPlan,
     addMealToSlot,
     removeMealFromSlot,
+    removeDishFromMeal,
     generateShoppingList
   } = useMealPlanning();
 
@@ -110,9 +113,20 @@ const PersonalMealPlanner: React.FC = () => {
   // Handle removing meal
   const handleRemoveMeal = (date: string, mealType: string) => {
     if (!currentPlan) return;
-    
+
     removeMealFromSlot(currentPlan.id, date, mealType);
     toast.success('Đã xóa món ăn khỏi kế hoạch');
+  };
+
+  // Handle removing individual dish
+  const handleRemoveDish = (mealSlotId: string) => {
+    if (!currentPlan) return;
+
+    console.log('🗑️ Removing dish with ID:', mealSlotId);
+    console.log('📋 Current plan meals before removal:', currentPlan.meals.map(m => ({ id: m.id, recipe: m.recipe?.title })));
+
+    removeDishFromMeal(currentPlan.id, mealSlotId);
+    toast.success('Đã xóa món ăn');
   };
 
   // Handle viewing recipe details
@@ -420,17 +434,58 @@ const PersonalMealPlanner: React.FC = () => {
                         Thống kê
                       </CardTitle>
                     </CardHeader>
-                    <CardContent className="space-y-3">
-                      <div className="flex justify-between">
-                        <span className="text-sm text-gray-600">Tổng bữa ăn:</span>
-                        <Badge variant="secondary">{currentPlan.meals.length}</Badge>
+                    <CardContent className="space-y-4">
+                      <div className="space-y-3">
+                        <div className="flex justify-between">
+                          <span className="text-sm text-gray-600">Tổng bữa ăn:</span>
+                          <Badge variant="secondary">{currentPlan.meals.length}</Badge>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-sm text-gray-600">Công thức khác nhau:</span>
+                          <Badge variant="secondary">
+                            {new Set(currentPlan.meals.map(m => m.recipe?.id)).size}
+                          </Badge>
+                        </div>
                       </div>
-                      <div className="flex justify-between">
-                        <span className="text-sm text-gray-600">Công thức khác nhau:</span>
-                        <Badge variant="secondary">
-                          {new Set(currentPlan.meals.map(m => m.recipe?.id)).size}
-                        </Badge>
-                      </div>
+
+                      {/* Quick Actions */}
+                      {currentPlan.meals.length > 0 && (
+                        <div className="space-y-2 pt-3 border-t">
+                          <h4 className="text-sm font-medium text-gray-700 mb-2">Hành động nhanh</h4>
+
+                          {/* Cooking Mode for all meals */}
+                          <CookingModeButton
+                            recipes={currentPlan.meals
+                              .filter(meal => meal.recipe)
+                              .map(meal => ({
+                                id: meal.recipe!.id,
+                                title: meal.recipe!.title,
+                                description: '',
+                                ingredients: meal.recipe!.ingredients,
+                                instructions: meal.recipe!.instructions || [],
+                                prepTime: 15,
+                                cookTime: 30,
+                                servings: 2,
+                                difficulty: 'Trung bình' as const,
+                                tags: []
+                              }))
+                            }
+                            mealName={currentPlan.name}
+                            variant="outline"
+                            size="sm"
+                            className="w-full"
+                          />
+
+                          {/* Shopping List for all meals */}
+                          <ShoppingListButton
+                            mealSlots={currentPlan.meals}
+                            planName={currentPlan.name}
+                            variant="outline"
+                            size="sm"
+                            className="w-full"
+                          />
+                        </div>
+                      )}
                     </CardContent>
                   </Card>
                 )}
@@ -442,6 +497,7 @@ const PersonalMealPlanner: React.FC = () => {
                   onAddMeal={handleAddMeal}
                   onViewRecipe={handleViewRecipe}
                   onRemoveMeal={handleRemoveMeal}
+                  onRemoveDish={handleRemoveDish}
                 />
               </div>
             </div>

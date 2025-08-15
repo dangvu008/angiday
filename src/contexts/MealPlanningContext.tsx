@@ -91,13 +91,16 @@ interface MealPlanningContextType {
 
 const MealPlanningContext = createContext<MealPlanningContextType | undefined>(undefined);
 
-export const useMealPlanning = () => {
+// Custom hook for accessing meal planning context
+function useMealPlanning() {
   const context = useContext(MealPlanningContext);
   if (!context) {
     throw new Error('useMealPlanning must be used within a MealPlanningProvider');
   }
   return context;
-};
+}
+
+export { useMealPlanning };
 
 // Mock recipes data
 const mockRecipes: Recipe[] = [
@@ -558,8 +561,15 @@ export const MealPlanningProvider: React.FC<{ children: React.ReactNode }> = ({ 
         }
 
         // Update local state with database result
-        const updatedPlans = userMealPlans.filter(p => p.id !== plan.id);
-        updatedPlans.push(savedPlan);
+        const updatedPlans = userMealPlans.map(p =>
+          p.id === plan.id ? savedPlan : p
+        );
+
+        // If plan doesn't exist, add it
+        if (!userMealPlans.find(p => p.id === plan.id)) {
+          updatedPlans.push(savedPlan);
+        }
+
         setUserMealPlans(updatedPlans);
 
         // Also save to localStorage as backup
@@ -567,6 +577,11 @@ export const MealPlanningProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
         if (currentPlan?.id === plan.id) {
           setCurrentPlan(savedPlan);
+        }
+
+        // Also update activePlan if it's the same plan
+        if (activePlan?.id === plan.id) {
+          setActivePlanState(savedPlan);
         }
 
         console.log('✅ Meal plan saved to database successfully:', savedPlan.id);
@@ -579,14 +594,25 @@ export const MealPlanningProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }
 
     // Fallback to localStorage only (or if no supabase adapter)
-    const updatedPlans = userMealPlans.filter(p => p.id !== plan.id);
-    updatedPlans.push(updatedPlan);
+    const updatedPlans = userMealPlans.map(p =>
+      p.id === plan.id ? updatedPlan : p
+    );
+
+    // If plan doesn't exist, add it
+    if (!userMealPlans.find(p => p.id === plan.id)) {
+      updatedPlans.push(updatedPlan);
+    }
 
     setUserMealPlans(updatedPlans);
     localStorage.setItem(`meal_plans_${user.id}`, JSON.stringify(updatedPlans));
 
     if (currentPlan?.id === plan.id) {
       setCurrentPlan(updatedPlan);
+    }
+
+    // Also update activePlan if it's the same plan
+    if (activePlan?.id === plan.id) {
+      setActivePlanState(updatedPlan);
     }
 
     console.log('✅ Meal plan saved to localStorage:', updatedPlan.id);
@@ -614,18 +640,24 @@ export const MealPlanningProvider: React.FC<{ children: React.ReactNode }> = ({ 
       return;
     }
 
-    const existingMealIndex = plan.meals.findIndex(
-      m => m.date === date && m.mealType === mealType
+    // Check if recipe already exists for this meal slot to avoid duplicates
+    const existingMealWithSameRecipe = plan.meals.find(
+      m => m.date === date && m.mealType === mealType && m.recipe?.id === recipe.id
     );
 
+    if (existingMealWithSameRecipe) {
+      console.log('⚠️ Recipe already exists for this meal slot, skipping:', recipe.title);
+      return;
+    }
+
     const newMeal: MealSlot = {
-      id: `meal_${Date.now()}`,
+      id: `meal_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       date,
       mealType: mealType as MealSlot['mealType'],
       recipe
     };
 
-    console.log('📝 Creating meal slot:', { newMeal, existingMealIndex });
+    console.log('📝 Creating meal slot:', { newMeal });
 
     // Try to save meal to database if adapter is available
     if (supabaseAdapter && user) {
@@ -647,16 +679,25 @@ export const MealPlanningProvider: React.FC<{ children: React.ReactNode }> = ({ 
       }
     }
 
-    if (existingMealIndex >= 0) {
-      console.log('🔄 Replacing existing meal');
-      plan.meals[existingMealIndex] = newMeal;
-    } else {
-      console.log('➕ Adding new meal');
-      plan.meals.push(newMeal);
-    }
+    // Always add new meal (allow multiple dishes per meal)
+    console.log('➕ Adding new meal to slot');
+    plan.meals.push(newMeal);
 
     console.log('💾 Saving plan with meals:', plan.meals.length);
+    console.log('📋 Current plan meals:', plan.meals.map(m => ({ id: m.id, date: m.date, mealType: m.mealType, recipeTitle: m.recipe?.title })));
+
     await saveMealPlan(plan);
+
+    // Count meals for this specific slot
+    const mealsForThisSlot = plan.meals.filter(m => m.date === date && m.mealType === mealType);
+
+    console.log('✅ Meal added successfully. Updated plan:', {
+      planId: plan.id,
+      totalMeals: plan.meals.length,
+      newMealId: newMeal.id,
+      mealsForThisSlot: mealsForThisSlot.length,
+      slotInfo: `${date} - ${mealType}`
+    });
   };
 
   // New function to add multiple dishes to a meal
@@ -676,23 +717,94 @@ export const MealPlanningProvider: React.FC<{ children: React.ReactNode }> = ({ 
   };
 
   const removeMealFromSlot = (planId: string, date: string, mealType: string) => {
+    console.log('🗑️ removeMealFromSlot called with:', { planId, date, mealType });
+
     const plan = userMealPlans.find(p => p.id === planId);
-    if (!plan) return;
+    if (!plan) {
+      console.error('❌ Plan not found:', planId);
+      console.log('📋 Available plans:', userMealPlans.map(p => ({ id: p.id, name: p.name })));
+      return;
+    }
 
-    plan.meals = plan.meals.filter(
-      m => !(m.date === date && m.mealType === mealType)
-    );
+    const originalLength = plan.meals.length;
+    console.log('📋 Meals before removal:', plan.meals.map(m => ({ id: m.id, recipe: m.recipe?.title, date: m.date, mealType: m.mealType })));
 
-    saveMealPlan(plan);
+    // Create a new plan object with filtered meals (immutable update)
+    const updatedPlan = {
+      ...plan,
+      meals: plan.meals.filter(
+        m => !(m.date === date && m.mealType === mealType)
+      )
+    };
+
+    console.log('📋 Meals after removal:', updatedPlan.meals.map(m => ({ id: m.id, recipe: m.recipe?.title, date: m.date, mealType: m.mealType })));
+    console.log(`🔢 Removed ${originalLength - updatedPlan.meals.length} meal(s) from ${mealType} on ${date}`);
+
+    saveMealPlan(updatedPlan);
+    console.log('✅ removeMealFromSlot completed successfully');
   };
 
   // New function to remove a specific dish from a meal
   const removeDishFromMeal = (planId: string, mealSlotId: string) => {
-    const plan = userMealPlans.find(p => p.id === planId);
-    if (!plan) return;
+    console.log('🗑️ MealPlanningContext.removeDishFromMeal called with:', { planId, mealSlotId });
 
-    plan.meals = plan.meals.filter(m => m.id !== mealSlotId);
-    saveMealPlan(plan);
+    const plan = userMealPlans.find(p => p.id === planId);
+    if (!plan) {
+      console.error('❌ Plan not found:', planId);
+      console.log('📋 Available plans:', userMealPlans.map(p => ({ id: p.id, name: p.name })));
+      return;
+    }
+
+    console.log('🔍 DEBUG - MealPlanningContext.removeDishFromMeal:');
+    console.log('- planId:', planId);
+    console.log('- mealSlotId:', mealSlotId);
+    console.log('- typeof mealSlotId:', typeof mealSlotId);
+    console.log('- plan.meals.length:', plan.meals.length);
+
+    console.log('📋 Meals before removal:', plan.meals.map(m => ({
+      id: m.id,
+      recipe: m.recipe?.title,
+      date: m.date,
+      mealType: m.mealType
+    })));
+    console.log('🎯 Looking for meal with ID:', mealSlotId);
+
+    const originalLength = plan.meals.length;
+    const mealToRemove = plan.meals.find(m => m.id === mealSlotId);
+
+    if (!mealToRemove) {
+      console.warn('⚠️ No meal found with ID:', mealSlotId);
+      console.log('📋 Available meal IDs:', plan.meals.map(m => m.id));
+      console.log('📋 Detailed meal comparison:');
+      plan.meals.forEach((m, index) => {
+        console.log(`  [${index}] ID: "${m.id}" (type: ${typeof m.id}) vs looking for: "${mealSlotId}" (type: ${typeof mealSlotId})`);
+        console.log(`      Equal? ${m.id === mealSlotId}, Strict equal? ${m.id === mealSlotId}`);
+      });
+      return;
+    }
+
+    console.log('🎯 Found meal to remove:', {
+      id: mealToRemove.id,
+      recipe: mealToRemove.recipe?.title,
+      date: mealToRemove.date,
+      mealType: mealToRemove.mealType
+    });
+
+    // Create a new plan object with filtered meals (immutable update)
+    const updatedPlan = {
+      ...plan,
+      meals: plan.meals.filter(m => m.id !== mealSlotId)
+    };
+
+    console.log('📋 Meals after removal:', updatedPlan.meals.map(m => ({ id: m.id, recipe: m.recipe?.title })));
+    console.log(`🔢 Removed ${originalLength - updatedPlan.meals.length} meal(s)`);
+
+    if (originalLength === updatedPlan.meals.length) {
+      console.error('❌ No meals were actually removed! This indicates an ID mismatch.');
+    }
+
+    saveMealPlan(updatedPlan);
+    console.log('✅ MealPlanningContext.removeDishFromMeal completed');
   };
 
   const getDayNutrition = (date: string): NutritionSummary => {

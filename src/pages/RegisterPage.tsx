@@ -7,6 +7,8 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
 import { ChefHat, Mail, Lock, User, Eye, EyeOff, AlertCircle } from 'lucide-react';
 
 const RegisterPage = () => {
@@ -21,6 +23,7 @@ const RegisterPage = () => {
     password: '',
     confirmPassword: ''
   });
+  const [acceptTerms, setAcceptTerms] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,6 +42,11 @@ const RegisterPage = () => {
 
     if (formData.password.length < 6) {
       setError('Mật khẩu phải có ít nhất 6 ký tự');
+      return;
+    }
+
+    if (!acceptTerms) {
+      setError('Vui lòng đồng ý với điều khoản sử dụng');
       return;
     }
 
@@ -184,13 +192,13 @@ const RegisterPage = () => {
               </div>
 
               <div className="flex items-start">
-                <input
-                  type="checkbox"
+                <Checkbox
                   id="terms"
-                  className="mt-1 rounded border-gray-300 text-orange-600 focus:ring-orange-500"
-                  required
+                  checked={acceptTerms}
+                  onCheckedChange={setAcceptTerms}
+                  className="mt-1"
                 />
-                <label htmlFor="terms" className="ml-2 text-sm text-gray-600">
+                <Label htmlFor="terms" className="ml-2 text-sm text-gray-600">
                   Tôi đồng ý với{' '}
                   <a href="#" className="text-orange-600 hover:text-orange-700">
                     Điều khoản sử dụng
@@ -199,7 +207,7 @@ const RegisterPage = () => {
                   <a href="#" className="text-orange-600 hover:text-orange-700">
                     Chính sách bảo mật
                   </a>
-                </label>
+                </Label>
               </div>
 
               <Button

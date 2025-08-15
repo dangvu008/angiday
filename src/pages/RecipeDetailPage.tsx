@@ -9,6 +9,8 @@ import { FavoriteButton } from '@/components/recipe/FavoriteButton';
 import { recipeManagementService, Recipe } from '@/services/recipeManagementService';
 import { Clock, Users, ChefHat, Star, ShoppingCart, Utensils, Eye, Calendar } from 'lucide-react';
 import CookingModeStarter from '@/components/cooking/CookingModeStarter';
+import CookingModeButton from '@/components/cooking/CookingModeButton';
+import ShoppingListButton from '@/components/shopping/ShoppingListButton';
 import { toast } from 'sonner';
 
 const RecipeDetailPage = () => {
@@ -261,22 +263,47 @@ const RecipeDetailPage = () => {
               </div>
 
               <div className="space-y-3">
-                <Button className="w-full bg-orange-600 hover:bg-orange-700 text-white py-3 rounded-xl font-semibold">
-                  <ShoppingCart className="h-5 w-5 mr-2" />
-                  Thêm vào danh sách mua
-                </Button>
+                {/* Cooking Mode Button */}
+                <CookingModeButton
+                  recipe={{
+                    id: recipe.id,
+                    title: recipe.name,
+                    description: recipe.description,
+                    ingredients: recipe.ingredients,
+                    instructions: recipe.instructions,
+                    prepTime: recipe.prep_time,
+                    cookTime: recipe.cook_time,
+                    servings: recipe.servings,
+                    difficulty: recipe.difficulty,
+                    tags: recipe.tags || []
+                  }}
+                  variant="default"
+                  size="lg"
+                  className="w-full bg-orange-600 hover:bg-orange-700 text-white py-3 rounded-xl font-semibold"
+                />
+
+                {/* Shopping List Button */}
+                <ShoppingListButton
+                  recipe={{
+                    id: recipe.id,
+                    title: recipe.name,
+                    description: recipe.description,
+                    ingredients: recipe.ingredients,
+                    instructions: recipe.instructions,
+                    prepTime: recipe.prep_time,
+                    cookTime: recipe.cook_time,
+                    servings: recipe.servings,
+                    difficulty: recipe.difficulty,
+                    tags: recipe.tags || []
+                  }}
+                  variant="outline"
+                  size="lg"
+                  className="w-full py-3 rounded-xl font-semibold"
+                />
               </div>
             </div>
 
-            {/* Cooking Mode Starter - Temporarily disabled */}
-            <div className="mt-6">
-              <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 text-center">
-                <p className="text-orange-700 font-medium">🍳 Chế Độ Nấu Ăn</p>
-                <p className="text-sm text-orange-600 mt-1">
-                  Truy cập <a href="/cooking-demo" className="underline font-medium">/cooking-demo</a> để trải nghiệm tính năng mới!
-                </p>
-              </div>
-            </div>
+
           </div>
 
           {/* Instructions */}

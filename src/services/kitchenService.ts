@@ -1,7 +1,30 @@
 // Kitchen Command Center Service Layer
 // Hỗ trợ multiple backends: Supabase, Firebase, PocketBase, LocalStorage
 
-export interface Recipe {
+import { AdapterFactory } from './adapters/AdapterFactory';
+import {
+  Recipe as IRecipe,
+  MealPlan as IMealPlan,
+  ShoppingList as IShoppingList,
+  ShoppingItem as IShoppingItem,
+  DailyMenuShoppingStatus as IDailyMenuShoppingStatus,
+  MealShoppingItem as IMealShoppingItem,
+  DatabaseAdapter as IDatabaseAdapter
+} from './interfaces/DatabaseAdapter';
+
+// Re-export interfaces for backward compatibility
+export type {
+  IRecipe as Recipe,
+  IMealPlan as MealPlan,
+  IShoppingList as ShoppingList,
+  IShoppingItem as ShoppingItem,
+  IDailyMenuShoppingStatus as DailyMenuShoppingStatus,
+  IMealShoppingItem as MealShoppingItem,
+  IDatabaseAdapter as DatabaseAdapter
+};
+
+// Keep original Recipe interface for now (will be removed later)
+export interface RecipeOld {
   id: string;
   name: string;
   description?: string;
@@ -1216,8 +1239,8 @@ export const dailyMenuPlans: DailyMenuPlan[] = [
 export class KitchenService {
   private adapter: DatabaseAdapter;
 
-  constructor(adapter: DatabaseAdapter = new LocalStorageAdapter()) {
-    this.adapter = adapter;
+  constructor(adapter?: DatabaseAdapter) {
+    this.adapter = adapter || AdapterFactory.getAdapterFromEnv();
   }
 
   // Method to switch adapter (useful for testing different backends)
@@ -1280,9 +1303,16 @@ export class KitchenService {
 
   // High-level Shopping Status Business Logic
   async getTodayMenuStatus(userId: string): Promise<TodayMenuStatus> {
+    console.log('🔄 KitchenService: Getting today menu status for user:', userId);
     const today = new Date().toISOString().split('T')[0];
+    console.log('📅 KitchenService: Today date:', today);
+
     const todayMeals = await this.getTodayMeals(userId);
+    console.log('🍽️ KitchenService: Today meals count:', todayMeals.length);
+
+    console.log('🛒 KitchenService: Getting daily shopping status...');
     const shoppingStatus = await this.getDailyShoppingStatus(userId, today);
+    console.log('🛒 KitchenService: Shopping status result:', shoppingStatus);
 
     // Import getCurrentMealTime from utils
     const { getCurrentMealTime } = await import('@/utils/vndPriceUtils');
@@ -1583,7 +1613,5 @@ export class KitchenService {
 }
 
 // Export singleton instance with environment-based adapter
-import { AdapterFactory } from './adapters/AdapterFactory';
-
 const defaultAdapter = AdapterFactory.getAdapterFromEnv();
 export const kitchenService = new KitchenService(defaultAdapter);

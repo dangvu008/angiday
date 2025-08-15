@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Calendar, Clock, Users, ChefHat, CalendarDays, CalendarRange } from 'lucide-react';
 import { AnyPlan, MealPlan, SingleDayPlan, WeekPlan, MonthPlan } from '@/types/meal-planning';
 
@@ -491,24 +492,22 @@ const PlanCreator = ({ isOpen, onClose, onCreatePlan, initialType = 'day' }: Pla
               <div className="space-y-3">
                 <Label>Tùy chọn</Label>
                 <div className="space-y-2">
-                  <label className="flex items-center space-x-2">
-                    <input
-                      type="checkbox"
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="isTemplate"
                       checked={formData.isTemplate}
-                      onChange={(e) => setFormData(prev => ({ ...prev, isTemplate: e.target.checked }))}
-                      className="rounded"
+                      onCheckedChange={(checked) => setFormData(prev => ({ ...prev, isTemplate: checked }))}
                     />
-                    <span className="text-sm">Lưu làm template</span>
-                  </label>
-                  <label className="flex items-center space-x-2">
-                    <input
-                      type="checkbox"
+                    <Label htmlFor="isTemplate" className="text-sm">Lưu làm template</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="isPublic"
                       checked={formData.isPublic}
-                      onChange={(e) => setFormData(prev => ({ ...prev, isPublic: e.target.checked }))}
-                      className="rounded"
+                      onCheckedChange={(checked) => setFormData(prev => ({ ...prev, isPublic: checked }))}
                     />
-                    <span className="text-sm">Công khai</span>
-                  </label>
+                    <Label htmlFor="isPublic" className="text-sm">Công khai</Label>
+                  </div>
                 </div>
               </div>
 

@@ -9,8 +9,10 @@ import FeaturedMealPackages from '@/components/FeaturedMealPackages';
 import TodayMealPlanWidget from '@/components/dashboard/TodayMealPlanWidget';
 import ShoppingStatusManager from '@/components/ShoppingStatusManager';
 import UnifiedShoppingListModal from '@/components/UnifiedShoppingListModal';
+import ErrorBoundary from '@/components/ErrorBoundary';
 import WelcomeGuide from '@/components/WelcomeGuide';
 import QuickMealPlanModal from '@/components/QuickMealPlanModal';
+
 import { useAuth } from '@/contexts/AuthContext';
 import { useKitchen } from '@/contexts/KitchenContext';
 import { supabaseHelpers } from '@/config/supabase';
@@ -79,23 +81,7 @@ const Index = () => {
     <PublicLayout>
       <HeroSection />
 
-      {/* Debug Connection Status - Only show if using Supabase */}
-      {import.meta.env.VITE_DATABASE_ADAPTER === 'supabase' && connectionStatus && (
-        <div className="bg-yellow-50 border border-yellow-200 p-4 m-4 rounded-lg">
-          <h3 className="font-bold text-yellow-800">🔍 Debug: Supabase Connection Status</h3>
-          <pre className="text-sm text-yellow-700 mt-2">
-            {JSON.stringify(connectionStatus, null, 2)}
-          </pre>
-          {!connectionStatus.success && (
-            <button
-              onClick={handleSetupDatabase}
-              className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-            >
-              🔧 Setup Database
-            </button>
-          )}
-        </div>
-      )}
+
 
       {/* Today's Meal Plan Widget - Only show for authenticated users */}
       {isAuthenticated && (

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-// import { Checkbox } from '@/components/ui/checkbox';
+import { Checkbox } from '@/components/ui/checkbox';
 import { ShoppingCart, Users, Plus, Minus, Check, AlertCircle } from 'lucide-react';
 
 interface Ingredient {
@@ -163,11 +163,10 @@ const KnorrIngredientsList: React.FC<KnorrIngredientsListProps> = ({
                           isChecked ? 'bg-green-50' : ''
                         }`}
                       >
-                        <input
-                          type="checkbox"
+                        <Checkbox
                           checked={isChecked}
-                          onChange={() => toggleIngredient(globalIndex)}
-                          className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500 focus:ring-2"
+                          onCheckedChange={() => toggleIngredient(globalIndex)}
+                          className="w-4 h-4"
                         />
                         
                         <div className="flex-1 flex items-center justify-between">

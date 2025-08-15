@@ -27,7 +27,32 @@ const MealPlanContent: React.FC<MealPlanContentProps> = ({
   };
 
   const handleRemoveMeal = (mealType: string, mealId: string) => {
-    onRemoveMeal(mealType, mealId);
+    console.log('🗑️ MealPlanContent.handleRemoveMeal called:', { mealType, mealId });
+
+    // Debug: Kiểm tra dữ liệu trước khi gọi onRemoveMeal
+    console.log('🔍 DEBUG - MealPlanContent.handleRemoveMeal:');
+    console.log('- mealType:', mealType);
+    console.log('- mealId:', mealId);
+    console.log('- typeof mealId:', typeof mealId);
+    console.log('- todayPlan structure:', {
+      id: todayPlan.id,
+      date: todayPlan.date,
+      mealsKeys: Object.keys(todayPlan.meals),
+      mealsForThisType: todayPlan.meals[mealType]?.meals?.length || 0
+    });
+
+    // Kiểm tra meals trong mealType này
+    const mealsInSlot = todayPlan.meals[mealType]?.meals || [];
+    console.log(`- Meals in ${mealType} slot:`, mealsInSlot.map(m => ({ id: m.id, name: m.name })));
+
+    try {
+      console.log('🚀 Calling onRemoveMeal from MealPlanContent');
+      onRemoveMeal(mealType, mealId);
+      console.log('✅ MealPlanContent.handleRemoveMeal completed successfully');
+    } catch (error) {
+      console.error('❌ MealPlanContent.handleRemoveMeal error:', error);
+      console.error('Error stack:', error.stack);
+    }
   };
 
   return (

@@ -3,13 +3,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
-import { 
-  ShoppingCart, 
-  X, 
-  Coffee, 
-  UtensilsCrossed, 
+import {
+  ShoppingCart,
+  X,
+  Coffee,
+  UtensilsCrossed,
   Moon,
-  Snack,
+  Cookie,
   CheckCircle,
   Calendar
 } from 'lucide-react';
@@ -73,7 +73,7 @@ const ShoppingListSelectionMode: React.FC<ShoppingListSelectionModeProps> = ({
       case 'breakfast': return <Coffee className="h-4 w-4 text-amber-600" />;
       case 'lunch': return <UtensilsCrossed className="h-4 w-4 text-orange-600" />;
       case 'dinner': return <Moon className="h-4 w-4 text-indigo-600" />;
-      case 'snack': return <Snack className="h-4 w-4 text-green-600" />;
+      case 'snack': return <Cookie className="h-4 w-4 text-green-600" />;
       default: return <UtensilsCrossed className="h-4 w-4" />;
     }
   };

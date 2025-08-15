@@ -70,12 +70,14 @@ interface MealPlanCalendarProps {
   onAddMeal: (date: string, mealType: string) => void;
   onViewRecipe: (recipe: Recipe) => void;
   onRemoveMeal: (date: string, mealType: string) => void;
+  onRemoveDish?: (mealSlotId: string) => void;
 }
 
 const MealPlanCalendar: React.FC<MealPlanCalendarProps> = ({
   onAddMeal,
   onViewRecipe,
-  onRemoveMeal
+  onRemoveMeal,
+  onRemoveDish
 }) => {
   const { currentPlan, currentDate, setCurrentDate, viewMode, getDayNutrition } = useMealPlanning();
   
@@ -91,13 +93,19 @@ const MealPlanCalendar: React.FC<MealPlanCalendarProps> = ({
     { key: 'snack', label: 'Phụ', color: 'bg-green-50 border-green-200' }
   ];
 
-  // Get meals for a specific date and meal type
-  const getMealForSlot = (date: Date, mealType: string): MealSlot | undefined => {
-    if (!currentPlan) return undefined;
+  // Get meals for a specific date and meal type (now returns array for multiple dishes)
+  const getMealsForSlot = (date: Date, mealType: string): MealSlot[] => {
+    if (!currentPlan) return [];
     const dateStr = formatDate(date, 'yyyy-MM-dd');
-    return currentPlan.meals.find(meal =>
+    return currentPlan.meals.filter(meal =>
       meal.date === dateStr && meal.mealType === mealType
     );
+  };
+
+  // Keep backward compatibility - get first meal for slot
+  const getMealForSlot = (date: Date, mealType: string): MealSlot | undefined => {
+    const meals = getMealsForSlot(date, mealType);
+    return meals.length > 0 ? meals[0] : undefined;
   };
 
   // Navigate weeks
@@ -201,49 +209,80 @@ const MealPlanCalendar: React.FC<MealPlanCalendarProps> = ({
 
             {/* Meal slots */}
             {mealTypes.map(mealType => {
-              const meal = getMealForSlot(day, mealType.key);
+              const meals = getMealsForSlot(day, mealType.key);
               const dateStr = formatDate(day, 'yyyy-MM-dd');
 
               return (
-                <Card 
+                <Card
                   key={`${day.toISOString()}-${mealType.key}`}
-                  className={`h-32 ${mealType.color} hover:shadow-md transition-shadow`}
+                  className={`min-h-32 ${mealType.color} hover:shadow-md transition-shadow`}
                 >
-                  <CardContent className="p-2 h-full">
-                    {meal?.recipe ? (
-                      <div className="h-full flex flex-col">
-                        <div className="flex-1">
-                          <img
-                            src={meal.recipe.image}
-                            alt={meal.recipe.title}
-                            className="w-full h-16 object-cover rounded mb-1"
-                          />
-                          <h4 className="text-xs font-medium line-clamp-2 mb-1">
-                            {meal.recipe.title}
-                          </h4>
-                          <div className="flex items-center text-xs text-gray-600">
-                            <Clock className="h-3 w-3 mr-1" />
-                            {meal.recipe.cookTime}
+                  <CardContent className="p-2">
+                    {meals.length > 0 ? (
+                      <div className="space-y-2">
+                        {/* Show count if multiple meals */}
+                        {meals.length > 1 && (
+                          <div className="text-xs font-medium text-gray-700 mb-2">
+                            {meals.length} món ăn
                           </div>
-                        </div>
-                        <div className="flex space-x-1 mt-1">
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="h-6 px-2 text-xs"
-                            onClick={() => onViewRecipe(meal.recipe!)}
-                          >
-                            <Eye className="h-3 w-3" />
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="h-6 px-2 text-xs text-red-600 hover:text-red-700"
-                            onClick={() => onRemoveMeal(dateStr, mealType.key)}
-                          >
-                            <Trash2 className="h-3 w-3" />
-                          </Button>
-                        </div>
+                        )}
+
+                        {/* Display all meals */}
+                        {meals.map((meal, index) => (
+                          <div key={meal.id} className="bg-white rounded p-2 border">
+                            <div className="flex items-start gap-2">
+                              <img
+                                src={meal.recipe?.image}
+                                alt={meal.recipe?.title}
+                                className="w-8 h-8 object-cover rounded flex-shrink-0"
+                              />
+                              <div className="flex-1 min-w-0">
+                                <h4 className="text-xs font-medium line-clamp-1">
+                                  {meal.recipe?.title}
+                                </h4>
+                                <div className="flex items-center text-xs text-gray-600 mt-1">
+                                  <Clock className="h-3 w-3 mr-1" />
+                                  {meal.recipe?.cookTime}
+                                </div>
+                              </div>
+                              <div className="flex flex-col space-y-1">
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  className="h-5 w-5 p-0"
+                                  onClick={() => onViewRecipe(meal.recipe!)}
+                                >
+                                  <Eye className="h-3 w-3" />
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  className="h-5 w-5 p-0 text-red-600 hover:text-red-700"
+                                  onClick={() => {
+                                    if (onRemoveDish) {
+                                      onRemoveDish(meal.id);
+                                    } else {
+                                      onRemoveMeal(dateStr, mealType.key);
+                                    }
+                                  }}
+                                >
+                                  <Trash2 className="h-3 w-3" />
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+
+                        {/* Add more button */}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="w-full text-xs text-gray-500 hover:text-gray-700 border-dashed border mt-2"
+                          onClick={() => onAddMeal(dateStr, mealType.key)}
+                        >
+                          <Plus className="h-3 w-3 mr-1" />
+                          Thêm món
+                        </Button>
                       </div>
                     ) : (
                       <div className="h-full flex items-center justify-center">

@@ -7,6 +7,8 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
 import { ChefHat, Mail, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
 
 const LoginPage = () => {
@@ -19,6 +21,7 @@ const LoginPage = () => {
     email: '',
     password: ''
   });
+  const [rememberMe, setRememberMe] = useState(false);
 
   // Debug function to check localStorage
   const checkLocalStorage = () => {
@@ -175,10 +178,14 @@ const LoginPage = () => {
               </div>
 
               <div className="flex items-center justify-between">
-                <label className="flex items-center">
-                  <input type="checkbox" className="rounded border-gray-300 text-orange-600 focus:ring-orange-500" />
-                  <span className="ml-2 text-sm text-gray-600">Ghi nhớ đăng nhập</span>
-                </label>
+                <div className="flex items-center">
+                  <Checkbox
+                    id="remember-me"
+                    checked={rememberMe}
+                    onCheckedChange={setRememberMe}
+                  />
+                  <Label htmlFor="remember-me" className="ml-2 text-sm text-gray-600">Ghi nhớ đăng nhập</Label>
+                </div>
                 <a href="#" className="text-sm text-orange-600 hover:text-orange-700">
                   Quên mật khẩu?
                 </a>

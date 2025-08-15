@@ -24,7 +24,30 @@ const MealCard: React.FC<MealCardProps> = ({
   };
 
   const handleRemoveMeal = () => {
-    onRemoveMeal(meal.id);
+    console.log('🗑️ MealCard.handleRemoveMeal called with meal ID:', meal.id);
+    console.log('🗑️ MealCard meal details:', {
+      id: meal.id,
+      name: meal.name,
+      recipeId: meal.recipeId,
+      fullMealObject: meal
+    });
+
+    // Debug: Kiểm tra cấu trúc dữ liệu
+    console.log('🔍 DEBUG - MealCard data structure:');
+    console.log('- meal.id:', meal.id);
+    console.log('- meal.name:', meal.name);
+    console.log('- meal.recipeId:', meal.recipeId);
+    console.log('- typeof meal.id:', typeof meal.id);
+    console.log('- meal object keys:', Object.keys(meal));
+    console.log('- Full meal object:', JSON.stringify(meal, null, 2));
+
+    try {
+      console.log('🚀 Calling onRemoveMeal with:', meal.id);
+      onRemoveMeal(meal.id);
+      console.log('✅ MealCard.handleRemoveMeal completed successfully');
+    } catch (error) {
+      console.error('❌ MealCard.handleRemoveMeal error:', error);
+    }
   };
 
   return (

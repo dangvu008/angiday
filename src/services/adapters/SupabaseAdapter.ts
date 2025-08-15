@@ -4,11 +4,11 @@ import {
   DatabaseAdapter,
   Recipe,
   MealPlan,
-  MealSlot,
   ShoppingList,
   ShoppingItem,
-  InventoryItem
-} from '../kitchenService';
+  DailyMenuShoppingStatus,
+  MealShoppingItem
+} from '../interfaces/DatabaseAdapter';
 
 // Helper functions for converting between snake_case (database) and camelCase (TypeScript)
 const toCamelCase = (str: string): string => {
@@ -464,37 +464,75 @@ export class SupabaseAdapter implements DatabaseAdapter {
 
   // Daily Shopping Status Methods
   async getDailyShoppingStatus(userId: string, menuDate: string): Promise<DailyMenuShoppingStatus | null> {
-    const { data, error } = await this.supabase
-      .from('daily_shopping_status')
-      .select('*')
-      .eq('user_id', userId)
-      .eq('menu_date', menuDate)
-      .single();
+    console.log('🔄 SupabaseAdapter: getDailyShoppingStatus called with:', { userId, menuDate });
+    try {
+      console.log('📡 SupabaseAdapter: Making Supabase query...');
+      console.log('📡 SupabaseAdapter: Supabase URL:', this.supabase.supabaseUrl);
+      console.log('📡 SupabaseAdapter: Table name: daily_menu_shopping_status');
 
-    if (error) {
-      if (error.code === 'PGRST116') return null; // Not found
-      throw error;
+      // Use limit(1) instead of single() to avoid PGRST116 error in console
+      const { data, error } = await this.supabase
+        .from('daily_menu_shopping_status')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('menu_date', menuDate)
+        .limit(1);
+
+      console.log('📡 SupabaseAdapter: Query result:', { data, error });
+
+      if (error) {
+        console.error('❌ SupabaseAdapter: Query failed with error:', error);
+
+        if (error.code === '42P01') {
+          // Table doesn't exist, fallback to localStorage
+          console.warn('daily_menu_shopping_status table not found, using localStorage fallback');
+          return null;
+        }
+
+        throw error;
+      }
+
+      // Return first record if found, null if no records
+      const record = data && data.length > 0 ? data[0] : null;
+      console.log('📝 SupabaseAdapter: Found record:', record ? 'Yes' : 'No');
+
+      return record ? convertKeysToCamelCase(record) : null;
+    } catch (error) {
+      console.warn('Error accessing daily_menu_shopping_status, using localStorage fallback:', error);
+      return null;
     }
-    return data ? convertKeysToCamelCase(data) : null;
   }
 
   async getDailyShoppingStatusById(id: string): Promise<DailyMenuShoppingStatus | null> {
-    const { data, error } = await this.supabase
-      .from('daily_shopping_status')
-      .select('*')
-      .eq('id', id)
-      .single();
+    try {
+      // Use limit(1) instead of single() to avoid PGRST116 error in console
+      const { data, error } = await this.supabase
+        .from('daily_menu_shopping_status')
+        .select('*')
+        .eq('id', id)
+        .limit(1);
 
-    if (error) {
-      if (error.code === 'PGRST116') return null; // Not found
-      throw error;
+      if (error) {
+        if (error.code === '42P01') {
+          // Table doesn't exist, fallback to localStorage
+          console.warn('daily_menu_shopping_status table not found, using localStorage fallback');
+          return null;
+        }
+        throw error;
+      }
+
+      // Return first record if found, null if no records
+      const record = data && data.length > 0 ? data[0] : null;
+      return record ? convertKeysToCamelCase(record) : null;
+    } catch (error) {
+      console.warn('Error accessing daily_menu_shopping_status, using localStorage fallback:', error);
+      return null;
     }
-    return data ? convertKeysToCamelCase(data) : null;
   }
 
   async createDailyShoppingStatus(status: Omit<DailyMenuShoppingStatus, 'id' | 'createdAt' | 'updatedAt'>): Promise<DailyMenuShoppingStatus> {
     const { data, error } = await this.supabase
-      .from('daily_shopping_status')
+      .from('daily_menu_shopping_status')
       .insert([{
         user_id: status.userId,
         menu_date: status.menuDate,
@@ -523,7 +561,7 @@ export class SupabaseAdapter implements DatabaseAdapter {
     if (updates.shoppingCompletedAt !== undefined) updateData.shopping_completed_at = updates.shoppingCompletedAt;
 
     const { data, error } = await this.supabase
-      .from('daily_shopping_status')
+      .from('daily_menu_shopping_status')
       .update(updateData)
       .eq('id', id)
       .select()
@@ -535,7 +573,7 @@ export class SupabaseAdapter implements DatabaseAdapter {
 
   async deleteDailyShoppingStatus(id: string): Promise<void> {
     const { error } = await this.supabase
-      .from('daily_shopping_status')
+      .from('daily_menu_shopping_status')
       .delete()
       .eq('id', id);
 

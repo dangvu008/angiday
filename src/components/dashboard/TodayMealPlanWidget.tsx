@@ -31,7 +31,7 @@ import { CookingSession } from '@/types/cookingMode';
 
 const TodayMealPlanWidget: React.FC<TodayMealPlanWidgetProps> = ({ className }) => {
   const { widgetStateData, actions } = useTodayMealWidget();
-  const { availableRecipes } = useMealPlanning();
+  const { availableRecipes, activePlan } = useMealPlanning();
   const { startSession } = useCookingMode();
   const navigate = useNavigate();
 
@@ -237,7 +237,45 @@ const TodayMealPlanWidget: React.FC<TodayMealPlanWidgetProps> = ({ className }) 
 
 
   const handleRemoveMeal = (mealType: string, mealId?: string) => {
-    actions.removeMealFromSlot(mealType, mealId);
+    console.log('🗑️ TodayMealPlanWidget.handleRemoveMeal called:', { mealType, mealId });
+
+    // Debug: Kiểm tra dữ liệu và activePlan
+    console.log('🔍 DEBUG - TodayMealPlanWidget.handleRemoveMeal:');
+    console.log('- mealType:', mealType);
+    console.log('- mealId:', mealId);
+    console.log('- typeof mealId:', typeof mealId);
+    console.log('- activePlan exists:', !!activePlan);
+    console.log('- activePlan.id:', activePlan?.id);
+    console.log('- activePlan meals count:', activePlan?.meals?.length || 0);
+
+    if (activePlan) {
+      const today = new Date().toISOString().split('T')[0];
+      const todayMeals = activePlan.meals.filter(m => m.date === today);
+      console.log('- Today meals in activePlan:', todayMeals.map(m => ({
+        id: m.id,
+        mealType: m.mealType,
+        recipeTitle: m.recipe?.title
+      })));
+
+      // Tìm meal cụ thể cần xóa
+      const mealToRemove = todayMeals.find(m => m.id === mealId);
+      console.log('- Meal to remove found:', !!mealToRemove);
+      if (mealToRemove) {
+        console.log('- Meal to remove details:', {
+          id: mealToRemove.id,
+          mealType: mealToRemove.mealType,
+          recipeTitle: mealToRemove.recipe?.title,
+          date: mealToRemove.date
+        });
+      }
+    }
+
+    try {
+      actions.removeMealFromSlot(mealType, mealId);
+      console.log('✅ TodayMealPlanWidget.handleRemoveMeal completed successfully');
+    } catch (error) {
+      console.error('❌ TodayMealPlanWidget.handleRemoveMeal error:', error);
+    }
   };
 
   const handleAISuggestion = () => {
