@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ChefHat, Menu, Calendar, Plus, Clock, Users, Star } from 'lucide-react';
 import MenuSelector from '@/components/meal-planning/MenuSelector';
-import { Menu as MenuType } from '@/types/meal-planning';
+import { Menu as MenuType } from '@/types/core';
 
 const MenuSystemDemo = () => {
   const [showMenuSelector, setShowMenuSelector] = useState(false);
@@ -80,10 +80,7 @@ const MenuSystemDemo = () => {
       createdAt: '2024-01-15T00:00:00Z',
       updatedAt: '2024-01-15T00:00:00Z',
       category: 'Ăn chay',
-      cuisine: 'Việt Nam',
-      targetAudience: ['family'],
-      dietaryRestrictions: ['vegetarian'],
-      usageCount: 45,
+      createdByName: 'Chef Minh', // Added required field
       rating: 4.5,
       reviews: 12
     }

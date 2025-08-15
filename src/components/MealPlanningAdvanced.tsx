@@ -63,9 +63,21 @@ const MealPlanningAdvanced: React.FC = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
 
   useEffect(() => {
-    loadData();
+    const loadMealData = async () => {
+      setIsLoading(true);
+      try {
+        // Load data logic here
+        console.log('Loading meal planning data...');
+      } catch (error) {
+        console.error('Error loading data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    loadMealData();
     loadSampleFamilyMembers();
-  }, [loadData]);
+  }, []);
 
   // Debug: Log userMealPlans when it changes
   useEffect(() => {

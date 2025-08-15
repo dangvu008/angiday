@@ -102,7 +102,7 @@ const BatchImportModal: React.FC<BatchImportModalProps> = ({
   const generateId = () => Math.random().toString(36).substr(2, 9);
 
   // Initialize IngredientManagementService
-  useEffect(() => {
+  React.useEffect(() => {
     IngredientManagementService.initialize();
   }, []);
 
@@ -416,7 +416,7 @@ const BatchImportModal: React.FC<BatchImportModalProps> = ({
   }, [items, existingRecipes, duplicateDetection]);
 
   // Auto-run duplicate detection when items change or detection is toggled
-  useEffect(() => {
+  React.useEffect(() => {
     const timeoutId = setTimeout(() => {
       detectDuplicates();
     }, 500); // Debounce to avoid excessive calls

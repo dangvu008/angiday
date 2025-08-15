@@ -73,9 +73,23 @@ const EnhancedShoppingListModal: React.FC<EnhancedShoppingListModalProps> = ({
   // Load shopping items
   useEffect(() => {
     if (isOpen && dailyShoppingStatusId) {
-      loadShoppingItems();
+      const loadItems = async () => {
+        if (!dailyShoppingStatusId) return;
+        
+        try {
+          setIsLoading(true);
+          const shoppingItems = await kitchenService.getMealShoppingItems(dailyShoppingStatusId);
+          setItems(shoppingItems);
+        } catch (error) {
+          console.error('Error loading shopping items:', error);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+      
+      loadItems();
     }
-  }, [isOpen, dailyShoppingStatusId, loadShoppingItems]);
+  }, [isOpen, dailyShoppingStatusId]);
 
   const loadShoppingItems = useCallback(async () => {
     if (!dailyShoppingStatusId) return;
