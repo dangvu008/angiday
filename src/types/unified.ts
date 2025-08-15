@@ -1,24 +1,33 @@
-// Kitchen types for the integrated system
-
+// Unified Recipe type that satisfies all usages across the codebase
 export interface Recipe {
   id: string;
   title: string;
-  name?: string; // Alias for title
+  name?: string; // Alias for title - for compatibility
   description?: string | null;
   image?: string | null;
+  
+  // Time fields - supporting multiple naming conventions
   cooking_time?: string | null;
-  cookTime?: string; // Unified cooking time field
-  cookingTime?: string; // Alternative name
-  prepTime?: string; // Preparation time
+  cookTime?: string;
+  cookingTime?: string;
+  prepTime?: string;
+  
+  // Basic info
   servings?: number | null;
   difficulty?: string | null;
   category?: string | null;
   cuisine?: string | null;
   author?: string | null;
   status?: string | null;
+  
+  // Dates
   created_at?: string | null;
   updated_at?: string | null;
   created_date?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+  
+  // Metrics
   views?: number | null;
   rating?: number | null;
   reviews?: number | null;
@@ -27,15 +36,18 @@ export interface Recipe {
   protein?: number | null;
   carbs?: number | null;
   fat?: number | null;
+  fiber?: number | null;
+  
+  // Flags
   is_favorite?: boolean | null;
   is_popular?: boolean | null;
   is_user_created?: boolean | null;
-  ingredients?: string[] | any; // Support both string array and JSON field
-  instructions?: string[] | any; // Support both string array and JSON field
-  tags?: string[] | any; // Support both string array and JSON field
-  nutrition?: any; // JSON field
-  createdAt?: string;
-  updatedAt?: string;
+  
+  // Arrays - supporting both string[] and any for JSON fields
+  ingredients?: string[] | any;
+  instructions?: string[] | any;
+  tags?: string[] | any;
+  nutrition?: any;
 }
 
 export interface MealItem {
@@ -50,6 +62,35 @@ export interface MealItem {
   status?: string;
 }
 
+export interface MealSlot {
+  id: string;
+  date: string; // YYYY-MM-DD format
+  mealType: 'breakfast' | 'lunch' | 'dinner' | 'snack';
+  recipe?: Recipe;
+  notes?: string;
+}
+
+export interface MealPlan {
+  id: string;
+  userId?: string;
+  name: string;
+  description?: string;
+  startDate: string;
+  endDate: string;
+  meals: MealSlot[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface NutritionSummary {
+  calories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
+  fiber: number;
+}
+
+// Kitchen types
 export interface DailyMenuPlan {
   id: string;
   name: string;
@@ -103,7 +144,7 @@ export interface MenuSuggestion {
 }
 
 // Enhanced Meal Plan for advanced meal planning
-export interface MealPlan {
+export interface AdvancedMealPlan {
   id: string;
   name: string;
   description?: string;
@@ -113,7 +154,7 @@ export interface MealPlan {
   tags: string[];
   createdAt: Date;
   updatedAt: Date;
-  isTemplate?: boolean; // Có phải template không
+  isTemplate?: boolean;
   category?: 'breakfast' | 'lunch' | 'dinner' | 'snack' | 'mixed';
   totalCalories?: number;
   difficulty?: 'easy' | 'medium' | 'hard';
@@ -124,8 +165,8 @@ export interface MealAssignment {
   id: string;
   date: string; // YYYY-MM-DD format
   mealType: 'breakfast' | 'lunch' | 'dinner' | 'snack';
-  mealPlan?: MealPlan; // Thực đơn được áp dụng
-  customRecipes?: Recipe[]; // Món được thêm riêng lẻ
+  mealPlan?: AdvancedMealPlan;
+  customRecipes?: Recipe[];
   status: 'planned' | 'in-progress' | 'completed';
   notes?: string;
   createdAt: Date;
@@ -149,7 +190,7 @@ export interface WeeklyMealSchedule {
 
 // Meal planning context state
 export interface MealPlanningState {
-  mealPlans: MealPlan[];
+  mealPlans: AdvancedMealPlan[];
   currentWeekSchedule: WeeklyMealSchedule | null;
   selectedDate: string;
   isLoading: boolean;

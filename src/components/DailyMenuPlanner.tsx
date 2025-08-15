@@ -93,8 +93,10 @@ const DailyMenuPlanner: React.FC = () => {
 
   // Load daily schedule when date changes
   useEffect(() => {
-    loadDailySchedule();
-  }, [loadDailySchedule]);
+    if (loadDailySchedule) {
+      loadDailySchedule();
+    }
+  }, [selectedDate]); // Remove loadDailySchedule from deps to avoid circular dependency
 
   const loadDailySchedule = useCallback(async () => {
     setIsLoadingSchedule(true);

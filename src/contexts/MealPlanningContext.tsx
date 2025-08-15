@@ -2,48 +2,10 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
 import { kitchenService } from '@/services/kitchenService';
 import { SupabaseAdapter } from '@/services/adapters/SupabaseAdapter';
+import { Recipe, MealSlot, MealPlan, NutritionSummary } from '@/types/unified';
 
-export interface Recipe {
-  id: string;
-  title: string;
-  image: string;
-  cookTime: string;
-  servings: number;
-  difficulty: 'Dễ' | 'Trung bình' | 'Khó';
-  calories?: number;
-  ingredients: string[];
-  instructions: string[];
-  category: string;
-  tags: string[];
-}
-
-export interface MealSlot {
-  id: string;
-  date: string; // YYYY-MM-DD format
-  mealType: 'breakfast' | 'lunch' | 'dinner' | 'snack';
-  recipe?: Recipe;
-  notes?: string;
-}
-
-export interface MealPlan {
-  id: string;
-  userId: string;
-  name: string;
-  description?: string;
-  startDate: string;
-  endDate: string;
-  meals: MealSlot[];
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface NutritionSummary {
-  calories: number;
-  protein: number;
-  carbs: number;
-  fat: number;
-  fiber: number;
-}
+// Re-export types for backward compatibility
+export type { Recipe, MealSlot, MealPlan, NutritionSummary } from '@/types/unified';
 
 interface MealPlanningContextType {
   // Current meal plan being edited

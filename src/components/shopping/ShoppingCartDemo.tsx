@@ -6,10 +6,32 @@ import { Separator } from '@/components/ui/separator';
 import { ShoppingCart, Star, Clock, Users } from 'lucide-react';
 import AddToCartButton from './AddToCartButton';
 import ShoppingCartWidget from './ShoppingCartWidget';
-import { Recipe } from '@/types/kitchen';
+
+// Simple Recipe type for demo - avoiding type conflicts
+interface DemoRecipe {
+  id: string;
+  title: string;
+  description: string;
+  image?: string;
+  category: string;
+  difficulty: string;
+  cookingTime: string;
+  prepTime?: string;
+  servings: number;
+  ingredients: string[];
+  instructions?: string[];
+  calories?: number;
+  protein?: number;
+  carbs?: number;
+  fat?: number;
+  rating?: number;
+  reviews?: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
 
 // Sample data for demo
-const sampleRecipes: Recipe[] = [
+const sampleRecipes: DemoRecipe[] = [
   {
     id: 'recipe-1',
     title: 'Phở Bò Truyền Thống',
@@ -32,7 +54,6 @@ const sampleRecipes: Recipe[] = [
       'Rau mùi, hành lá'
     ],
     prepTime: '30 phút',
-    instructions: [],
     calories: 350,
     protein: 25,
     carbs: 45,
@@ -62,7 +83,6 @@ const sampleRecipes: Recipe[] = [
       'Ớt 1 quả'
     ],
     prepTime: '20 phút',
-    instructions: [],
     calories: 280,
     protein: 20,
     carbs: 35,
@@ -93,7 +113,6 @@ const sampleRecipes: Recipe[] = [
       'Sả'
     ],
     prepTime: '25 phút',
-    instructions: [],
     calories: 420,
     protein: 28,
     carbs: 55,
@@ -184,7 +203,7 @@ const ShoppingCartDemo: React.FC = () => {
               <CardContent className="pt-0">
                 <div className="flex items-center justify-between">
                   <Badge variant="secondary">{recipe.category}</Badge>
-                  <AddToCartButton recipe={recipe} variant="outline" size="sm" />
+                  <AddToCartButton recipe={recipe as any} variant="outline" size="sm" />
                 </div>
               </CardContent>
             </Card>
@@ -208,7 +227,7 @@ const ShoppingCartDemo: React.FC = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {menu.recipes.map((recipe, index) => (
+                  {menu.recipes.map((recipe) => (
                     <div key={recipe.id} className="flex items-center justify-between">
                       <div>
                         <p className="font-medium">{recipe.title}</p>
@@ -222,7 +241,7 @@ const ShoppingCartDemo: React.FC = () => {
                     </div>
                   ))}
                   <div className="pt-3">
-                    <AddToCartButton menu={menu} variant="outline" className="w-full" />
+                    <AddToCartButton menu={menu as any} variant="outline" className="w-full" />
                   </div>
                 </div>
               </CardContent>
@@ -260,7 +279,7 @@ const ShoppingCartDemo: React.FC = () => {
                       {meal.recipe.ingredients.length} nguyên liệu • {meal.recipe.cookingTime}
                     </p>
                   </div>
-                  <AddToCartButton meal={meal} variant="outline" className="w-full" />
+                  <AddToCartButton meal={meal as any} variant="outline" className="w-full" />
                 </div>
               </CardContent>
             </Card>
