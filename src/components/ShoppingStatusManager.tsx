@@ -33,9 +33,43 @@ const ShoppingStatusManager: React.FC<ShoppingStatusManagerProps> = ({
   const { user } = useAuth();
   const { todayMenuStatus, dailyShoppingStatus, createTodayShoppingList, refreshTodayMenuStatus } = useKitchen();
   const [isUpdating, setIsUpdating] = useState(false);
+  const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
 
   // Use menu status from context
   const menuStatus = todayMenuStatus;
+
+  // Auto-refresh every 30 seconds
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      if (user && !isUpdating) {
+        try {
+          await refreshTodayMenuStatus();
+          setLastRefresh(new Date());
+        } catch (error) {
+          console.error('Auto-refresh failed:', error);
+        }
+      }
+    }, 30000); // 30 seconds
+
+    return () => clearInterval(interval);
+  }, [user, isUpdating, refreshTodayMenuStatus]);
+
+  // Manual refresh function
+  const handleManualRefresh = async () => {
+    if (!user || isUpdating) return;
+
+    try {
+      setIsUpdating(true);
+      await refreshTodayMenuStatus();
+      setLastRefresh(new Date());
+      toast.success('Đã cập nhật trạng thái');
+    } catch (error) {
+      console.error('Manual refresh failed:', error);
+      toast.error('Không thể cập nhật trạng thái');
+    } finally {
+      setIsUpdating(false);
+    }
+  };
 
   const handleCreateShoppingList = async () => {
     if (!user) return;

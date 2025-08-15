@@ -26,13 +26,16 @@ import AISuggestionModal from './widget-components/AISuggestionModal';
 import { useMealPlanning } from '@/contexts/MealPlanningContext';
 import { useNavigate } from 'react-router-dom';
 import { useCookingMode } from '@/contexts/CookingModeContext';
+import { useKitchen } from '@/contexts/KitchenContext';
 import { CookingOptimizer } from '@/utils/cookingOptimizer';
 import { CookingSession } from '@/types/cookingMode';
+import UnifiedShoppingListModal from '@/components/UnifiedShoppingListModal';
 
 const TodayMealPlanWidget: React.FC<TodayMealPlanWidgetProps> = ({ className }) => {
   const { widgetStateData, actions } = useTodayMealWidget();
   const { availableRecipes, activePlan } = useMealPlanning();
   const { startSession } = useCookingMode();
+  const { createTodayShoppingList, todayMenuStatus, dailyShoppingStatus } = useKitchen();
   const navigate = useNavigate();
 
   // Modal states
@@ -61,6 +64,7 @@ const TodayMealPlanWidget: React.FC<TodayMealPlanWidgetProps> = ({ className }) 
   });
 
   const [aiSuggestionModal, setAiSuggestionModal] = useState(false);
+  const [unifiedShoppingModal, setUnifiedShoppingModal] = useState(false);
 
   // Lấy ngày hôm nay
   const todayDate = useMemo(() => {
@@ -86,12 +90,31 @@ const TodayMealPlanWidget: React.FC<TodayMealPlanWidgetProps> = ({ className }) 
   };
 
   const handleCreateShoppingList = async () => {
-    const shoppingList = await actions.createShoppingList();
-    if (shoppingList) {
-      setShoppingListModal({
-        isOpen: true,
-        shoppingList: shoppingList
-      });
+    try {
+      console.log('🛒 Creating shopping list from today meal plan...');
+
+      // Try to create shopping list using KitchenContext first
+      if (createTodayShoppingList) {
+        const result = await createTodayShoppingList();
+        console.log('✅ Shopping list created:', result);
+
+        // Open unified shopping modal with daily shopping status
+        setUnifiedShoppingModal(true);
+        return;
+      }
+
+      // Fallback to widget actions
+      const shoppingList = await actions.createShoppingList();
+      if (shoppingList) {
+        setShoppingListModal({
+          isOpen: true,
+          shoppingList: shoppingList
+        });
+      }
+    } catch (error) {
+      console.error('❌ Error creating shopping list:', error);
+      // Still try to open the modal for manual shopping list creation
+      setUnifiedShoppingModal(true);
     }
   };
 
@@ -379,6 +402,17 @@ const TodayMealPlanWidget: React.FC<TodayMealPlanWidgetProps> = ({ className }) 
         isOpen={aiSuggestionModal}
         onClose={() => setAiSuggestionModal(false)}
         onGenerateSuggestions={handleGenerateAISuggestions}
+      />
+
+      <UnifiedShoppingListModal
+        isOpen={unifiedShoppingModal}
+        onClose={() => setUnifiedShoppingModal(false)}
+        mealPlan={activePlan}
+        dailyShoppingStatusId={dailyShoppingStatus?.id}
+        enablePriceTracking={true}
+        enableCategoryBreakdown={true}
+        enableExport={true}
+        mode="enhanced"
       />
     </Card>
   );

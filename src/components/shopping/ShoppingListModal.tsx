@@ -50,6 +50,9 @@ interface ShoppingItem {
   quantity?: number;
   unit?: string;
   estimatedPrice?: number;
+  actualPrice?: number;
+  notes?: string;
+  priority?: 'low' | 'medium' | 'high';
 }
 
 const ShoppingListModal: React.FC<ShoppingListModalProps> = ({
@@ -62,6 +65,10 @@ const ShoppingListModal: React.FC<ShoppingListModalProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [customItems, setCustomItems] = useState<string[]>([]);
   const [newItemInput, setNewItemInput] = useState('');
+  const [itemPrices, setItemPrices] = useState<{ [key: string]: number }>({});
+  const [itemNotes, setItemNotes] = useState<{ [key: string]: string }>({});
+  const [showPriceInput, setShowPriceInput] = useState(false);
+  const [totalBudget, setTotalBudget] = useState<number>(0);
 
   // Categorize ingredients
   const categorizeIngredient = (ingredient: string): string => {
@@ -107,6 +114,46 @@ const ShoppingListModal: React.FC<ShoppingListModalProps> = ({
     return 'Khác';
   };
 
+  // Helper function to estimate price based on ingredient type
+  const estimatePrice = (ingredient: string, category: string): number => {
+    const lowerIngredient = ingredient.toLowerCase();
+
+    // Price estimates in VND
+    switch (category) {
+      case 'Thịt':
+        if (lowerIngredient.includes('bò')) return 250000;
+        if (lowerIngredient.includes('heo')) return 150000;
+        if (lowerIngredient.includes('gà')) return 120000;
+        return 180000;
+
+      case 'Hải sản':
+        if (lowerIngredient.includes('tôm')) return 200000;
+        if (lowerIngredient.includes('cua')) return 300000;
+        if (lowerIngredient.includes('cá')) return 100000;
+        return 150000;
+
+      case 'Rau củ':
+        return 20000;
+
+      case 'Trái cây':
+        return 30000;
+
+      case 'Sữa & Chế phẩm':
+        if (lowerIngredient.includes('sữa')) return 25000;
+        if (lowerIngredient.includes('phô mai')) return 80000;
+        return 40000;
+
+      case 'Ngũ cốc':
+        return 25000;
+
+      case 'Gia vị':
+        return 15000;
+
+      default:
+        return 30000;
+    }
+  };
+
   // Generate shopping list from meal slots
   const shoppingList = useMemo(() => {
     const ingredientMap = new Map<string, ShoppingItem>();
@@ -125,6 +172,7 @@ const ShoppingListModal: React.FC<ShoppingListModalProps> = ({
             }
             existing.quantity = (existing.quantity || 1) + 1;
           } else {
+            const estimatedPrice = estimatePrice(ingredient, category);
             ingredientMap.set(key, {
               id: key,
               name: ingredient,
@@ -132,7 +180,11 @@ const ShoppingListModal: React.FC<ShoppingListModalProps> = ({
               recipes: [slot.recipe!.title],
               checked: checkedItems[key] || false,
               quantity: 1,
-              unit: 'phần'
+              unit: 'phần',
+              estimatedPrice,
+              actualPrice: itemPrices[key],
+              notes: itemNotes[key],
+              priority: 'medium'
             });
           }
         });
@@ -143,20 +195,26 @@ const ShoppingListModal: React.FC<ShoppingListModalProps> = ({
     customItems.forEach(item => {
       const key = item.toLowerCase().trim();
       if (!ingredientMap.has(key)) {
+        const category = 'Tự thêm';
+        const estimatedPrice = estimatePrice(item, category);
         ingredientMap.set(key, {
           id: key,
           name: item,
-          category: 'Tự thêm',
+          category,
           recipes: [],
           checked: checkedItems[key] || false,
           quantity: 1,
-          unit: 'cái'
+          unit: 'cái',
+          estimatedPrice,
+          actualPrice: itemPrices[key],
+          notes: itemNotes[key],
+          priority: 'low'
         });
       }
     });
 
     return Array.from(ingredientMap.values());
-  }, [mealSlots, customItems, checkedItems]);
+  }, [mealSlots, customItems, checkedItems, itemPrices, itemNotes]);
 
   // Group items by category
   const groupedItems = useMemo(() => {
@@ -174,6 +232,33 @@ const ShoppingListModal: React.FC<ShoppingListModalProps> = ({
     
     return groups;
   }, [shoppingList, searchQuery]);
+
+  // Calculate total estimated and actual costs
+  const totalCosts = useMemo(() => {
+    const estimated = shoppingList.reduce((sum, item) =>
+      sum + (item.estimatedPrice || 0) * (item.quantity || 1), 0);
+    const actual = shoppingList.reduce((sum, item) =>
+      sum + (item.actualPrice || 0) * (item.quantity || 1), 0);
+    return { estimated, actual };
+  }, [shoppingList]);
+
+  // Handle price input
+  const handlePriceChange = (itemId: string, price: number) => {
+    setItemPrices(prev => ({ ...prev, [itemId]: price }));
+  };
+
+  // Handle notes input
+  const handleNotesChange = (itemId: string, notes: string) => {
+    setItemNotes(prev => ({ ...prev, [itemId]: notes }));
+  };
+
+  // Format price in VND
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat('vi-VN', {
+      style: 'currency',
+      currency: 'VND'
+    }).format(price);
+  };
 
   const getCategoryIcon = (category: string) => {
     switch (category) {
@@ -290,6 +375,30 @@ const ShoppingListModal: React.FC<ShoppingListModalProps> = ({
             <Button onClick={handleAddCustomItem} size="sm">
               <Plus className="h-4 w-4" />
             </Button>
+          </div>
+
+          {/* Budget Tracking */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-gray-50 rounded-lg">
+            <div className="text-center">
+              <div className="text-sm text-gray-600">Ước tính</div>
+              <div className="text-lg font-semibold text-blue-600">
+                {formatPrice(totalCosts.estimated)}
+              </div>
+            </div>
+            <div className="text-center">
+              <div className="text-sm text-gray-600">Thực tế</div>
+              <div className="text-lg font-semibold text-green-600">
+                {formatPrice(totalCosts.actual)}
+              </div>
+            </div>
+            <div className="text-center">
+              <div className="text-sm text-gray-600">Chênh lệch</div>
+              <div className={`text-lg font-semibold ${
+                totalCosts.actual > totalCosts.estimated ? 'text-red-600' : 'text-green-600'
+              }`}>
+                {totalCosts.actual > 0 ? formatPrice(totalCosts.actual - totalCosts.estimated) : '--'}
+              </div>
+            </div>
           </div>
         </div>
 
