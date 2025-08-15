@@ -12,6 +12,7 @@ import UnifiedShoppingListModal from '@/components/UnifiedShoppingListModal';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import WelcomeGuide from '@/components/WelcomeGuide';
 import QuickMealPlanModal from '@/components/QuickMealPlanModal';
+import RecipeImportButton from '@/components/recipe/RecipeImportButton';
 
 import { useAuth } from '@/contexts/AuthContext';
 import { useKitchen } from '@/contexts/KitchenContext';
@@ -63,6 +64,13 @@ const Index = () => {
     console.log('Starting cooking mode...');
   };
 
+  const handleImportRecipe = (recipe: any) => {
+    console.log('Imported recipe:', recipe);
+    // In a real app, this would save to the database
+    // For now, just show success message
+    alert(`Đã nhập công thức: ${recipe.title}`);
+  };
+
   const handleSetupDatabase = async () => {
     try {
       console.log('🔧 Manual database setup...');
@@ -81,7 +89,27 @@ const Index = () => {
     <PublicLayout>
       <HeroSection />
 
-
+      {/* Recipe Import Section */}
+      <section className="py-8 bg-white border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col sm:flex-row items-center justify-between">
+            <div className="mb-4 sm:mb-0">
+              <h2 className="text-xl font-semibold text-gray-900">
+                Có công thức yêu thích?
+              </h2>
+              <p className="text-gray-600">
+                Nhập công thức từ bất kỳ trang web, văn bản hoặc file nào
+              </p>
+            </div>
+            <RecipeImportButton
+              onImport={handleImportRecipe}
+              variant="default"
+              size="default"
+              showDropdown={true}
+            />
+          </div>
+        </div>
+      </section>
 
       {/* Today's Meal Plan Widget - Only show for authenticated users */}
       {isAuthenticated && (

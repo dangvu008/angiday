@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { FavoriteButton } from '@/components/recipe/FavoriteButton';
 import { CreateRecipeModal } from '@/components/recipe/CreateRecipeModal';
+import RecipeImportButton from '@/components/recipe/RecipeImportButton';
 import { recipeManagementService, Recipe } from '@/services/recipeManagementService';
 import { toast } from 'sonner';
 import {
@@ -175,6 +176,42 @@ const MyRecipesPageNew = () => {
       setMealPlanRecipes(mockMealPlanRecipes);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleImportRecipe = async (importedRecipe: any) => {
+    if (!user) {
+      toast.error('Vui lòng đăng nhập để nhập công thức');
+      return;
+    }
+
+    try {
+      // Convert imported recipe to our format
+      const recipe = {
+        name: importedRecipe.title,
+        description: importedRecipe.description,
+        ingredients: importedRecipe.ingredients,
+        instructions: importedRecipe.instructions,
+        prep_time: parseInt(importedRecipe.cookTime) || 30,
+        cook_time: 0,
+        servings: importedRecipe.servings,
+        difficulty: importedRecipe.difficulty.toLowerCase(),
+        image_url: importedRecipe.image,
+        tags: [importedRecipe.category],
+        is_public: false,
+        source: importedRecipe.source || 'import'
+      };
+
+      // Save to database
+      const savedRecipe = await recipeManagementService.createRecipe(recipe);
+
+      // Reload recipes to show the new one
+      await loadAllRecipes();
+
+      toast.success(`Đã nhập công thức "${importedRecipe.title}" thành công!`);
+    } catch (error) {
+      console.error('Error importing recipe:', error);
+      toast.error('Có lỗi xảy ra khi nhập công thức');
     }
   };
 
@@ -372,7 +409,14 @@ const MyRecipesPageNew = () => {
                   Quản lý công thức cá nhân, yêu thích và từ thực đơn
                 </p>
               </div>
-              <CreateRecipeModal onRecipeCreated={loadAllRecipes} />
+              <div className="flex gap-3">
+                <RecipeImportButton
+                  onImport={handleImportRecipe}
+                  variant="outline"
+                  showDropdown={true}
+                />
+                <CreateRecipeModal onRecipeCreated={loadAllRecipes} />
+              </div>
             </div>
           </div>
         </section>
