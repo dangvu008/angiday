@@ -187,7 +187,7 @@ const EasyDinnerRecipes: React.FC = () => {
 
               <CardContent className="p-4">
                 <h3 className="font-bold text-lg text-gray-900 mb-2 group-hover:text-orange-600 transition-colors">
-                  {recipe.name || recipe.title || 'Không có tên'}
+                  {recipe.name || 'Không có tên'}
                 </h3>
                 <p className="text-gray-600 text-sm mb-3 line-clamp-2">
                   {recipe.description}

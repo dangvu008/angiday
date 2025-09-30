@@ -90,7 +90,7 @@ const TodayMenuDisplay: React.FC<TodayMenuDisplayProps> = ({ className = '' }) =
   return (
     <div className={className}>
       {/* Show fallback data warning */}
-      {todayMeals?.source === 'fallback' && (
+      {todayMeals && 'source' in todayMeals && (todayMeals as any).source === 'fallback' && (
         <div className="bg-yellow-50 border border-yellow-200 p-3 mb-4 rounded-lg">
           <p className="text-yellow-800 text-sm">
             ⚠️ Đang sử dụng dữ liệu mẫu do không thể kết nối database.

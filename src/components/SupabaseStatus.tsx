@@ -22,10 +22,14 @@ const SupabaseStatus: React.FC = () => {
     setIsLoading(true);
     try {
       const statusInfo = supabaseHelpers.getStatus();
-      setStatus(statusInfo);
+      setStatus({
+        url: statusInfo.url || '',
+        key: import.meta.env.VITE_SUPABASE_ANON_KEY ? '***' : '',
+        connected: statusInfo.isInitialized && statusInfo.hasClient
+      });
       
       const connected = await supabaseHelpers.testConnection();
-      setIsConnected(connected);
+      setIsConnected(connected.success || false);
     } catch (error) {
       console.error('Error checking Supabase status:', error);
       setIsConnected(false);
@@ -91,16 +95,16 @@ const SupabaseStatus: React.FC = () => {
         {status && (
           <div className="space-y-2">
             <div className="flex items-center justify-between text-sm">
-              <span>Client Initialized:</span>
-              <Badge variant={status.isInitialized ? "default" : "secondary"}>
-                {status.isInitialized ? 'Yes' : 'No'}
+              <span>Database URL:</span>
+              <Badge variant={status.url ? "default" : "secondary"}>
+                {status.url ? 'Configured' : 'Not Set'}
               </Badge>
             </div>
             
             <div className="flex items-center justify-between text-sm">
-              <span>Has Client:</span>
-              <Badge variant={status.hasClient ? "default" : "secondary"}>
-                {status.hasClient ? 'Yes' : 'No'}
+              <span>API Key:</span>
+              <Badge variant={status.key ? "default" : "secondary"}>
+                {status.key ? 'Configured' : 'Not Set'}
               </Badge>
             </div>
           </div>

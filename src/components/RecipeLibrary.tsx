@@ -378,7 +378,7 @@ const RecipeLibrary: React.FC = () => {
           </div>
           <div className="flex items-center gap-1">
             <Clock className="h-4 w-4 text-blue-500" />
-            <span>Trung bình {Math.round(filteredRecipes.reduce((acc, r) => acc + r.prepTime + r.cookTime, 0) / filteredRecipes.length || 0)} phút</span>
+            <span>Trung bình {Math.round(filteredRecipes.reduce((acc, r) => acc + (typeof r.prepTime === 'number' ? r.prepTime : parseInt(r.prepTime) || 0) + (typeof r.cookTime === 'number' ? r.cookTime : parseInt(r.cookTime) || 0), 0) / filteredRecipes.length || 0)} phút</span>
           </div>
           <div className="flex items-center gap-1">
             <ChefHat className="h-4 w-4 text-green-500" />

@@ -63,7 +63,7 @@ interface UnifiedShoppingListModalProps {
   mode?: 'legacy' | 'enhanced';
 }
 
-interface ShoppingItemWithPrice extends MealShoppingItem {
+interface ShoppingItemWithPrice extends Omit<MealShoppingItem, 'category'> {
   tempPrice?: string;
   showPriceInput?: boolean;
   // Legacy compatibility
@@ -267,7 +267,7 @@ const UnifiedShoppingListModal: React.FC<UnifiedShoppingListModalProps> = ({
     const purchasedItems = items.filter(item => item.isPurchased || item.checked).length;
     const totalEstimated = calculateTotalCost(items, false);
     const totalActual = calculateTotalCost(items, true);
-    const categoryBreakdown = calculateCategoryBreakdown(items, true);
+    const categoryBreakdown = calculateCategoryBreakdown(items.filter(i => i.category) as Array<{category: string; estimatedPrice?: number; actualPrice?: number}>, true);
     
     return {
       totalItems,

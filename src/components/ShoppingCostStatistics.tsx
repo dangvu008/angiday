@@ -14,11 +14,11 @@ import {
   Filter
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { kitchenService, ShoppingCostStatistics } from '@/services/kitchenService';
+import { kitchenService, type ShoppingCostStatistics as ShoppingCostStats } from '@/services/kitchenService';
 import { formatVNDPrice, formatPeriodValue } from '@/utils/vndPriceUtils';
 import { toast } from 'sonner';
 
-interface ShoppingCostStatisticsProps {
+interface ShoppingCostStatisticsComponentProps {
   className?: string;
 }
 
@@ -31,9 +31,9 @@ interface StatisticsSummary {
   trendPercentage: number;
 }
 
-const ShoppingCostStatistics: React.FC<ShoppingCostStatisticsProps> = ({ className = '' }) => {
+const ShoppingCostStatistics: React.FC<ShoppingCostStatisticsComponentProps> = ({ className = '' }) => {
   const { user } = useAuth();
-  const [statistics, setStatistics] = useState<ShoppingCostStatistics[]>([]);
+  const [statistics, setStatistics] = useState<ShoppingCostStats[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedPeriod, setSelectedPeriod] = useState<'daily' | 'weekly' | 'monthly' | 'yearly'>('monthly');
 
@@ -91,7 +91,7 @@ const ShoppingCostStatistics: React.FC<ShoppingCostStatisticsProps> = ({ classNa
     const categoryBreakdown: Record<string, number> = {};
     statistics.slice(0, 3).forEach(stat => {
       Object.entries(stat.categoryBreakdown).forEach(([category, cost]) => {
-        categoryBreakdown[category] = (categoryBreakdown[category] || 0) + cost;
+        categoryBreakdown[category] = (categoryBreakdown[category] || 0) + (typeof cost === 'number' ? cost : 0);
       });
     });
 
