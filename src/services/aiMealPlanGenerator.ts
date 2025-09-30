@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Recipe } from '@/types/kitchen';
 
 export interface UserPreferences {

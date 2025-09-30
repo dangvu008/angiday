@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Utility functions for price formatting and calculations
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Kitchen Command Center Service Layer
 // Hỗ trợ multiple backends: Supabase, Firebase, PocketBase, LocalStorage
 

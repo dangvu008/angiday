@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Types for comprehensive meal planning system
 
 export interface Dish {

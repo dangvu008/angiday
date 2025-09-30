@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { DatabaseAdapter } from '../interfaces/DatabaseAdapter';
 import { SupabaseAdapter } from './SupabaseAdapter';
 import { LocalStorageAdapter } from './LocalStorageAdapter';

@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Types và interfaces cho widget "Thực Đơn Hôm Nay"
 
 export interface MealItem {

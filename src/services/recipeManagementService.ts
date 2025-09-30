@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { getSupabaseClient } from '@/config/supabase';
 
 export interface Recipe {

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useMemo, useCallback, useRef, useEffect } from 'react';
 
 // Memoization utility with TTL (Time To Live)

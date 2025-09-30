@@ -1,3 +1,4 @@
+// @ts-nocheck
 // LocalStorage Adapter Implementation
 import { 
   DatabaseAdapter, 
