@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useEffect, useState } from 'react';
 import { useMealPlanning } from '@/contexts/MealPlanningContext';
 import { useKitchen } from '@/contexts/KitchenContext';

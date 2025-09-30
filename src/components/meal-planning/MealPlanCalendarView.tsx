@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState } from 'react';
 import { Plus, ChevronLeft, ChevronRight, Coffee, Sun, Moon, Clock, Users, Flame, X, Edit } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';

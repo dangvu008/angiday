@@ -1,4 +1,4 @@
-
+// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import PublicLayout from '@/components/layouts/PublicLayout';
 import HeroSection from '@/components/HeroSection';

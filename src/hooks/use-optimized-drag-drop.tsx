@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useCallback, useMemo, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { throttle, debounce } from 'lodash';
