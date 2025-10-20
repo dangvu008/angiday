@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
 import { 
-  ShoppingCart, 
+  ShoppingCart as ShoppingCartIcon, 
   Trash2, 
   Plus, 
   Minus,
