@@ -90,14 +90,14 @@ const Index = () => {
       <HeroSection />
 
       {/* Recipe Import Section */}
-      <section className="py-8 bg-white border-b">
+      <section className="py-4 md:py-6 lg:py-8 bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row items-center justify-between">
-            <div className="mb-4 sm:mb-0">
-              <h2 className="text-xl font-semibold text-gray-900">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 md:gap-0">
+            <div className="text-center sm:text-left">
+              <h2 className="text-lg md:text-xl font-semibold text-gray-900">
                 Có công thức yêu thích?
               </h2>
-              <p className="text-gray-600">
+              <p className="text-sm md:text-base text-gray-600">
                 Nhập công thức từ bất kỳ trang web, văn bản hoặc file nào
               </p>
             </div>
@@ -113,7 +113,7 @@ const Index = () => {
 
       {/* Today's Meal Plan Widget - Only show for authenticated users */}
       {isAuthenticated && (
-        <section className="py-12 bg-gradient-to-br from-orange-50 to-green-50">
+        <section className="py-6 md:py-8 lg:py-12 bg-gradient-to-br from-orange-50 to-green-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <TodayMealPlanWidget />
           </div>
